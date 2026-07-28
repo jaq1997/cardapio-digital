@@ -791,27 +791,27 @@ function filterAdminTable(query) {
 
 function switchAdminTab(tabName) {
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tabContentItems').style.display = 'none';
+  document.getElementById('tabContentCategories').style.display = 'none';
+  document.getElementById('tabContentDelivery').style.display = 'none';
   document.getElementById('tabContentBranding').style.display = 'none';
   document.getElementById('tabContentSheets').style.display = 'none';
-  document.getElementById('tabContentDelivery').style.display = 'none';
-  document.getElementById('tabContentCategories').style.display = 'none';
-  document.getElementById('tabContentItems').style.display = 'none';
 
-  if (tabName === 'branding') {
+  if (tabName === 'items') {
     document.querySelectorAll('.nav-tab')[0].classList.add('active');
-    document.getElementById('tabContentBranding').style.display = 'block';
-  } else if (tabName === 'sheets') {
+    document.getElementById('tabContentItems').style.display = 'block';
+  } else if (tabName === 'categories') {
     document.querySelectorAll('.nav-tab')[1].classList.add('active');
-    document.getElementById('tabContentSheets').style.display = 'block';
+    document.getElementById('tabContentCategories').style.display = 'block';
   } else if (tabName === 'delivery') {
     document.querySelectorAll('.nav-tab')[2].classList.add('active');
     document.getElementById('tabContentDelivery').style.display = 'block';
-  } else if (tabName === 'categories') {
+  } else if (tabName === 'branding') {
     document.querySelectorAll('.nav-tab')[3].classList.add('active');
-    document.getElementById('tabContentCategories').style.display = 'block';
-  } else {
+    document.getElementById('tabContentBranding').style.display = 'block';
+  } else if (tabName === 'sheets') {
     document.querySelectorAll('.nav-tab')[4].classList.add('active');
-    document.getElementById('tabContentItems').style.display = 'block';
+    document.getElementById('tabContentSheets').style.display = 'block';
   }
 }
 

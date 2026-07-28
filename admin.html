@@ -32,13 +32,13 @@
     </div>
   </header>
 
-  <!-- ABAS SUPERIORES DA CENTRAL DE COMANDO -->
+  <!-- ABAS SUPERIORES DA CENTRAL DE COMANDO (ORDEM SIMPLIFICADA PARA O CLIENTE) -->
   <nav class="admin-nav-tabs">
-    <button class="nav-tab active" onclick="switchAdminTab('branding')">Identidade, Banners & WhatsApp</button>
-    <button class="nav-tab" onclick="switchAdminTab('sheets')">Integração Google Sheets</button>
-    <button class="nav-tab" onclick="switchAdminTab('delivery')">Taxas de Entrega por Bairro</button>
+    <button class="nav-tab active" onclick="switchAdminTab('items')">Produtos & Estoque</button>
     <button class="nav-tab" onclick="switchAdminTab('categories')">Categorias do Cardápio</button>
-    <button class="nav-tab" onclick="switchAdminTab('items')">Produtos & Estoque</button>
+    <button class="nav-tab" onclick="switchAdminTab('delivery')">Taxas de Entrega por Bairro</button>
+    <button class="nav-tab" onclick="switchAdminTab('branding')">Identidade, Banners & WhatsApp</button>
+    <button class="nav-tab" onclick="switchAdminTab('sheets')" style="opacity: 0.75;">Configurações do Servidor</button>
   </nav>
 
   <main class="admin-container">
@@ -58,13 +58,95 @@
         <div class="stat-value" id="totalDeliveryZonesCount">0</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Status Google Sheets</div>
-        <div class="stat-value" id="sheetsStatusDisplay" style="font-size: 0.95rem; font-family: var(--font-mono); margin-top: 6px; color: #FFA000;">Local Storage</div>
+        <div class="stat-label">Status do Banco de Dados</div>
+        <div class="stat-value" id="sheetsStatusDisplay" style="font-size: 0.95rem; font-family: var(--font-mono); margin-top: 6px; color: #2E7D32;">Conectado</div>
       </div>
     </div>
 
-    <!-- TAB 1: IDENTIDADE VISUAL, BANNERS E WHATSAPP -->
-    <div id="tabContentBranding">
+    <!-- TAB 1: PRODUTOS E ESTOQUE (INICIAL DO CLIENTE) -->
+    <div id="tabContentItems">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <h2 style="font-size: 1.2rem; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display);">Produtos do Cardápio</h2>
+        
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <input type="text" class="admin-input" placeholder="Buscar produto..." onkeyup="filterAdminTable(this.value)" style="width: 200px;">
+          <button class="btn-admin btn-admin-primary" onclick="openAddProductModal()">
+            <span>+ Cadastrar Novo Produto</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Foto</th>
+              <th>Nome do Produto</th>
+              <th>Categoria</th>
+              <th>Descrição</th>
+              <th>Preço (R$)</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="adminTableBody">
+            <!-- Renderizado via admin.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 2: CATEGORIAS -->
+    <div id="tabContentCategories" style="display: none;">
+      <div class="config-card">
+        <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display);">Gerenciar Categorias</h3>
+        
+        <form onsubmit="addNewCategory(event)" style="display: flex; gap: 10px; margin-bottom: 20px;">
+          <input type="text" id="newCategoryInput" class="admin-input" placeholder="Ex: Pizzas Especiais, Sobremesas, Bebidas..." required style="flex: 1;">
+          <button type="submit" class="btn-admin btn-admin-primary">
+            <span>+ Adicionar Categoria</span>
+          </button>
+        </form>
+
+        <label class="admin-label">Categorias Ativas no Cardápio:</label>
+        <div id="categoriesListContainer" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;">
+          <!-- Categorias renderizadas via admin.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: TAXAS DE ENTREGA -->
+    <div id="tabContentDelivery" style="display: none;">
+      <div class="config-card">
+        <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display);">Taxas de Entrega por Bairro / Região</h3>
+        
+        <form onsubmit="addNewDeliveryZone(event)" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+          <input type="text" id="newZoneNameInput" class="admin-input" placeholder="Nome do Bairro / Região (Ex: Centro, Zona Sul...)" required style="flex: 2; min-width: 200px;">
+          <input type="number" id="newZonePriceInput" class="admin-input" step="0.50" placeholder="Valor da Taxa (Ex: 8.00)" required style="flex: 1; min-width: 120px;">
+          <button type="submit" class="btn-admin btn-admin-primary">
+            <span>+ Adicionar Região</span>
+          </button>
+        </form>
+
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Bairro / Região</th>
+                <th>Taxa de Entrega (R$)</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="deliveryZonesTableBody">
+              <!-- Renderizado via admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: IDENTIDADE VISUAL, BANNERS E WHATSAPP -->
+    <div id="tabContentBranding" style="display: none;">
       <div class="config-card">
         <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display); color: var(--ph-black);">Identidade Visual, Banners & WhatsApp</h3>
         
@@ -73,11 +155,11 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
             <div>
               <label class="admin-label">Nome do Estabelecimento / Marca:</label>
-              <input type="text" id="cfgStoreName" class="admin-input" placeholder="Ex: Marmitas da Ana, Hamburgueria Smash..." required>
+              <input type="text" id="cfgStoreName" class="admin-input" placeholder="Ex: Pizza Todo Dia, Marmitas da Ana..." required>
             </div>
             <div>
               <label class="admin-label">Subtítulo / Slogan:</label>
-              <input type="text" id="cfgStoreSub" class="admin-input" placeholder="Ex: Marmitas Saudáveis & Pratos Executivos">
+              <input type="text" id="cfgStoreSub" class="admin-input" placeholder="Ex: Pizzas Artesanais & Forno a Lenha">
             </div>
           </div>
 
@@ -109,7 +191,7 @@
             </div>
           </div>
 
-          <!-- UPLOAD DIRETO DA LOGO DA MARCA (.PNG / .JPG) -->
+          <!-- UPLOAD DIRETO DA LOGO DA MARCA -->
           <div>
             <label class="admin-label">Logo da Marca (.PNG ou .JPG) — <span style="color: #666; font-weight: normal;">Tamanho recomendado: 300x300 px</span>:</label>
             <div class="file-drop-zone" id="logoDropZone" onclick="document.getElementById('cfgLogoFile').click()">
@@ -175,192 +257,110 @@
       </div>
     </div>
 
-    <!-- TAB NEW: INTEGRAÇÃO GOOGLE SHEETS & APPS SCRIPT -->
+    <!-- TAB 5: CONFIGURAÇÕES AVANÇADAS (ÁREA TÉCNICA RESTRITA) -->
     <div id="tabContentSheets" style="display: none;">
       <div class="config-card">
-        <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display); color: var(--ph-black);">Conexão com Google Sheets via Apps Script</h3>
-        <p style="font-size: 0.84rem; color: #666; margin-bottom: 16px;">Conecte o seu cardápio a uma planilha remota do Google Sheets. Se a URL não for fornecida, o sistema opera via localStorage local automaticamente.</p>
+        <div style="background: #FFF8E1; border-left: 4px solid #FFA000; padding: 12px 16px; margin-bottom: 20px; border-radius: 4px; font-size: 0.85rem; color: #5D4037;">
+          <strong>Área Técnica — Banco de Dados e Servidor Remoto:</strong> Não é necessário alterar estes campos durante a operação normal do estabelecimento.
+        </div>
+
+        <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display); color: var(--ph-black);">Configurações de Conexão do Servidor</h3>
         
         <form onsubmit="saveSheetsConfig(event)" style="display: flex; flex-direction: column; gap: 14px;">
           <div>
-            <label class="admin-label">URL do Google Apps Script (Web App - GET/POST):</label>
+            <label class="admin-label">URL do Google Apps Script (Web App):</label>
             <input type="url" id="cfgAppsScriptUrl" class="admin-input" placeholder="Ex: https://script.google.com/macros/s/AKfycb.../exec">
-            <div style="font-size: 0.74rem; color: #777; margin-top: 4px;">Utilizado para leitura remota em JSON (`fetchFromSheets`) e salvamento via `POST` (`saveToSheets`).</div>
+            <div style="font-size: 0.74rem; color: #777; margin-top: 4px;">Servidor proxy para leitura e salvamento remoto de dados.</div>
           </div>
 
           <div>
-            <label class="admin-label">URL da Planilha Publicada em CSV (Fallback PapaParse):</label>
+            <label class="admin-label">URL da Planilha Publicada em CSV (Backup PapaParse):</label>
             <input type="url" id="cfgSheetCsvUrl" class="admin-input" placeholder="Ex: https://docs.google.com/spreadsheets/d/.../pub?output=csv">
-            <div style="font-size: 0.74rem; color: #777; margin-top: 4px;">Usado como leitura estática ultrarrápida com PapaParse caso o Apps Script falhe.</div>
+            <div style="font-size: 0.74rem; color: #777; margin-top: 4px;">Utilizado como leitura estática de alta velocidade.</div>
           </div>
 
           <div style="display: flex; gap: 10px; margin-top: 8px;">
             <button type="submit" class="btn-admin btn-admin-primary" style="padding: 10px 18px;">
-              <span>Salvar Configuração do Google Sheets</span>
+              <span>Salvar Configurações Avançadas</span>
             </button>
             <button type="button" class="btn-admin" style="padding: 10px 18px;" onclick="syncWithSheetsNow()">
-              <span>⚡ Sincronizar Agora com Google Sheets</span>
+              <span>Sincronizar Agora</span>
             </button>
             <button type="button" class="btn-admin" style="padding: 10px 18px;" onclick="pushCurrentToSheetsNow()">
-              <span>📤 Enviar Produtos para a Planilha</span>
+              <span>Enviar Dados para a Planilha</span>
             </button>
           </div>
         </form>
 
-        <div style="margin-top: 20px; background: #FFF8E1; border: 1px solid #FFE082; padding: 14px; border-radius: 4px;">
-          <h4 style="font-size: 0.9rem; font-weight: 800; color: #896100; margin-bottom: 6px;">📄 Código de Exemplo do Google Apps Script</h4>
-          <p style="font-size: 0.8rem; color: #6D4C41; margin-bottom: 8px;">
-            O arquivo <code style="background:#FFF; padding:2px 4px;">google_apps_script_code.js</code> na raiz do projeto possui o código <code style="background:#FFF; padding:2px 4px;">Code.gs</code> para você colar no Google Apps Script.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 3: TAXAS DE ENTREGA POR BAIRRO / REGIÃO -->
-    <div id="tabContentDelivery" style="display: none;">
-      <div class="config-card">
-        <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display); color: var(--ph-black);">Tabela de Taxas de Entrega por Bairro / Região</h3>
-        <p style="font-size: 0.84rem; color: #666; margin-bottom: 16px;">Cadastre os bairros ou regiões e o valor da taxa. O cliente selecionará a região no carrinho do cardápio ao vivo.</p>
-        
-        <form onsubmit="addNewDeliveryZone(event)" style="display: flex; gap: 12px; margin-bottom: 20px;">
-          <input type="text" id="newZoneNameInput" class="admin-input" placeholder="Ex: Centro / Zona Sul, Farrapos, Retirada no Balcão..." style="flex: 2;" required>
-          <input type="number" id="newZonePriceInput" class="admin-input" step="0.50" placeholder="Taxa (Ex: 8.00)" style="flex: 1;" required>
-          <button type="submit" class="btn-admin btn-admin-primary">
-            <span>+ Adicionar Região</span>
-          </button>
-        </form>
-
-        <div style="font-weight: 800; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 10px; color: #666;">Bairros e Taxas Cadastradas:</div>
-        
-        <div class="admin-table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Bairro / Região</th>
-                <th>Valor da Taxa</th>
-                <th>Ação</th>
-              </tr>
-            </thead>
-            <tbody id="deliveryZonesTableBody">
-              <!-- Preenchido via admin.js -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 4: GERENCIAR CATEGORIAS DO CARDÁPIO -->
-    <div id="tabContentCategories" style="display: none;">
-      <div class="config-card">
-        <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display); color: var(--ph-black);">Criar & Gerenciar Categorias</h3>
-        
-        <form onsubmit="addNewCategory(event)" style="display: flex; gap: 12px; margin-bottom: 20px;">
-          <input type="text" id="newCategoryInput" class="admin-input" placeholder="Ex: Pizzas Salgadas, Bebidas, Sobremesas, Marmitas Fit..." style="flex: 1;" required>
-          <button type="submit" class="btn-admin btn-admin-primary">
-            <span>+ Adicionar Categoria</span>
-          </button>
-        </form>
-
-        <div style="font-weight: 800; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 10px; color: #666;">Categorias Ativas no Cardápio:</div>
-        
-        <div id="categoriesListContainer" style="display: flex; flex-wrap: wrap; gap: 10px;">
-          <!-- Preenchido via admin.js -->
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 5: GERENCIAR PRODUTOS -->
-    <div id="tabContentItems" style="display: none;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-        <input type="text" id="adminSearchInput" class="admin-input" placeholder="Filtrar produtos por nome..." oninput="filterAdminTable(this.value)" style="max-width: 320px;">
-        <button class="btn-admin btn-admin-primary" onclick="openAddProductModal()">
-          <span>+ Cadastrar Novo Produto</span>
-        </button>
-      </div>
-
-      <div class="admin-table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Imagem</th>
-              <th>Nome do Produto</th>
-              <th>Categoria</th>
-              <th>Descrição</th>
-              <th>Preço</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="adminTableBody">
-            <!-- Preenchido via admin.js -->
-          </tbody>
-        </table>
       </div>
     </div>
 
   </main>
 
-  <!-- MODAL ADICIONAR / EDITAR PRODUTO -->
+  <!-- MODAL FORMULÁRIO PRODUTO -->
   <div class="modal-overlay" id="productFormModal">
     <div class="modal-card">
-      <button class="modal-close-btn" onclick="closeProductFormModal()">✕</button>
-      <div class="modal-content-body">
-        <h2 class="checkout-main-title" id="productModalTitle">NOVO PRODUTO</h2>
-        
-        <form id="productForm" onsubmit="saveProductItem(event)">
-          <input type="hidden" id="prodEditId">
-          
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            <div>
-              <label class="admin-label">Nome do Produto:</label>
-              <input type="text" id="prodName" class="admin-input" placeholder="Ex: Pepperoni Especial" required>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-              <div>
-                <label class="admin-label">Categoria:</label>
-                <select id="prodCategory" class="admin-input" required>
-                  <!-- Preenchido dinamicamente via admin.js -->
-                </select>
-              </div>
-              <div>
-                <label class="admin-label">Preço (R$):</label>
-                <input type="number" id="prodPrice" class="admin-input" step="0.50" placeholder="64.90" required>
-              </div>
-            </div>
-
-            <div>
-              <label class="admin-label">Descrição / Ingredientes:</label>
-              <textarea id="prodDesc" class="admin-input" rows="2" placeholder="Ex: Molho de tomate artesanal da casa, mussarela e pepperoni crocante."></textarea>
-            </div>
-
-            <!-- UPLOAD DIRETO DA FOTO DO PRODUTO (.PNG / .JPG) -->
-            <div>
-              <label class="admin-label">Foto do Produto (.PNG ou .JPG) — <span style="color: #666; font-weight: normal;">Recomendado: 800 x 800 px</span>:</label>
-              <div class="file-drop-zone" id="productDropZone" onclick="document.getElementById('prodImgFile').click()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                <div>
-                  <strong>Clique para selecionar a foto</strong> no computador
-                  <div style="font-size: 0.74rem; color: #777; margin-top: 2px;">Ou arraste a imagem para esta área</div>
-                </div>
-              </div>
-              <input type="file" id="prodImgFile" style="display: none;" accept="image/*" onchange="previewProductFileUpload(this)">
-              <div style="margin-top: 8px;">
-                <img id="prodFilePreview" style="max-height: 80px; border-radius: 4px; display: none; border: 2px solid var(--ph-black);" alt="Pré-visualização">
-              </div>
-            </div>
-
-            <div>
-              <label class="admin-label">Selo de Destaque (Opcional):</label>
-              <input type="text" id="prodBadge" class="admin-input" placeholder="Ex: Mais Pedida, Combo Destaque, Promoção">
-            </div>
-
-            <button type="submit" class="btn-admin btn-admin-primary" style="padding: 12px; margin-top: 8px;">
-              <span>Salvar Produto no Cardápio</span>
-            </button>
-          </div>
-        </form>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 id="productModalTitle" style="font-size: 1.1rem; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display);">CADASTRAR PRODUTO</h3>
+        <button onclick="closeProductFormModal()" style="background: none; border: none; font-size: 1.2rem; font-weight: 900; cursor: pointer; color: var(--ph-black);">✕</button>
       </div>
+
+      <form id="productForm" onsubmit="saveProductItem(event)" style="display: flex; flex-direction: column; gap: 12px;">
+        <input type="hidden" id="prodEditId" value="">
+
+        <div>
+          <label class="admin-label">Nome do Produto:</label>
+          <input type="text" id="prodName" class="admin-input" placeholder="Ex: Pizza Pepperoni Especial, Marmita de Strogonoff..." required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div>
+            <label class="admin-label">Categoria:</label>
+            <select id="prodCategory" class="admin-input" required>
+              <!-- Renderizado via admin.js -->
+            </select>
+          </div>
+          <div>
+            <label class="admin-label">Preço (R$):</label>
+            <input type="number" id="prodPrice" class="admin-input" step="0.50" placeholder="59.90" required>
+          </div>
+        </div>
+
+        <div>
+          <label class="admin-label">Selo / Destaque (Opcional):</label>
+          <input type="text" id="prodBadge" class="admin-input" placeholder="Ex: Mais Pedida, Promoção, Especialidade...">
+        </div>
+
+        <div>
+          <label class="admin-label">Descrição dos Ingredientes / Detalhes:</label>
+          <textarea id="prodDesc" class="admin-input" rows="3" placeholder="Descreva os ingredientes ou detalhes do produto..."></textarea>
+        </div>
+
+        <!-- UPLOAD FOTO DO PRODUTO OU ARRASTAR E SOLTAR -->
+        <div>
+          <label class="admin-label">Foto do Produto (.PNG ou .JPG):</label>
+          <div class="file-drop-zone" id="productDropZone" onclick="document.getElementById('prodFile').click()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.89 8.82 10a2 2 0 0 1 2.83 0l6.47 6.47"/><circle cx="8.5" cy="8.5" r="1.5"/><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
+            <div>
+              <strong>Clique para escolher a imagem do produto</strong>
+              <div style="font-size: 0.74rem; color: #777; margin-top: 2px;">Ou arraste o arquivo da foto para cá</div>
+            </div>
+          </div>
+          <input type="file" id="prodFile" style="display: none;" accept="image/*" onchange="previewProductFileUpload(this)">
+          <div style="margin-top: 8px;">
+            <img id="prodFilePreview" style="max-height: 80px; border-radius: 4px; display: none; border: 2px solid var(--ph-black);" alt="Pré-visualização Foto Produto">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button type="submit" class="btn-admin btn-admin-primary" style="flex: 1; padding: 12px;">
+            <span>Salvar Produto</span>
+          </button>
+          <button type="button" class="btn-admin" onclick="closeProductFormModal()" style="padding: 12px;">
+            <span>Cancelar</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
