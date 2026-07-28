@@ -128,12 +128,20 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 }
 
 .mobile-hamburger-btn {
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   border: none;
   color: var(--ph-black);
   cursor: pointer;
-  padding: 4px;
+  padding: 6px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.mobile-hamburger-btn:hover {
+  background: var(--ph-gray-light);
 }
 
 .ph-brand-logo {
@@ -1118,14 +1126,15 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 }
 
 /* FOOTER COM ÍCONES DA LUCIDE */
-footer {
+.ph-footer {
   background: var(--ph-black-pure);
   color: #FFF;
-  padding: 40px 24px 0;
+  padding: 40px 24px;
   margin-top: 60px;
+  border-top: 3px solid var(--ph-red);
 }
 
-.footer-inner {
+.ph-footer-inner {
   max-width: 1280px;
   margin: 0 auto;
   display: flex;
@@ -1133,7 +1142,29 @@ footer {
   align-items: center;
   flex-wrap: wrap;
   gap: 20px;
-  padding-bottom: 40px;
+}
+
+/* BOTÃO FLUTUANTE WHATSAPP */
+.ph-wpp-float {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  background: #25D366;
+  color: #FFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4);
+  z-index: 2500;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ph-wpp-float:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
 }
 
 .footer-info-item {

@@ -177,20 +177,27 @@ function applyBrandingToUI() {
 
         if (cfg.wppNumber) {
             const wppFloat = document.getElementById('floatWppBtn');
-            if (wppFloat) wppFloat.href = `https://wa.me/${cfg.wppNumber}`;
+            if (wppFloat) {
+                const textMsg = encodeURIComponent("Olá! Quero fazer meu pedido pelo WhatsApp.");
+                wppFloat.href = `https://wa.me/${cfg.wppNumber}?text=${textMsg}`;
+            }
         }
     } catch(e) {}
 }
 
 function renderDynamicCategoriesInHeader() {
     const savedCategories = localStorage.getItem('ptd_store_categories');
-    if (!savedCategories) return;
+    const navContainer = document.getElementById('categoriesTabContainer');
+    const drawerContainer = document.getElementById('drawerCategoryListContainer');
 
-    try {
-        const cats = JSON.parse(savedCategories);
-        if (!cats || cats.length === 0) return;
+    let cats = [];
+    if (savedCategories) {
+        try {
+            cats = JSON.parse(savedCategories);
+        } catch(e) {}
+    }
 
-        const navContainer = document.getElementById('categoriesTabContainer');
+    if (cats && cats.length > 0) {
         if (navContainer) {
             let html = `<button class="ph-cat-pill active" data-cat="todos" onclick="filterCategory('todos', this)">TODOS OS PRODUTOS</button>`;
             cats.forEach(c => {
@@ -199,7 +206,6 @@ function renderDynamicCategoriesInHeader() {
             navContainer.innerHTML = html;
         }
 
-        const drawerContainer = document.getElementById('drawerCategoryListContainer');
         if (drawerContainer) {
             let dHtml = `<div style="font-size: 0.7rem; font-weight: 900; color: #888; margin-bottom: 4px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div>`;
             dHtml += `<button class="drawer-cat-item active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>`;
@@ -208,7 +214,14 @@ function renderDynamicCategoriesInHeader() {
             });
             drawerContainer.innerHTML = dHtml;
         }
-    } catch(e) {}
+    } else {
+        if (navContainer) {
+            navContainer.innerHTML = `<button class="ph-cat-pill active" data-cat="todos" onclick="filterCategory('todos', this)">TODOS OS PRODUTOS</button>`;
+        }
+        if (drawerContainer) {
+            drawerContainer.innerHTML = `<div style="font-size: 0.7rem; font-weight: 900; color: #888; margin-bottom: 4px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div><button class="drawer-cat-item active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>`;
+        }
+    }
 }
 
 function initSharedComponents() {

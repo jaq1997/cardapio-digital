@@ -157,7 +157,10 @@ function renderCatalog() {
   if (filtered.length === 0) {
     container.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: #FFFFFF; border: 2px dashed #DDD; border-radius: 8px; margin: 20px 0;">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px;"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 8 6 4-6 4Z"/></svg>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--ph-red)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px;">
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
         <h3 style="font-size: 1.2rem; font-weight: 900; color: #333; margin-bottom: 6px; font-family: var(--font-display);">CARDÁPIO EM ATUALIZAÇÃO</h3>
         <p style="font-size: 0.88rem; color: #777;">Este estabelecimento está cadastrando seus produtos. Volte em instantes!</p>
       </div>
@@ -589,30 +592,38 @@ function enviarPedidoWhatsAppFinal() {
     return;
   }
 
-  const numComp = document.getElementById('inputNumeroComp')?.value.trim() || 'Não informado';
+  const numComp = document.getElementById('inputNumeroComp')?.value.trim() || '';
   const enderecoInfo = document.getElementById('txtRuaBairro')?.innerText || 'Retirada no Balcão';
-
-  let msg = `*NOVO PEDIDO - ${storeName}*\n`;
-  msg += `-------------------------------------------\n`;
-  msg += `*ITENS DO PEDIDO:*\n`;
-
-  cart.forEach(item => {
-    msg += `• *${item.qty}x ${item.title}*\n`;
-    if (item.details) msg += `   _${item.details}_\n`;
-    msg += `   Subtotal: R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}\n\n`;
-  });
+  const orderNum = Math.floor(1000 + Math.random() * 9000);
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const currentUrl = window.location.href.split('?')[0];
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const total = subtotal + currentDeliveryFee;
+  const freteStr = currentDeliveryFee > 0 ? `R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}` : 'Grátis / Retirada no Balcão';
 
-  msg += `-------------------------------------------\n`;
-  msg += `*FORMA DE ENVIO:* ${currentSelectedZoneName}\n`;
-  msg += `*ENDEREÇO:* ${enderecoInfo}\n`;
-  msg += `*NÚMERO/COMPL:* ${numComp}\n`;
-  msg += `*FRETE:* R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}\n`;
-  msg += `*TOTAL FINAL:* R$ ${total.toFixed(2).replace('.', ',')}\n`;
-  msg += `-------------------------------------------\n`;
-  msg += `*Aguardando confirmação!*`;
+  let msg = `⭐ GOSTOU DE PEDIR NO NOSSO APP? ⭐\n`;
+  msg += `Não precisa baixar nada, adicione o nosso restaurante na tela inicial do seu celular e peça com mais agilidade na próxima vez através do link abaixo:\n`;
+  msg += `${currentUrl}\n`;
+  msg += `---------------------------------------\n`;
+  msg += `Confira o pedido abaixo:\n`;
+  msg += `Pedido #${orderNum} - ${storeName}\n`;
+  msg += `---------------------------------------\n\n`;
+
+  cart.forEach(item => {
+    msg += `${item.qty}x ${item.title}\n`;
+    if (item.details) msg += `   Obs: ${item.details}\n`;
+    msg += `\n`;
+  });
+
+  msg += `Taxa de entrega: ${freteStr}\n`;
+  msg += `Total: R$ ${total.toFixed(2).replace('.', ',')}\n\n`;
+  msg += `---------------------------------------\n\n`;
+  msg += `Forma de Envio: ${currentSelectedZoneName}\n`;
+  msg += `Endereço: ${enderecoInfo}${numComp ? ' - ' + numComp : ''}\n\n`;
+  msg += `Pagamento: WhatsApp / A Combinar\n\n`;
+  msg += `Pedido gerado via Cardápio Digital às ${timeStr}`;
 
   const encodedMsg = encodeURIComponent(msg);
   window.open(`https://wa.me/${targetWpp}?text=${encodedMsg}`, '_blank');
