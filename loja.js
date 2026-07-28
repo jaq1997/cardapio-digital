@@ -1,8 +1,5 @@
 
-const STORAGE_KEY_BRANDING = 'ptd_store_branding';
-const STORAGE_KEY_PRODUCTS = 'ptd_store_products';
-const STORAGE_KEY_CATEGORIES = 'ptd_store_categories';
-const STORAGE_KEY_DELIVERY_ZONES = 'ptd_delivery_zones';
+/* Constantes de Storage e URLs fornecidas por defaults.js */
 
 let WPP_NUMERO = '5531992082542';
 
@@ -499,7 +496,6 @@ function renderCartItems() {
       </div>
     `;
   }).join('');
-}
 }
 
 function updateItemQty(index, delta) {

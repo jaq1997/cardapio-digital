@@ -1,5 +1,16 @@
 /* Defaults centralizados para admin.js e loja.js */
 
+/* URLs e chaves compartilhadas com a planilha remota */
+const DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3UaSFxQeE9Wxj6BPuzC00T0k30eiq3EoZfTZgtwXqOCTL9IAuL9YMAytZX3ZyTACzw/exec';
+const DEFAULT_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTnWp67Ggx_hVGo4gLXJZtGJZa9ZrmO91sLF3cmzPqLOpgRhY-VdkWk3UyX5-eILluZJNxRIL4RdcRk/pub?output=csv';
+const BASE_URL_FOTOS = 'https://pub-67111bf9eee943e3aeaf4b493b4dd034.r2.dev/';
+
+const STORAGE_KEY_BRANDING    = 'ptd_store_branding';
+const STORAGE_KEY_PRODUCTS    = 'ptd_store_products';
+const STORAGE_KEY_CATEGORIES  = 'ptd_store_categories';
+const STORAGE_KEY_DELIVERY_ZONES = 'ptd_delivery_zones';
+const STORAGE_KEY_SHEETS_CONFIG  = 'ptd_sheets_config';
+
 const defaultBranding = {
   storeName: "Pizza Todo Dia",
   storeSub: "Antiga Tri Pizzas • Tradição e Sabor no Seu Bairro",
