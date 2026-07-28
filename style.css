@@ -331,10 +331,10 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 }
 
 /* ==========================================================================
-   3. MOBILE DRAWER
+   3. MOBILE & DESKTOP DRAWER (GAVETA LATERAL DE NAVEGAÇÃO)
    ========================================================================== */
 .mobile-drawer-overlay {
-  display: none;
+  display: block;
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.75);
@@ -345,12 +345,12 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 }
 
 .mobile-drawer-card {
-  display: none;
+  display: flex;
   position: fixed;
   top: 0;
-  left: -280px;
+  left: -300px;
   bottom: 0;
-  width: 280px;
+  width: 300px;
   background: #FFF;
   z-index: 3001;
   box-shadow: 4px 0 20px rgba(0,0,0,0.25);
@@ -359,20 +359,13 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
   padding: 20px;
 }
 
-@media (max-width: 768px) {
-  .mobile-drawer-overlay {
-    display: block;
-  }
-  .mobile-drawer-card {
-    display: flex;
-  }
-  .mobile-drawer-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  .mobile-drawer-card.active {
-    left: 0;
-  }
+.mobile-drawer-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-drawer-card.active {
+  left: 0;
 }
 
 .drawer-header {
@@ -1279,14 +1272,69 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
     padding: 6px 12px;
     font-size: 0.74rem;
   }
-  .grid-sizes {
-    grid-template-columns: repeat(2, 1fr);
+/* GRID DE MODAIS EM DESKTOP (2 COLUNAS LARGAS DE 840PX) */
+.modal-customizer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .modal-customizer-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
-  .mobile-sticky-bar {
-    display: flex;
-  }
-  .wpp-float-btn {
-    bottom: 75px;
-    right: 14px;
-  }
+}
+
+/* LISTA DE CARDS RADIO DE SABORES (ESTILO IFOOD SEM DROPDOWN) */
+.flavor-radio-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--ph-gray-light);
+  border: 2px solid var(--ph-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  margin-bottom: 6px;
+}
+
+.flavor-radio-card:hover {
+  border-color: var(--ph-red);
+}
+
+.flavor-radio-card:has(input[type="radio"]:checked) {
+  border-color: var(--ph-red);
+  background: rgba(233, 28, 36, 0.05);
+}
+
+.flavor-thumb {
+  width: 42px;
+  height: 42px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.flavor-info {
+  flex: 1;
+}
+
+.flavor-name {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.8rem;
+  color: var(--ph-black);
+}
+
+.flavor-desc {
+  font-size: 0.7rem;
+  color: #666;
+  line-height: 1.2;
+}
+
+.flavor-price-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--ph-red);
 }

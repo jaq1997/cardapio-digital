@@ -13,7 +13,7 @@
   <meta property="og:image" content="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80">
   <meta property="og:type" content="website">
 
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E91C24'><path d='M12 2L2 7l10 15 10-15-10-5z'/></svg>">
+  <link rel="icon" id="pageFavicon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E91C24'><path d='M12 2L2 7l10 15 10-15-10-5z'/></svg>">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -80,217 +80,249 @@
     </div>
   </div>
 
-  <!-- MODAL 1: CUSTOMIZADOR DE PIZZA -->
+  <!-- MODAL 1: CUSTOMIZADOR DE PRODUTO / PIZZA -->
   <div class="modal-overlay" id="pizzaModal">
-    <div class="modal-card">
+    <div class="modal-card" style="max-width: 860px; padding: 28px;">
       <button class="modal-close-btn" onclick="closePizzaModal()">✕</button>
-      <div class="modal-header-banner" style="height: 160px; position: relative; overflow: hidden;">
-        <img id="modalHeroBg" src="https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=800&q=80" alt="Customizador Pizza Todo Dia" style="width: 100%; height: 100%; object-fit: cover;">
-      </div>
-      <div class="modal-content-body">
-        <div style="border-bottom: 2px solid var(--ph-black); padding-bottom: 10px;">
-          <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--ph-black); text-transform: uppercase; font-style: italic;" id="modalPizzaTitle">Pepperoni Especial</h3>
-          <p style="font-size: 0.82rem; color: #777777;" id="modalPizzaDesc">Massa crocante com molho de tomate artesanal da casa e mussarela derretida.</p>
-        </div>
-
-        <!-- 1. SELEÇÃO DE TAMANHO -->
-        <div>
-          <div class="option-group-title">
-            <span>1. Escolha o Tamanho</span>
+      
+      <div class="modal-customizer-grid">
+        <!-- COLUNA ESQUERDA: FOTO, TÍTULO, DESCRIÇÃO E TAMANHO (RADIO CARDS) -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div style="height: 200px; border-radius: 8px; overflow: hidden; position: relative;">
+            <img id="modalHeroBg" src="https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=800&q=80" alt="Produto" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
-          <div class="grid-sizes" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
-            <div class="size-option-card" data-size="broto" onclick="selectPizzaSize('broto', this)">
-              <div class="size-name">Broto</div>
-              <div class="size-slices" style="font-size: 0.68rem; color: #777;">4 Fatias (15cm)</div>
-              <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem; margin-top: 2px;" id="priceBrotoVal">R$ 36,90</div>
-            </div>
-            <div class="size-option-card" data-size="media" onclick="selectPizzaSize('media', this)">
-              <div class="size-name">Média</div>
-              <div class="size-slices" style="font-size: 0.68rem; color: #777;">6 Fatias (25cm)</div>
-              <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem; margin-top: 2px;" id="priceMediaVal">R$ 49,90</div>
-            </div>
-            <div class="size-option-card selected" data-size="grande" onclick="selectPizzaSize('grande', this)">
-              <div class="size-name">Grande</div>
-              <div class="size-slices" style="font-size: 0.68rem; color: #777;">8 Fatias (35cm)</div>
-              <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem; margin-top: 2px;" id="priceGrandeVal">R$ 64,90</div>
-            </div>
-            <div class="size-option-card" data-size="gigante" onclick="selectPizzaSize('gigante', this)">
-              <div class="size-name">Gigante</div>
-              <div class="size-slices" style="font-size: 0.68rem; color: #777;">12 Fatias (40cm)</div>
-              <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem; margin-top: 2px;" id="priceGiganteVal">R$ 79,90</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2. DIVISÃO DE SABORES -->
-        <div>
-          <div class="option-group-title">
-            <span>2. Divisão de Sabores</span>
-          </div>
-          <div class="flavor-toggle-bar" style="display: flex; background: var(--ph-gray-light); padding: 4px; border-radius: var(--radius-pill); border: 1px solid var(--ph-border); gap: 4px;">
-            <button class="flavor-toggle-btn active" id="btnSingleFlavor" onclick="setFlavorMode('single')">1 Sabor (Inteira)</button>
-            <button class="flavor-toggle-btn" id="btnHalfFlavor" onclick="setFlavorMode('half')">2 Sabores (Meio a Meio)</button>
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-            <div>
-              <label style="font-size: 0.74rem; font-weight: 800; color: #777777; text-transform: uppercase;">1º Sabor (ou Inteira):</label>
-              <select class="cep-input" style="width: 100%; border-radius: 4px;" id="selectFlavor1" onchange="recalculateModalTotal()">
-              </select>
-            </div>
-            <div id="containerFlavor2" style="display: none;">
-              <label style="font-size: 0.74rem; font-weight: 800; color: #777777; text-transform: uppercase;">2º Sabor (Meio a Meio):</label>
-              <select class="cep-input" style="width: 100%; border-radius: 4px;" id="selectFlavor2" onchange="recalculateModalTotal()">
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. BORDA RECHEADA -->
-        <div>
-          <div class="option-group-title">
-            <span>3. Escolha a Borda</span>
-          </div>
-          <select class="cep-input" style="width: 100%; border-radius: 4px;" id="selectBorda" onchange="recalculateModalTotal()">
-            <option value="nenhuma" data-price="0">Massa Tradicional (Sem Borda Recheada)</option>
-            <option value="catupiry" data-price="12.90">Borda Vulcão de Catupiry Original (+ R$ 12,90)</option>
-            <option value="cheddar" data-price="12.90">Borda Recheada de Cheddar Cremoso (+ R$ 12,90)</option>
-            <option value="chocolate" data-price="13.90">Borda Recheada de Chocolate ao Leite (+ R$ 13,90)</option>
-          </select>
-        </div>
-
-        <!-- 4. ADICIONAIS EXTRAS -->
-        <div>
-          <div class="option-group-title">
-            <span>4. Adicionais Extras (Opcional)</span>
-          </div>
-          <select class="cep-input" style="width: 100%; border-radius: 4px;" id="selectAdicionaisExtra" onchange="recalculateModalTotal()">
-            <option value="nenhum" data-price="0">Nenhum adicional extra</option>
-            <option value="bacon" data-price="6.90">Extra Bacon Crispy (+ R$ 6,90)</option>
-            <option value="alho" data-price="4.90">Extra Molho Especial de Alho (+ R$ 4,90)</option>
-            <option value="catupiry-extra" data-price="7.90">Extra Requeijão Cremoso (+ R$ 7,90)</option>
-          </select>
-        </div>
-
-        <!-- 5. OBSERVAÇÕES -->
-        <div>
-          <div class="option-group-title">
-            <span>5. Observações do Pedido</span>
-          </div>
-          <textarea id="modalObs" rows="2" class="cep-input" style="width: 100%; border-radius: 4px;" placeholder="Ex: Tirar a cebola, massa bem assada..."></textarea>
-        </div>
-
-        <!-- FOOTER DO MODAL -->
-        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 2px solid var(--ph-black);">
+          
           <div>
-            <span style="font-size: 0.7rem; color: #777777; text-transform: uppercase; font-weight: 800;">TOTAL DA PIZZA:</span>
-            <div style="font-size: 2rem; font-weight: 900; color: var(--ph-red);" id="modalCalculatedTotal">R$ 64,90</div>
+            <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--ph-black); text-transform: uppercase; font-style: italic; font-family: var(--font-display);" id="modalPizzaTitle">Pepperoni Especial</h3>
+            <p style="font-size: 0.84rem; color: #666666; margin-top: 4px;" id="modalPizzaDesc">Massa crocante com molho de tomate artesanal da casa e mussarela derretida.</p>
           </div>
-          <button class="ph-btn-red-lg" style="width: auto; padding: 12px 24px;" onclick="addCustomPizzaToCart()">
-            <span>ADICIONAR AO PEDIDO</span>
-          </button>
+
+          <!-- 1. SELEÇÃO DE TAMANHO COM RADIO BUTTONS VISÍVEIS -->
+          <div>
+            <div class="option-group-title">1. Escolha o Tamanho</div>
+            <div class="grid-sizes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+              <label class="size-option-card" data-size="broto" onclick="selectPizzaSize('broto', this)" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="radio" name="sizeRadio" value="broto" style="accent-color: var(--ph-red);">
+                <div>
+                  <div class="size-name" style="font-family: var(--font-display); font-weight: 900;">Broto</div>
+                  <div class="size-slices" style="font-size: 0.68rem; color: #777;">4 Fatias (15cm)</div>
+                  <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem;" id="priceBrotoVal">R$ 36,90</div>
+                </div>
+              </label>
+              
+              <label class="size-option-card" data-size="media" onclick="selectPizzaSize('media', this)" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="radio" name="sizeRadio" value="media" style="accent-color: var(--ph-red);">
+                <div>
+                  <div class="size-name" style="font-family: var(--font-display); font-weight: 900;">Média</div>
+                  <div class="size-slices" style="font-size: 0.68rem; color: #777;">6 Fatias (25cm)</div>
+                  <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem;" id="priceMediaVal">R$ 49,90</div>
+                </div>
+              </label>
+
+              <label class="size-option-card selected" data-size="grande" onclick="selectPizzaSize('grande', this)" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="radio" name="sizeRadio" value="grande" checked style="accent-color: var(--ph-red);">
+                <div>
+                  <div class="size-name" style="font-family: var(--font-display); font-weight: 900;">Grande</div>
+                  <div class="size-slices" style="font-size: 0.68rem; color: #777;">8 Fatias (35cm)</div>
+                  <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem;" id="priceGrandeVal">R$ 64,90</div>
+                </div>
+              </label>
+
+              <label class="size-option-card" data-size="gigante" onclick="selectPizzaSize('gigante', this)" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="radio" name="sizeRadio" value="gigante" style="accent-color: var(--ph-red);">
+                <div>
+                  <div class="size-name" style="font-family: var(--font-display); font-weight: 900;">Gigante</div>
+                  <div class="size-slices" style="font-size: 0.68rem; color: #777;">12 Fatias (40cm)</div>
+                  <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem;" id="priceGiganteVal">R$ 79,90</div>
+                </div>
+              </label>
+            </div>
+          </div>
         </div>
 
+        <!-- COLUNA DIREITA: DIVISÃO DE SABORES (ESTILO IFOOD SEM DROPDOWN), BORDA, EXTRAS, OBS E BOTAO -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- 2. DIVISÃO DE SABORES -->
+          <div>
+            <div class="option-group-title">2. Escolha de Sabores</div>
+            <div class="flavor-toggle-bar" style="display: flex; background: var(--ph-gray-light); padding: 4px; border-radius: var(--radius-pill); border: 1px solid var(--ph-border); gap: 4px; margin-bottom: 12px;">
+              <button class="flavor-toggle-btn active" id="btnSingleFlavor" onclick="setFlavorMode('single')">1 Sabor (Inteira)</button>
+              <button class="flavor-toggle-btn" id="btnHalfFlavor" onclick="setFlavorMode('half')">2 Sabores (Meio a Meio)</button>
+            </div>
+
+            <!-- LISTA DE RADIO CARDS IFOOD DE SABORES -->
+            <div id="flavorRadioList1Container">
+              <label style="font-size: 0.72rem; font-weight: 800; color: #777; text-transform: uppercase;">1º Sabor (Principal):</label>
+              <div id="flavorRadioList1" style="max-height: 180px; overflow-y: auto; margin-top: 6px;"></div>
+            </div>
+
+            <div id="containerFlavor2" style="display: none; margin-top: 10px;">
+              <label style="font-size: 0.72rem; font-weight: 800; color: #777; text-transform: uppercase;">2º Sabor (Meio a Meio):</label>
+              <div id="flavorRadioList2" style="max-height: 180px; overflow-y: auto; margin-top: 6px;"></div>
+            </div>
+          </div>
+
+          <!-- 3. BORDA RECHEADA -->
+          <div>
+            <div class="option-group-title">3. Opções de Borda</div>
+            <select class="cep-input" style="width: 100%; border-radius: 6px;" id="selectBorda" onchange="recalculateModalTotal()">
+              <option value="nenhuma" data-price="0">Massa Tradicional (Sem Borda Recheada)</option>
+              <option value="catupiry" data-price="12.90">Borda Vulcão de Catupiry Original (+ R$ 12,90)</option>
+              <option value="cheddar" data-price="12.90">Borda Recheada de Cheddar Cremoso (+ R$ 12,90)</option>
+              <option value="chocolate" data-price="13.90">Borda Recheada de Chocolate ao Leite (+ R$ 13,90)</option>
+            </select>
+          </div>
+
+          <!-- 4. ADICIONAIS EXTRAS -->
+          <div>
+            <div class="option-group-title">4. Adicionais Extras</div>
+            <select class="cep-input" style="width: 100%; border-radius: 6px;" id="selectAdicionaisExtra" onchange="recalculateModalTotal()">
+              <option value="nenhum" data-price="0">Nenhum adicional extra</option>
+              <option value="bacon" data-price="6.90">Extra Bacon Crispy (+ R$ 6,90)</option>
+              <option value="alho" data-price="4.90">Extra Molho Especial de Alho (+ R$ 4,90)</option>
+              <option value="catupiry-extra" data-price="7.90">Extra Requeijão Cremoso (+ R$ 7,90)</option>
+            </select>
+          </div>
+
+          <!-- 5. OBSERVAÇÕES DO PEDIDO -->
+          <div>
+            <div class="option-group-title">5. Observações do Pedido</div>
+            <textarea id="modalObs" rows="2" class="cep-input" style="width: 100%; border-radius: 6px;" placeholder="Ex: Tirar a cebola, massa bem assada..."></textarea>
+          </div>
+
+          <!-- FOOTER DO MODAL -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 2px solid var(--ph-black); margin-top: auto;">
+            <div>
+              <span style="font-size: 0.7rem; color: #777777; text-transform: uppercase; font-weight: 800;">TOTAL ITEM:</span>
+              <div style="font-size: 1.8rem; font-weight: 900; color: var(--ph-red);" id="modalCalculatedTotal">R$ 64,90</div>
+            </div>
+            <button class="ph-btn-red-lg" style="width: auto; padding: 12px 24px;" onclick="addCustomPizzaToCart()">
+              <span>ADICIONAR AO PEDIDO</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 2: CHECKOUT PIZZA HUT FRANQUIA -->
+  <!-- MODAL 2: CHECKOUT DO CLIENTE -->
   <div class="modal-overlay" id="cartModal">
-    <div class="modal-card" style="max-width: 480px;">
+    <div class="modal-card" style="max-width: 800px; padding: 28px;">
       <button class="modal-close-btn" onclick="closeCartModal()">✕</button>
-      <div class="modal-content-body">
-        <h2 class="checkout-main-title">SEU PEDIDO</h2>
-        
-        <!-- ITENS DO CARRINHO -->
-        <div id="cartItemsContainer"></div>
+      
+      <div class="modal-customizer-grid">
+        <!-- COLUNA ESQUERDA: ITENS DO CARRINHO E ENDEREÇO -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <h2 class="checkout-main-title">SEU PEDIDO</h2>
+          
+          <!-- ITENS DO CARRINHO -->
+          <div id="cartItemsContainer" style="max-height: 260px; overflow-y: auto;"></div>
 
-        <!-- FORMA DE ENVIO & ENDEREÇO -->
-        <div class="checkout-section-box">
-          <div class="option-group-title">Forma de Envio</div>
-          <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-            <label style="flex: 1; background: #FFF; border: 2px solid var(--ph-border); padding: 10px; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 700;">
-              <input type="radio" name="deliveryType" value="entrega" checked onchange="toggleDeliveryTypeUI('entrega')">
-              <span>🛵 Entrega</span>
-            </label>
-            <label style="flex: 1; background: #FFF; border: 2px solid var(--ph-border); padding: 10px; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 700;">
-              <input type="radio" name="deliveryType" value="balcao" onchange="toggleDeliveryTypeUI('balcao')">
-              <span>🛍️ Retirada (Grátis)</span>
-            </label>
-          </div>
-
-          <div id="deliveryAddressBox">
-            <div class="option-group-title">Endereço de Entrega (CEP)</div>
-            <div class="cep-row">
-              <input type="text" class="cep-input" id="inputCep" placeholder="Digite seu CEP (ex: 90010-000)" maxlength="9">
-              <button class="btn-cep-search" onclick="buscarCepViaAPI()">BUSCAR</button>
+          <!-- FORMA DE ENTREGA E ENDEREÇO -->
+          <div class="checkout-section-box">
+            <div class="option-group-title">Forma de Entrega</div>
+            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+              <label style="flex: 1; background: #FFF; border: 2px solid var(--ph-border); padding: 10px; border-radius: 6px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 800;">
+                <input type="radio" name="deliveryType" value="entrega" checked onchange="toggleDeliveryTypeUI('entrega')" style="accent-color: var(--ph-red);">
+                <span>Entrega em Domicílio</span>
+              </label>
+              <label style="flex: 1; background: #FFF; border: 2px solid var(--ph-border); padding: 10px; border-radius: 6px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 800;">
+                <input type="radio" name="deliveryType" value="balcao" onchange="toggleDeliveryTypeUI('balcao')" style="accent-color: var(--ph-red);">
+                <span>Retirada no Balcão (Grátis)</span>
+              </label>
             </div>
-            <div class="address-result-box" id="addressResultBox" style="display: none;">
-              <div id="txtRuaBairro">Rua Principal, Centro</div>
-              <div class="txt-frete-val" id="txtFreteVal">Taxa de Entrega: R$ 5,00</div>
+
+            <div id="deliveryAddressBox">
+              <div class="option-group-title">Endereço de Entrega (CEP)</div>
+              <div class="cep-row">
+                <input type="text" class="cep-input" id="inputCep" placeholder="Digite seu CEP (ex: 90010-000)" maxlength="9">
+                <button class="btn-cep-search" onclick="buscarCepViaAPI()">BUSCAR</button>
+              </div>
+              
+              <div class="address-result-box" id="addressResultBox" style="display: none; margin-top: 8px;">
+                <div id="txtRuaBairro">Rua Principal, Centro</div>
+                <div class="txt-frete-val" id="txtFreteVal">Taxa de Entrega: R$ 5,00</div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                <div>
+                  <label style="font-size: 0.72rem; font-weight: 800; color: #666; text-transform: uppercase;">Número:</label>
+                  <input type="text" class="cep-input" id="inputNumero" placeholder="Ex: 236" style="width: 100%;">
+                  <label style="font-size: 0.72rem; font-weight: 700; color: #555; display: flex; align-items: center; gap: 4px; margin-top: 4px; cursor: pointer;">
+                    <input type="checkbox" id="chkSemNumero" onchange="toggleSemNumero(this)"> Sem número
+                  </label>
+                </div>
+                <div>
+                  <label style="font-size: 0.72rem; font-weight: 800; color: #666; text-transform: uppercase;">Complemento:</label>
+                  <input type="text" class="cep-input" id="inputComplemento" placeholder="Ex: Ap 405 / Bloco B" style="width: 100%;">
+                </div>
+              </div>
             </div>
-            <input type="text" class="cep-input" id="inputNumeroComp" placeholder="Número e complemento (ex: Ap 202)" style="margin-top: 8px;">
           </div>
         </div>
 
-        <!-- CUPOM DE DESCONTO -->
-        <div class="checkout-section-box">
-          <div class="option-group-title">Cupom de Desconto (Opcional)</div>
-          <div style="display: flex; gap: 8px;">
-            <input type="text" class="cep-input" id="inputCouponCode" placeholder="Digite seu cupom (ex: PRIMEIRACOMPRA)" style="text-transform: uppercase; flex: 1;">
-            <button class="btn-cep-search" onclick="aplicarCupomDesconto()">APLICAR</button>
-          </div>
-          <div id="couponFeedbackBox" style="font-size: 0.8rem; font-weight: 800; margin-top: 6px; display: none;"></div>
-        </div>
-
-        <!-- FORMAS DE PAGAMENTO -->
-        <div class="checkout-section-box">
-          <div class="option-group-title">Forma de Pagamento</div>
-          <div class="mp-checkout-tabs">
-            <button class="mp-tab-btn active" id="tabMpPix" onclick="switchCheckoutTab('pix')">PIX</button>
-            <button class="mp-tab-btn" id="tabMpCard" onclick="switchCheckoutTab('card')">CARTÃO DE CRÉDITO</button>
-            <button class="mp-tab-btn" id="tabWpp" onclick="switchCheckoutTab('wpp')">WHATSAPP</button>
-          </div>
-
-          <!-- TAB 1: PIX -->
-          <div id="contentCheckoutPix" class="tab-content-box">
-            <div class="pix-title">Pagamento Instantâneo via PIX</div>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=00020126580014BR.GOV.BCB.PIX013612345678-PIZZA-TODO-DIA520400005303986540578.905802BR5920PIZZA%20TODO%20DIA6009SAO%20PAULO62070503***6304ABCD" class="pix-qr-img" alt="QR Code PIX">
-            <div class="pix-code-str" id="pixCodeText">00020126580014BR.GOV.BCB.PIX013612345678-PIZZA-TODO-DIA520400005303986540578.905802BR5920PIZZA%20TODO%20DIA6009SAO%20PAULO62070503***6304ABCD</div>
-            <button class="ph-btn-add" style="width: 100%; justify-content: center;" onclick="copiarPixChave()">COPIAR CHAVE PIX</button>
-          </div>
-
-          <!-- TAB 2: CARTÃO -->
-          <div id="contentCheckoutCard" class="tab-content-box" style="display: none;">
-            <input type="text" class="cep-input" placeholder="Número do Cartão" style="margin-bottom: 8px;">
-            <div class="row-inputs">
-              <input type="text" class="cep-input" placeholder="MM/AA">
-              <input type="text" class="cep-input" placeholder="CVV">
+        <!-- COLUNA DIREITA: CUPOM DE DESCONTO, FORMA DE PAGAMENTO E TOTAL -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- CUPOM DE DESCONTO -->
+          <div class="checkout-section-box">
+            <div class="option-group-title">Cupom de Desconto (Opcional)</div>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" class="cep-input" id="inputCouponCode" placeholder="Digite seu cupom" style="text-transform: uppercase; flex: 1;">
+              <button class="btn-cep-search" onclick="aplicarCupomDesconto()">APLICAR</button>
             </div>
-            <input type="text" class="cep-input" placeholder="Nome do Titular" style="margin-top: 8px;">
-            <button class="ph-btn-red-lg" style="margin-top: 10px; width: 100%;" onclick="simularPagamentoMercadoPagoCard()">PAGAR COM CARTÃO</button>
+            <div id="couponFeedbackBox" style="font-size: 0.8rem; font-weight: 800; margin-top: 6px; display: none;"></div>
           </div>
 
-          <!-- TAB 3: WHATSAPP DIRETO -->
-          <div id="contentCheckoutWpp" class="tab-content-box" style="display: none; text-align: center;">
-            <p class="wpp-notice">Seu pedido será enviado formatado direto para o WhatsApp do atendimento!</p>
+          <!-- FORMAS DE PAGAMENTO -->
+          <div class="checkout-section-box">
+            <div class="option-group-title">Forma de Pagamento</div>
+            <div class="mp-checkout-tabs">
+              <button class="mp-tab-btn active" id="tabMpPix" onclick="switchCheckoutTab('pix')">PIX</button>
+              <button class="mp-tab-btn" id="tabMpCard" onclick="switchCheckoutTab('card')">CARTÃO DE CRÉDITO</button>
+              <button class="mp-tab-btn" id="tabWpp" onclick="switchCheckoutTab('wpp')">WHATSAPP</button>
+            </div>
+
+            <!-- TAB 1: PIX -->
+            <div id="contentCheckoutPix" class="tab-content-box">
+              <div class="pix-title">Pagamento Instantâneo via PIX</div>
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=00020126580014BR.GOV.BCB.PIX013612345678-PIZZA-TODO-DIA520400005303986540578.905802BR5920PIZZA%20TODO%20DIA6009SAO%20PAULO62070503***6304ABCD" class="pix-qr-img" alt="QR Code PIX">
+              <div class="pix-code-str" id="pixCodeText">00020126580014BR.GOV.BCB.PIX013612345678-PIZZA-TODO-DIA520400005303986540578.905802BR5920PIZZA%20TODO%20DIA6009SAO%20PAULO62070503***6304ABCD</div>
+              <button class="ph-btn-add" style="width: 100%; justify-content: center;" onclick="copiarPixChave()">COPIAR CHAVE PIX</button>
+            </div>
+
+            <!-- TAB 2: CARTÃO -->
+            <div id="contentCheckoutCard" class="tab-content-box" style="display: none;">
+              <input type="text" class="cep-input" placeholder="Número do Cartão" style="margin-bottom: 8px;">
+              <div class="row-inputs">
+                <input type="text" class="cep-input" placeholder="MM/AA">
+                <input type="text" class="cep-input" placeholder="CVV">
+              </div>
+              <input type="text" class="cep-input" placeholder="Nome do Titular" style="margin-top: 8px;">
+              <button class="ph-btn-red-lg" style="margin-top: 10px; width: 100%;" onclick="simularPagamentoMercadoPagoCard()">PAGAR COM CARTÃO</button>
+            </div>
+
+            <!-- TAB 3: WHATSAPP DIRETO -->
+            <div id="contentCheckoutWpp" class="tab-content-box" style="display: none; text-align: center;">
+              <p class="wpp-notice" style="font-size: 0.82rem; color: #555; margin-bottom: 10px;">Seu pedido será enviado formatado direto para o WhatsApp do atendimento com mensagem de confirmação!</p>
+              <button class="ph-btn-red-lg" style="width: 100%; background: #25D366; color: #FFF;" onclick="enviarPedidoWhatsAppFinal()">
+                <span>FINALIZAR PELO WHATSAPP</span>
+              </button>
+            </div>
           </div>
+
+          <!-- TOTAL GIGANTE EM NEGRITO -->
+          <div style="background: var(--ph-gray-light); padding: 14px; border-radius: 8px; margin-top: auto;">
+            <div id="txtSubtotalFrete" style="font-size: 0.8rem; color: #666; font-weight: 700;">Subtotal: R$ 0,00 | Frete: R$ 0,00</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+              <span style="font-family: var(--font-display); font-weight: 900; font-size: 1.1rem;">TOTAL:</span>
+              <span style="font-family: var(--font-display); font-weight: 900; font-size: 1.8rem; color: var(--ph-red);" id="txtTotalCartFinal">R$ 0,00</span>
+            </div>
+          </div>
+
+          <button class="ph-btn-red-lg" style="width: 100%; margin-top: 4px;" onclick="enviarPedidoWhatsAppFinal()">
+            <span>FINALIZAR PEDIDO</span>
+          </button>
         </div>
-
-        <!-- TOTAL GIGANTE EM NEGRITO -->
-        <div class="checkout-total-row">
-          <div class="checkout-total-label">
-            <span>TOTAL</span>
-            <span class="txt-subtotal-sub" id="txtSubtotalFrete">Subtotal: R$ 0,00 | Frete: R$ 5,00</span>
-          </div>
-          <span class="checkout-total-val" id="txtTotalCartFinal">R$ 0,00</span>
-        </div>
-
-        <!-- BOTÃO DE FINALIZAR PRINCIPAL -->
-        <button class="ph-btn-red-lg" style="width: 100%;" onclick="enviarPedidoWhatsAppFinal()">
-          FINALIZAR PEDIDO
-        </button>
-
       </div>
     </div>
   </div>

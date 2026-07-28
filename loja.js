@@ -232,32 +232,43 @@ function handleSearch(query) {
   renderCatalog();
 }
 
-function populateFlavorDropdowns() {
-  const flavor1Select = document.getElementById('selectSabor1');
-  const flavor2Select = document.getElementById('selectSabor2');
-  if (!flavor1Select || !flavor2Select) return;
+function populateFlavorRadioLists() {
+  const container1 = document.getElementById('flavorRadioList1');
+  const container2 = document.getElementById('flavorRadioList2');
+  if (!container1) return;
 
-  const pizzasSalgadas = catalogData.filter(p => p.categoria === 'pizzas-salgadas' || p.categoria === 'pizzas-doces');
+  const flavors = catalogData.filter(p => p.categoria === 'pizzas-salgadas' || p.categoria === 'pizzas-doces' || p.categoria.includes('pizza'));
 
-  if (pizzasSalgadas.length === 0) {
-    flavor1Select.innerHTML = `<option value="">Nenhum sabor cadastrado</option>`;
-    flavor2Select.innerHTML = `<option value="">Nenhum sabor cadastrado</option>`;
+  if (flavors.length === 0) {
+    container1.innerHTML = `<div style="font-size: 0.8rem; color: #888;">Nenhum outro sabor cadastrado.</div>`;
+    if (container2) container2.innerHTML = `<div style="font-size: 0.8rem; color: #888;">Nenhum outro sabor cadastrado.</div>`;
     return;
   }
 
-  const optionsHtml = pizzasSalgadas.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
-
-  flavor1Select.innerHTML = optionsHtml;
-  flavor2Select.innerHTML = optionsHtml;
-}
-
-function populateDeliveryZonesSelect() {
-  const select = document.getElementById('selectDeliveryZoneCheckout');
-  if (!select) return;
-
-  select.innerHTML = deliveryZones.map(z => `
-    <option value="${z.id}" data-price="${z.price}">${z.name} (R$ ${z.price.toFixed(2).replace('.', ',')})</option>
+  const html1 = flavors.map((p, idx) => `
+    <label class="flavor-radio-card">
+      <input type="radio" name="flavorRadio1" value="${p.id}" ${idx === 0 ? 'checked' : ''} onchange="recalculateModalTotal()" style="accent-color: var(--ph-red);">
+      <img src="${p.img_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=80'}" class="flavor-thumb" alt="${p.nome}">
+      <div class="flavor-info">
+        <div class="flavor-name">${p.nome}</div>
+        <div class="flavor-desc">${p.descricao || p.ingredientes || ''}</div>
+      </div>
+    </label>
   `).join('');
+
+  const html2 = flavors.map((p, idx) => `
+    <label class="flavor-radio-card">
+      <input type="radio" name="flavorRadio2" value="${p.id}" ${idx === 1 ? 'checked' : (idx === 0 ? 'checked' : '')} onchange="recalculateModalTotal()" style="accent-color: var(--ph-red);">
+      <img src="${p.img_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=100&q=80'}" class="flavor-thumb" alt="${p.nome}">
+      <div class="flavor-info">
+        <div class="flavor-name">${p.nome}</div>
+        <div class="flavor-desc">${p.descricao || p.ingredientes || ''}</div>
+      </div>
+    </label>
+  `).join('');
+
+  container1.innerHTML = html1;
+  if (container2) container2.innerHTML = html2;
 }
 
 function openPizzaCustomizerModal(productId) {
@@ -282,6 +293,7 @@ function openPizzaCustomizerModal(productId) {
   if (btn1) btn1.classList.add('active');
   if (btn2) btn2.classList.remove('active');
 
+  populateFlavorRadioLists();
   recalculateModalTotal();
 
   const modal = document.getElementById('pizzaModal') || document.getElementById('pizzaCustomizerModal');
@@ -300,24 +312,30 @@ function closePizzaCustomizerModal() {
 
 function selectPizzaSize(sizeName, btn) {
   selectedSize = sizeName;
-  document.querySelectorAll('.ph-size-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.size-option-card').forEach(b => b.classList.remove('selected'));
+  if (btn) btn.classList.add('selected');
+  const radio = btn ? btn.querySelector('input[type="radio"]') : null;
+  if (radio) radio.checked = true;
   recalculateModalTotal();
 }
 
 function selectFlavorMode(mode) {
+  setFlavorMode(mode);
+}
+
+function setFlavorMode(mode) {
   flavorMode = mode;
-  const btn1 = document.getElementById('btnFlavor1');
-  const btn2 = document.getElementById('btnFlavor2');
-  const wrapper2 = document.getElementById('secondFlavorWrapper');
+  const btn1 = document.getElementById('btnSingleFlavor') || document.getElementById('btnFlavor1');
+  const btn2 = document.getElementById('btnHalfFlavor') || document.getElementById('btnFlavor2');
+  const wrapper2 = document.getElementById('containerFlavor2');
 
   if (mode === 'single') {
-    btn1.classList.add('active');
-    btn2.classList.remove('active');
+    if (btn1) btn1.classList.add('active');
+    if (btn2) btn2.classList.remove('active');
     if (wrapper2) wrapper2.style.display = 'none';
   } else {
-    btn1.classList.remove('active');
-    btn2.classList.add('active');
+    if (btn1) btn1.classList.remove('active');
+    if (btn2) btn2.classList.add('active');
     if (wrapper2) wrapper2.style.display = 'block';
   }
 
@@ -338,8 +356,9 @@ function recalculateModalTotal() {
   }
 
   if (flavorMode === 'half') {
-    const s2Id = document.getElementById('selectSabor2')?.value;
-    const p2 = catalogData.find(p => p.id === s2Id);
+    const s2Radio = document.querySelector('input[name="flavorRadio2"]:checked');
+    const s2Id = s2Radio ? s2Radio.value : null;
+    const p2 = catalogData.find(p => String(p.id) === String(s2Id));
     if (p2) {
       let p2Price = p2.preco_grande || p2.preco || 0;
       if (selectedSize === 'broto' && p2.preco_broto) p2Price = p2.preco_broto;
@@ -357,6 +376,10 @@ function recalculateModalTotal() {
   const extraPrice = selectExtra ? (parseFloat(selectExtra.options[selectExtra.selectedIndex]?.dataset.price) || 0) : 0;
 
   const grandTotal = basePrice + bordaPrice + extraPrice;
+
+  const totalEl = document.getElementById('modalCalculatedTotal');
+  if (totalEl) totalEl.innerText = `R$ ${grandTotal.toFixed(2).replace('.', ',')}`;
+}
 
   const displayEl = document.getElementById('modalCalculatedTotal');
   if (displayEl) {
@@ -565,6 +588,18 @@ function toggleDeliveryTypeUI(type) {
   recalculateCartTotal();
 }
 
+function toggleSemNumero(chk) {
+  const numInput = document.getElementById('inputNumero');
+  if (!numInput) return;
+  if (chk.checked) {
+    numInput.value = 'S/N';
+    numInput.disabled = true;
+  } else {
+    numInput.value = '';
+    numInput.disabled = false;
+  }
+}
+
 function buscarCepViaAPI() {
   const cepInput = document.getElementById('inputCep').value.replace(/\D/g, '');
   if (cepInput.length !== 8) {
@@ -582,6 +617,33 @@ function buscarCepViaAPI() {
       const box = document.getElementById('addressResultBox');
       document.getElementById('txtRuaBairro').innerText = `${data.logradouro}, ${data.bairro} - ${data.localidade}/${data.uf}`;
       box.style.display = 'block';
+
+      // BUSCA AUTOMÁTICA DA TAXA DE ENTREGA DA REGIÃO/BAIRRO
+      const userBairro = (data.bairro || '').toLowerCase().trim();
+      const savedDelivery = localStorage.getItem('ptd_store_delivery_zones');
+      let zones = deliveryZones;
+      if (savedDelivery) {
+        try {
+          const parsed = JSON.parse(savedDelivery);
+          if (parsed.length > 0) zones = parsed;
+        } catch(e) {}
+      }
+
+      const matchedZone = zones.find(z => z.name.toLowerCase().includes(userBairro) || userBairro.includes(z.name.toLowerCase()));
+
+      if (matchedZone) {
+        currentDeliveryFee = matchedZone.price;
+        currentSelectedZoneName = matchedZone.name;
+      } else if (zones.length > 0) {
+        currentDeliveryFee = zones[0].price;
+        currentSelectedZoneName = zones[0].name;
+      } else {
+        currentDeliveryFee = 5.00;
+        currentSelectedZoneName = 'Taxa Padrão';
+      }
+
+      document.getElementById('txtFreteVal').innerText = `Taxa de Entrega (${currentSelectedZoneName}): R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}`;
+      recalculateCartTotal();
     })
     .catch(() => {
       alert('Erro ao consultar o CEP. Verifique sua conexão.');
@@ -625,12 +687,14 @@ function showOrderConfirmationOnScreen(paymentMethodLabel) {
   const orderNum = '#PED-' + Math.floor(1000 + Math.random() * 9000);
   document.getElementById('confirmedOrderNum').innerText = orderNum;
 
-  const numComp = document.getElementById('inputNumeroComp')?.value.trim() || 'Não informado';
+  const isSemNumero = document.getElementById('chkSemNumero')?.checked;
+  const numStr = isSemNumero ? 'S/N' : (document.getElementById('inputNumero')?.value.trim() || 'S/N');
+  const compStr = document.getElementById('inputComplemento')?.value.trim() || '';
   const enderecoInfo = document.getElementById('txtRuaBairro')?.innerText || 'Retirada no Balcão';
 
   let html = `<div style="margin-bottom: 8px;"><strong>Forma de Pagamento:</strong> ${paymentMethodLabel}</div>`;
-  html += `<div style="margin-bottom: 8px;"><strong>Forma de Envio:</strong> ${currentSelectedZoneName} (R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')})</div>`;
-  html += `<div style="margin-bottom: 8px;"><strong>Endereço:</strong> ${enderecoInfo} (${numComp})</div>`;
+  html += `<div style="margin-bottom: 8px;"><strong>Forma de Entrega:</strong> ${currentSelectedZoneName} (R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')})</div>`;
+  html += `<div style="margin-bottom: 8px;"><strong>Endereço:</strong> ${enderecoInfo}, Nº ${numStr}${compStr ? ' (' + compStr + ')' : ''}</div>`;
   html += `<div style="margin-bottom: 8px; border-top: 1px solid #DDD; padding-top: 6px;"><strong>Itens:</strong></div>`;
 
   cart.forEach(item => {
@@ -684,8 +748,12 @@ function enviarPedidoWhatsAppFinal() {
     return;
   }
 
-  const numComp = document.getElementById('inputNumeroComp')?.value.trim() || '';
+  const isSemNumero = document.getElementById('chkSemNumero')?.checked;
+  const numStr = isSemNumero ? 'S/N' : (document.getElementById('inputNumero')?.value.trim() || 'S/N');
+  const compStr = document.getElementById('inputComplemento')?.value.trim() || '';
   const enderecoInfo = document.getElementById('txtRuaBairro')?.innerText || 'Retirada no Balcão';
+  const enderecoCompleto = `${enderecoInfo}, Nº ${numStr}${compStr ? ' (' + compStr + ')' : ''}`;
+
   const orderNum = Math.floor(1000 + Math.random() * 9000);
   const now = new Date();
   const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -704,6 +772,7 @@ function enviarPedidoWhatsAppFinal() {
   const freteStr = currentDeliveryFee > 0 ? `R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}` : 'Grátis / Retirada no Balcão';
 
   let msg = `⭐ NOVO PEDIDO ⭐\n`;
+  msg += `Olá! Quero finalizar meu pedido.\n`;
   msg += `---------------------------------------\n`;
   msg += `Confira o pedido abaixo:\n`;
   msg += `Pedido #${orderNum} - ${storeName}\n`;
@@ -722,8 +791,8 @@ function enviarPedidoWhatsAppFinal() {
   msg += `Taxa de entrega: ${freteStr}\n`;
   msg += `Total: R$ ${total.toFixed(2).replace('.', ',')}\n\n`;
   msg += `---------------------------------------\n\n`;
-  msg += `Forma de Envio: ${currentSelectedZoneName}\n`;
-  msg += `Endereço: ${enderecoInfo}${numComp ? ' - ' + numComp : ''}\n\n`;
+  msg += `Forma de Entrega: ${currentSelectedZoneName}\n`;
+  msg += `Endereço: ${enderecoCompleto}\n\n`;
   msg += `Pagamento: WhatsApp / A Combinar\n\n`;
   msg += `Pedido gerado via Cardápio Digital às ${timeStr}`;
 
