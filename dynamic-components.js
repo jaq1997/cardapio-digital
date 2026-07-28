@@ -199,9 +199,10 @@ function renderDynamicCategoriesInHeader() {
 
     if (cats && cats.length > 0) {
         if (navContainer) {
-            let html = `<button class="ph-cat-pill active" data-cat="todos" onclick="filterCategory('todos', this)">TODOS OS PRODUTOS</button>`;
-            cats.forEach(c => {
-                html += `<button class="ph-cat-pill" data-cat="${c.id}" onclick="filterCategory('${c.id}', this)">${c.name.toUpperCase()}</button>`;
+            let html = '';
+            cats.forEach((c, idx) => {
+                const activeClass = idx === 0 ? 'active' : '';
+                html += `<button class="ph-cat-pill ${activeClass}" data-cat="${c.id}" onclick="filterCategory('${c.id}', this)">${c.name.toUpperCase()}</button>`;
             });
             navContainer.innerHTML = html;
         }
@@ -216,7 +217,7 @@ function renderDynamicCategoriesInHeader() {
         }
     } else {
         if (navContainer) {
-            navContainer.innerHTML = `<button class="ph-cat-pill active" data-cat="todos" onclick="filterCategory('todos', this)">TODOS OS PRODUTOS</button>`;
+            navContainer.innerHTML = '';
         }
         if (drawerContainer) {
             drawerContainer.innerHTML = `<div style="font-size: 0.7rem; font-weight: 900; color: #888; margin-bottom: 4px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div><button class="drawer-cat-item active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>`;

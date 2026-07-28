@@ -206,6 +206,24 @@ function filterCategory(catId, btnElement) {
     if (target) target.classList.add('active');
   }
 
+  const catTitleSpan = document.getElementById('catalogCategoryName');
+  if (catTitleSpan) {
+    if (catId === 'todos') {
+      catTitleSpan.innerText = 'TODOS OS PRODUTOS';
+    } else {
+      const savedCats = localStorage.getItem(STORAGE_KEY_CATEGORIES);
+      let catName = catId.toUpperCase();
+      if (savedCats) {
+        try {
+          const parsed = JSON.parse(savedCats);
+          const found = parsed.find(c => c.id === catId);
+          if (found) catName = found.name.toUpperCase();
+        } catch(e) {}
+      }
+      catTitleSpan.innerText = catName;
+    }
+  }
+
   renderCatalog();
 }
 
