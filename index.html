@@ -162,26 +162,100 @@
             </div>
           </div>
 
-          <!-- 3. BORDA RECHEADA -->
+          <!-- 3. ESCOLHA DA BORDA RECHEADA -->
           <div>
-            <div class="option-group-title">3. Opções de Borda</div>
-            <select class="cep-input" style="width: 100%; border-radius: 6px;" id="selectBorda" onchange="recalculateModalTotal()">
-              <option value="nenhuma" data-price="0">Massa Tradicional (Sem Borda Recheada)</option>
-              <option value="catupiry" data-price="12.90">Borda Vulcão de Catupiry Original (+ R$ 12,90)</option>
-              <option value="cheddar" data-price="12.90">Borda Recheada de Cheddar Cremoso (+ R$ 12,90)</option>
-              <option value="chocolate" data-price="13.90">Borda Recheada de Chocolate ao Leite (+ R$ 13,90)</option>
-            </select>
+            <div class="option-group-title">3. Borda Recheada (Opcional)</div>
+            <div class="flavor-radio-list" id="bordaRadioList">
+              <label class="flavor-radio-card">
+                <input type="radio" name="bordaRadio" value="sem" data-price="0" checked onchange="recalculateModalTotal()">
+                <div class="flavor-radio-img-wrap" style="background: #F5F5F5; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 6px;">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                </div>
+                <div class="flavor-radio-content">
+                  <div class="flavor-radio-title">Sem Borda Recheada</div>
+                  <div class="flavor-radio-desc">Massa tradicional assada com borda simples crocante.</div>
+                </div>
+                <div style="font-weight: 800; font-size: 0.82rem; color: #2E7D32;">Grátis</div>
+              </label>
+
+              <label class="flavor-radio-card">
+                <input type="radio" name="bordaRadio" value="catupiry" data-price="8.00" onchange="recalculateModalTotal()">
+                <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=200&q=80" class="flavor-radio-img" alt="Catupiry Cremoso">
+                <div class="flavor-radio-content">
+                  <div class="flavor-radio-title">Catupiry Cremoso Original</div>
+                  <div class="flavor-radio-desc">Borda recheada com legítimo Catupiry cremoso e gratinado.</div>
+                </div>
+                <div style="font-weight: 800; font-size: 0.82rem; color: var(--ph-red);">+ R$ 8,00</div>
+              </label>
+
+              <label class="flavor-radio-card">
+                <input type="radio" name="bordaRadio" value="cheddar" data-price="8.00" onchange="recalculateModalTotal()">
+                <img src="https://images.unsplash.com/photo-1541745537411-b8046dc6d66c?auto=format&fit=crop&w=200&q=80" class="flavor-radio-img" alt="Requeijão Cheddar">
+                <div class="flavor-radio-content">
+                  <div class="flavor-radio-title">Requeijão Cheddar Cremoso</div>
+                  <div class="flavor-radio-desc">Borda recheada com cheddar cremoso derretido e intenso.</div>
+                </div>
+                <div style="font-weight: 800; font-size: 0.82rem; color: var(--ph-red);">+ R$ 8,00</div>
+              </label>
+
+              <label class="flavor-radio-card">
+                <input type="radio" name="bordaRadio" value="chocolate" data-price="10.00" onchange="recalculateModalTotal()">
+                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=200&q=80" class="flavor-radio-img" alt="Chocolate ao Leite">
+                <div class="flavor-radio-content">
+                  <div class="flavor-radio-title">Chocolate ao Leite Nobre</div>
+                  <div class="flavor-radio-desc">Borda recheada com ganache de chocolate ao leite artesanal.</div>
+                </div>
+                <div style="font-weight: 800; font-size: 0.82rem; color: var(--ph-red);">+ R$ 10,00</div>
+              </label>
+            </div>
           </div>
 
-          <!-- 4. ADICIONAIS EXTRAS -->
+          <!-- 4. ADICIONAIS EXTRA -->
           <div>
-            <div class="option-group-title">4. Adicionais Extras</div>
-            <select class="cep-input" style="width: 100%; border-radius: 6px;" id="selectAdicionaisExtra" onchange="recalculateModalTotal()">
-              <option value="nenhum" data-price="0">Nenhum adicional extra</option>
-              <option value="bacon" data-price="6.90">Extra Bacon Crispy (+ R$ 6,90)</option>
-              <option value="alho" data-price="4.90">Extra Molho Especial de Alho (+ R$ 4,90)</option>
-              <option value="catupiry-extra" data-price="7.90">Extra Requeijão Cremoso (+ R$ 7,90)</option>
-            </select>
+            <div class="option-group-title">4. Adicionais Extra (Opcional)</div>
+            <div class="flavor-radio-list" id="extraRadioList">
+              <label class="flavor-radio-card">
+                <input type="radio" name="extraRadio" value="nenhum" data-price="0" checked onchange="recalculateModalTotal()">
+                <div class="flavor-radio-img-wrap" style="background: #F5F5F5; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 6px;">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                </div>
+                <div class="flavor-radio-content">
+                  <div class="flavor-radio-title">Nenhum Adicional Extra</div>
+                  <div class="flavor-radio-desc">Sem acréscimo de ingredientes extras.</div>
+                </div>
+                <div style="font-weight: 800; font-size: 0.82rem; color: #2E7D32;">Grátis</div>
+              </label>
+
+              <label class="flavor-radio-card">
+                <input type="radio" name="extraRadio" value="bacon" data-price="6.90" onchange="recalculateModalTotal()">
+                <img src="https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=200&q=80" class="flavor-radio-img" alt="Bacon Crocante">
+                <div class="flavor-radio-content">
+                  <div class="flavor-radio-title">Bacon Crispy Extra</div>
+                  <div class="flavor-radio-desc">Porção extra de fatias crocantes de bacon defumado.</div>
+                </div>
+                <div style="font-weight: 800; font-size: 0.82rem; color: var(--ph-red);">+ R$ 6,90</div>
+              </label>
+
+              <label class="flavor-radio-card">
+                <input type="radio" name="extraRadio" value="alho" data-price="4.90" onchange="recalculateModalTotal()">
+                <img src="https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=200&q=80" class="flavor-radio-img" alt="Alho Frito">
+                <div class="flavor-radio-content">
+                  <div class="flavor-radio-title">Alho Frito Dourado Extra</div>
+                  <div class="flavor-radio-desc">Porção extra de alho lâminado frito e salpicado.</div>
+                </div>
+                <div style="font-weight: 800; font-size: 0.82rem; color: var(--ph-red);">+ R$ 4,90</div>
+              </label>
+
+              <label class="flavor-radio-card">
+                <input type="radio" name="extraRadio" value="catupiry-extra" data-price="7.90" onchange="recalculateModalTotal()">
+                <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=200&q=80" class="flavor-radio-img" alt="Mussarela em Dobro">
+                <div class="flavor-radio-content">
+                  <div class="flavor-radio-title">Mussarela em Dobro Extra</div>
+                  <div class="flavor-radio-desc">Camada extra de mussarela especial de cura derretida.</div>
+                </div>
+                <div style="font-weight: 800; font-size: 0.82rem; color: var(--ph-red);">+ R$ 7,90</div>
+              </label>
+            </div>
           </div>
 
           <!-- 5. OBSERVAÇÕES DO PEDIDO -->
@@ -328,6 +402,7 @@
   </div>
 
   <script src="dynamic-components.js"></script>
+  <script src="defaults.js"></script>
   <script src="loja.js"></script>
 </body>
 

@@ -1,8 +1,4 @@
-/**
- * GOOGLE APPS SCRIPT (Code.gs) - CARDÁPIO DIGITAL MULTI-CLIENTE
- * Copie e cole este código no seu Google Apps Script (Extensões > Apps Script na Planilha Google Sheets)
- * Depois clique em "Implantar" > "Nova implantação" > Tipo: "App da Web" > Acesso: "Qualquer pessoa" (Anyone)
- */
+
 
 const SHEET_NAME = "Produtos";
 const R2_ACCOUNT_ID = "SEU_CLOUDFLARE_ACCOUNT_ID"; 

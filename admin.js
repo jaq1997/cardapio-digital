@@ -12,167 +12,7 @@ const STORAGE_KEY_CATEGORIES = 'ptd_store_categories';
 const STORAGE_KEY_DELIVERY_ZONES = 'ptd_delivery_zones';
 const STORAGE_KEY_SHEETS_CONFIG = 'ptd_sheets_config';
 
-const defaultBranding = {
-  storeName: "Pizza Todo Dia",
-  storeSub: "Antiga Tri Pizzas • Tradição e Sabor no Seu Bairro",
-  wppNumber: "5531992082542",
-  frete: 5.00,
-  primaryColor: "#E91C24",
-  darkColor: "#C50303",
-  logoUrl: "",
-  bannerDeskUrl: "",
-  bannerMobUrl: "",
-  coverageCities: "Porto Alegre, Viamão"
-};
-
-const defaultDeliveryZones = [
-  { id: "z-balcao", name: "Retirada no Balcão (Grátis)", price: 0.00 },
-  { id: "z-centro", name: "Centro / Bairros Próximos", price: 5.00 },
-  { id: "z-zonasul", name: "Zona Sul / Bairros Médios", price: 8.00 },
-  { id: "z-zonanorte", name: "Zona Norte / Bairros Distantes", price: 12.00 }
-];
-
-const defaultCategories = [
-  { id: "combos", name: "Promos do Dia" },
-  { id: "pizzas-salgadas", name: "Pizzas Salgadas" },
-  { id: "pizzas-doces", name: "Pizzas Doces" },
-  { id: "bebidas", name: "Bebidas" }
-];
-
-const defaultProducts = [
-  {
-    id: "combo-familia",
-    nome: "Combo Família Todo Dia",
-    categoria: "combos",
-    descricao: "2 Pizzas Grandes (até 4 sabores) + 1 Borda Recheada à escolha + 1 Guaraná Antarctica 2 Litros trincando de gelado.",
-    preco: 109.90,
-    preco_grande: 109.90,
-    preco_media: 89.90,
-    preco_broto: 0,
-    badge: "Combo Destaque",
-    img_url: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "combo-individual",
-    nome: "Combo Individual",
-    categoria: "combos",
-    descricao: "1 Pizza Broto (4 fatias) + 1 Porção de Pão de Alho (4un) + 1 Refrigerante Lata 350ml.",
-    preco: 34.90,
-    preco_grande: 0,
-    preco_media: 0,
-    preco_broto: 34.90,
-    badge: "Promoção",
-    img_url: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "pizza-pepperoni",
-    nome: "Pepperoni Especial",
-    categoria: "pizzas-salgadas",
-    descricao: "Molho de tomate artesanal da casa, generosa camada de mussarela derretida e fatias crocantes de pepperoni.",
-    preco: 64.90,
-    preco_grande: 64.90,
-    preco_media: 49.90,
-    preco_broto: 36.90,
-    badge: "Mais Pedida",
-    img_url: "https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "pizza-pepperoni-requeijao",
-    nome: "Pepperoni com Requeijão Cremoso",
-    categoria: "pizzas-salgadas",
-    descricao: "Fatias crocantes de pepperoni combinadas com fios generosos de requeijão cremoso e mussarela derretida.",
-    preco: 68.90,
-    preco_grande: 68.90,
-    preco_media: 53.90,
-    preco_broto: 39.90,
-    badge: "",
-    img_url: "https://images.unsplash.com/photo-1541745537411-b8046dc6d66c?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "pizza-calabresa",
-    nome: "Calabresa com Cebola Roxa",
-    categoria: "pizzas-salgadas",
-    descricao: "Calabresa defumada selecionada fatiada fininha, cebola roxa fresca, azeitonas pretas e orégano sobre mussarela.",
-    preco: 59.90,
-    preco_grande: 59.90,
-    preco_media: 46.90,
-    preco_broto: 34.90,
-    badge: "",
-    img_url: "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "pizza-supreme",
-    nome: "Pizza Suprema Todo Dia",
-    categoria: "pizzas-salgadas",
-    descricao: "A receita da casa! Pepperoni, carne moída temperada, pimentão verde crocante, cebola fresca e cogumelos.",
-    preco: 72.90,
-    preco_grande: 72.90,
-    preco_media: 56.90,
-    preco_broto: 42.90,
-    badge: "Especialidade",
-    img_url: "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "pizza-frango-requeijao",
-    nome: "Frango com Catupiry Original",
-    categoria: "pizzas-salgadas",
-    descricao: "Peito de frango desfiaudinho bem temperado, milho verde e camada generosa do autêntico Catupiry cremoso.",
-    preco: 64.90,
-    preco_grande: 64.90,
-    preco_media: 49.90,
-    preco_broto: 37.90,
-    badge: "",
-    img_url: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "pizza-4queijos",
-    nome: "Quatro Queijos Premium",
-    categoria: "pizzas-salgadas",
-    descricao: "Harmonia perfeita de Mussarela, Provolone defumado, Gorgonzola aveludado e Requeijão cremoso.",
-    preco: 66.90,
-    preco_grande: 66.90,
-    preco_media: 51.90,
-    preco_broto: 38.90,
-    badge: "",
-    img_url: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "pizza-doce-nutella",
-    nome: "Nutella com Morango",
-    categoria: "pizzas-doces",
-    descricao: "Massa crocante assada no forno coberta com uma generosa camada de Nutella® cremosa e morangos frescos fatiados.",
-    preco: 58.90,
-    preco_grande: 58.90,
-    preco_media: 46.90,
-    preco_broto: 36.90,
-    badge: "Doce Mais Pedida",
-    img_url: "https://images.unsplash.com/photo-1588315029754-2dd089d39a1a?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "bebida-coca-2l",
-    nome: "Coca-Cola Garrafa 2L",
-    categoria: "bebidas",
-    descricao: "Garrafa 2 Litros trincando de gelada.",
-    preco: 14.90,
-    preco_grande: 14.90,
-    preco_media: 0,
-    preco_broto: 0,
-    badge: "",
-    img_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "bebida-guarana-2l",
-    nome: "Guaraná Antarctica Garrafa 2L",
-    categoria: "bebidas",
-    descricao: "Garrafa 2 Litros super gelada.",
-    preco: 12.90,
-    preco_grande: 12.90,
-    preco_media: 0,
-    preco_broto: 0,
-    badge: "",
-    img_url: "https://images.unsplash.com/photo-1581006852262-e4307cf6283a?auto=format&fit=crop&w=800&q=80"
-  }
-];
+// Defaults moved to `defaults.js` (loaded before this script)
 
 let currentBranding = {};
 let currentCategories = [];
@@ -194,6 +34,42 @@ document.addEventListener('DOMContentLoaded', () => {
   initDragAndDropHandlers();
   fetchFromSheets();
 });
+
+/**
+ * Helper de requisição com timeout e validação de resposta
+ * Retorna JSON quando aplicável, lança erro em timeouts ou resposta não-ok
+ */
+async function apiRequest(url, options = {}, timeout = 8000) {
+  const controller = new AbortController();
+  const signal = controller.signal;
+  const timer = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const fetchOptions = { ...options, signal };
+    const res = await fetch(url, fetchOptions);
+    clearTimeout(timer);
+
+    if (!res.ok) {
+      const txt = await res.text().catch(() => '');
+      throw new Error(`HTTP ${res.status} - ${txt}`);
+    }
+
+    const ct = (res.headers.get('content-type') || '').toLowerCase();
+    if (ct.includes('application/json') || ct.includes('text/plain')) {
+      try {
+        return await res.json();
+      } catch (e) {
+        throw new Error('Resposta JSON inválida');
+      }
+    }
+
+    // fallback para texto/HTML
+    return await res.text();
+  } catch (err) {
+    if (err.name === 'AbortError') throw new Error('Timeout de requisição');
+    throw err;
+  }
+}
 
 function applyUnifiedBrandingVariables(primaryColor, darkColor) {
   if (primaryColor) {
@@ -220,17 +96,38 @@ function loadAdminSettings() {
   const savedSheetsCfg = localStorage.getItem(STORAGE_KEY_SHEETS_CONFIG);
   sheetsConfig = savedSheetsCfg ? JSON.parse(savedSheetsCfg) : { appsScriptUrl: DEFAULT_APPS_SCRIPT_URL, sheetCsvUrl: DEFAULT_CSV_URL };
 
-  document.getElementById('cfgStoreName').value = currentBranding.storeName || '';
-  document.getElementById('cfgStoreSub').value = currentBranding.storeSub || '';
-  if (document.getElementById('cfgStoreAddress')) document.getElementById('cfgStoreAddress').value = currentBranding.storeAddress || '';
-  if (document.getElementById('cfgStoreHours')) document.getElementById('cfgStoreHours').value = currentBranding.storeHours || '';
-  document.getElementById('cfgWppNumber').value = currentBranding.wppNumber || '';
-  document.getElementById('cfgFrete').value = currentBranding.frete || 5.00;
-  document.getElementById('cfgPrimaryColor').value = currentBranding.primaryColor || '#E91C24';
-  document.getElementById('cfgPrimaryColorPicker').value = currentBranding.primaryColor || '#E91C24';
-  document.getElementById('cfgDarkColor').value = currentBranding.darkColor || '#C50303';
-  document.getElementById('cfgDarkColorPicker').value = currentBranding.darkColor || '#C50303';
-  document.getElementById('cfgCoverageCities').value = currentBranding.coverageCities || 'Porto Alegre, Viamão';
+  const elName = document.getElementById('cfgStoreName');
+  if (elName) elName.value = currentBranding.storeName || '';
+
+  const elSub = document.getElementById('cfgStoreSub');
+  if (elSub) elSub.value = currentBranding.storeSub || '';
+
+  const elAddr = document.getElementById('cfgStoreAddress');
+  if (elAddr) elAddr.value = currentBranding.storeAddress || '';
+
+  const elHours = document.getElementById('cfgStoreHours');
+  if (elHours) elHours.value = currentBranding.storeHours || '';
+
+  const elWpp = document.getElementById('cfgWppNumber');
+  if (elWpp) elWpp.value = currentBranding.wppNumber || '';
+
+  const elFrete = document.getElementById('cfgFrete');
+  if (elFrete) elFrete.value = currentBranding.frete || 5.00;
+
+  const elPrimColor = document.getElementById('cfgPrimaryColor');
+  if (elPrimColor) elPrimColor.value = currentBranding.primaryColor || '#E91C24';
+
+  const elPrimPicker = document.getElementById('cfgPrimaryColorPicker');
+  if (elPrimPicker) elPrimPicker.value = currentBranding.primaryColor || '#E91C24';
+
+  const elDarkColor = document.getElementById('cfgDarkColor');
+  if (elDarkColor) elDarkColor.value = currentBranding.darkColor || '#C50303';
+
+  const elDarkPicker = document.getElementById('cfgDarkColorPicker');
+  if (elDarkPicker) elDarkPicker.value = currentBranding.darkColor || '#C50303';
+
+  const elCities = document.getElementById('cfgCoverageCities');
+  if (elCities) elCities.value = currentBranding.coverageCities || 'Porto Alegre, Viamão';
 
   const scriptInput = document.getElementById('cfgAppsScriptUrl');
   const csvInput = document.getElementById('cfgSheetCsvUrl');
@@ -266,8 +163,11 @@ function loadAdminSettings() {
     }
   }
 
-  document.getElementById('adminStoreTitleDisplay').innerText = currentBranding.storeName || 'Sua Loja';
-  document.getElementById('currentWppDisplay').innerText = currentBranding.wppNumber || 'Não cadastrado';
+  const titleDisp = document.getElementById('adminStoreTitleDisplay');
+  if (titleDisp) titleDisp.innerText = currentBranding.storeName || 'Sua Loja';
+
+  const wppDisp = document.getElementById('currentWppDisplay');
+  if (wppDisp) wppDisp.innerText = currentBranding.wppNumber || 'Não cadastrado';
 }
 
 function saveSheetsConfig(event) {
@@ -276,7 +176,7 @@ function saveSheetsConfig(event) {
   sheetsConfig.sheetCsvUrl = document.getElementById('cfgSheetCsvUrl').value.trim() || DEFAULT_CSV_URL;
 
   localStorage.setItem(STORAGE_KEY_SHEETS_CONFIG, JSON.stringify(sheetsConfig));
-  alert('Configurações salvas com sucesso!');
+  showToast('Configurações salvas com sucesso!', 'success');
   fetchFromSheets();
 }
 
@@ -293,11 +193,10 @@ async function fetchFromSheets() {
       statusDisplay.style.color = "#FFA000";
     }
     try {
-      const res = await fetch(targetUrl);
-      const json = await res.json();
-      if (json.ok && Array.isArray(json.data)) {
-        if (json.data.length > 0) {
-          currentProducts = json.data.map((p, i) => ({
+        const json = await apiRequest(targetUrl, { method: 'GET' }, 8000);
+        if (json && json.ok && Array.isArray(json.data)) {
+          if (json.data.length > 0) {
+            currentProducts = json.data.map((p, i) => ({
             id: p.id || String(i + 1),
             nome: p.nome || '',
             categoria: p.categoria || 'pizzas-salgadas',
@@ -391,6 +290,56 @@ function fetchFromCsvFallback() {
   });
 }
 
+/**
+ * Validação leve de produto antes de salvar
+ * Retorna { valid: boolean, errors: string[] }
+ */
+function validateProduct(prod) {
+  // Use Ajv when available (loaded via CDN in admin.html)
+  const productSchema = {
+    type: 'object',
+    properties: {
+      id: { type: 'string' },
+      nome: { type: 'string', minLength: 2 },
+      categoria: { type: 'string', minLength: 1 },
+      descricao: { type: 'string' },
+      preco: { type: 'number', minimum: 0 },
+      preco_grande: { type: 'number', minimum: 0 },
+      preco_media: { type: 'number', minimum: 0 },
+      preco_broto: { type: 'number', minimum: 0 },
+      badge: { type: 'string' },
+      img_url: { type: 'string' }
+    },
+    required: ['id', 'nome', 'categoria', 'preco', 'img_url'],
+    additionalProperties: true
+  };
+
+  try {
+    if (window.Ajv) {
+      const ajv = new window.Ajv();
+      const validate = ajv.compile(productSchema);
+      const valid = validate(prod);
+      if (valid) return { valid: true, errors: [] };
+      const errors = (validate.errors || []).map(e => `${e.instancePath.replace(/^\//, '') || e.params.missingProperty || 'campo'} ${e.message}`);
+      return { valid: false, errors };
+    }
+  } catch (e) {
+    console.warn('Ajv validation failed, falling back to lightweight checks', e);
+  }
+
+  // Fallback leve caso Ajv não esteja presente
+  const errors = [];
+  if (!prod) {
+    errors.push('Produto vazio');
+    return { valid: false, errors };
+  }
+  if (!prod.nome || String(prod.nome).trim().length < 2) errors.push('Nome inválido (mínimo 2 caracteres)');
+  if (!prod.categoria || String(prod.categoria).trim().length === 0) errors.push('Categoria é obrigatória');
+  if (isNaN(parseFloat(prod.preco)) || parseFloat(prod.preco) < 0) errors.push('Preço inválido');
+  if (!prod.img_url || String(prod.img_url).trim().length === 0) errors.push('Imagem é obrigatória (URL ou upload)');
+  return { valid: errors.length === 0, errors };
+}
+
 function formatFotoUrl(val) {
   if (!val) return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
   const trimmed = val.trim();
@@ -406,20 +355,21 @@ async function saveToSheets(productsToSave = currentProducts) {
   if (!targetUrl) return;
 
   try {
-    const res = await fetch(targetUrl, {
+    const json = await apiRequest(targetUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
-        action: 'save',
-        data: productsToSave
-      })
-    });
-    const json = await res.json();
-    if (json.ok) {
+      headers: { 'Content-Type': 'application/json;charset=utf-8' },
+      body: JSON.stringify({ action: 'save', data: productsToSave })
+    }, 12000);
+
+    if (json && json.ok) {
       console.log('✓ Sincronizado com a Planilha Remota!');
+      return json;
+    } else {
+      throw new Error('Resposta inesperada do servidor');
     }
   } catch (err) {
     console.error('Erro ao salvar na Planilha Remota:', err);
+    throw err;
   }
 }
 
@@ -443,20 +393,13 @@ async function uploadToCloudflareR2(file) {
       }
 
       try {
-        const res = await fetch(targetUrl, {
+        const json = await apiRequest(targetUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'uploadR2',
-            folder: storeSlug,
-            fileName: file.name,
-            mimeType: file.type || 'image/png',
-            base64: base64
-          })
-        });
+          headers: { 'Content-Type': 'application/json;charset=utf-8' },
+          body: JSON.stringify({ action: 'uploadR2', folder: storeSlug, fileName: file.name, mimeType: file.type || 'image/png', base64: base64 })
+        }, 20000);
 
-        const json = await res.json();
-        if (json.ok && json.url) {
+        if (json && json.ok && json.url) {
           resolve(json.url);
         } else {
           resolve(reader.result);
@@ -471,28 +414,27 @@ async function uploadToCloudflareR2(file) {
 
 function syncWithSheetsNow() {
   fetchFromSheets();
-  alert('Sincronização iniciada!');
+  showToast('Sincronização iniciada!', 'info');
 }
 
 function pushCurrentToSheetsNow() {
   saveToSheets(currentProducts).then(() => {
-    alert('Produtos e categorias enviados para a planilha remota com sucesso!');
+    showToast('Produtos e categorias enviados para a planilha remota com sucesso!', 'success');
   });
 }
-
-function resetBrandingToDefault() {
-  if (confirm('Deseja restaurar as configurações originais da marca Pizza Todo Dia?')) {
-    localStorage.removeItem(STORAGE_KEY_BRANDING);
-    localStorage.removeItem(STORAGE_KEY_CATEGORIES);
-    localStorage.removeItem(STORAGE_KEY_PRODUCTS);
-    localStorage.removeItem(STORAGE_KEY_DELIVERY_ZONES);
-    localStorage.removeItem(STORAGE_KEY_SHEETS_CONFIG);
-    loadAdminSettings();
-    renderAdminTable();
-    renderCategoriesUI();
-    renderDeliveryZonesUI();
-    alert('Configurações da Pizza Todo Dia restauradas com sucesso!');
-  }
+async function resetBrandingToDefault() {
+  const ok = await showConfirm('Deseja restaurar as configurações originais da marca Pizza Todo Dia?');
+  if (!ok) return;
+  localStorage.removeItem(STORAGE_KEY_BRANDING);
+  localStorage.removeItem(STORAGE_KEY_CATEGORIES);
+  localStorage.removeItem(STORAGE_KEY_PRODUCTS);
+  localStorage.removeItem(STORAGE_KEY_DELIVERY_ZONES);
+  localStorage.removeItem(STORAGE_KEY_SHEETS_CONFIG);
+  loadAdminSettings();
+  renderAdminTable();
+  renderCategoriesUI();
+  renderDeliveryZonesUI();
+  showToast('Configurações da Pizza Todo Dia restauradas com sucesso!', 'success');
 }
 
 function renderDeliveryZonesUI() {
@@ -541,15 +483,16 @@ function addNewDeliveryZone(event) {
   nameInput.value = '';
   priceInput.value = '';
   renderDeliveryZonesUI();
-  alert(`Região "${name}" (R$ ${price.toFixed(2)}) cadastrada com sucesso!`);
+  showToast(`Região "${name}" (R$ ${price.toFixed(2)}) cadastrada com sucesso!`, 'success');
 }
 
-function deleteDeliveryZone(zoneId) {
-  if (confirm('Deseja excluir esta taxa de entrega?')) {
-    currentDeliveryZones = currentDeliveryZones.filter(z => z.id !== zoneId);
-    localStorage.setItem(STORAGE_KEY_DELIVERY_ZONES, JSON.stringify(currentDeliveryZones));
-    renderDeliveryZonesUI();
-  }
+async function deleteDeliveryZone(zoneId) {
+  const ok = await showConfirm('Deseja excluir esta taxa de entrega?');
+  if (!ok) return;
+  currentDeliveryZones = currentDeliveryZones.filter(z => z.id !== zoneId);
+  localStorage.setItem(STORAGE_KEY_DELIVERY_ZONES, JSON.stringify(currentDeliveryZones));
+  renderDeliveryZonesUI();
+  showToast('Região excluída com sucesso!', 'success');
 }
 
 function renderCategoriesUI() {
@@ -571,7 +514,7 @@ function renderCategoriesUI() {
   updateStats();
 }
 
-function addNewCategory(event) {
+async function addNewCategory(event) {
   event.preventDefault();
   const input = document.getElementById('newCategoryInput');
   const catName = input.value.trim();
@@ -579,7 +522,7 @@ function addNewCategory(event) {
 
   const exists = currentCategories.some(c => c.name.toLowerCase() === catName.toLowerCase());
   if (exists) {
-    const confirmCreate = confirm(`Já existe uma categoria cadastrada com o nome "${catName}". Deseja criar outra categoria com este mesmo nome assim mesmo?`);
+    const confirmCreate = await showConfirm(`Já existe uma categoria cadastrada com o nome "${catName}". Deseja criar outra categoria com este mesmo nome assim mesmo?`);
     if (!confirmCreate) return;
   }
 
@@ -590,15 +533,16 @@ function addNewCategory(event) {
 
   input.value = '';
   renderCategoriesUI();
-  alert(`Categoria "${catName}" adicionada com sucesso!`);
+  showToast(`Categoria "${catName}" adicionada com sucesso!`, 'success');
 }
 
-function deleteCategory(catId) {
-  if (confirm('Deseja excluir esta categoria? Os produtos vinculados a ela permanecerão salvos.')) {
-    currentCategories = currentCategories.filter(c => c.id !== catId);
-    localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(currentCategories));
-    renderCategoriesUI();
-  }
+async function deleteCategory(catId) {
+  const ok = await showConfirm('Deseja excluir esta categoria? Os produtos vinculados a ela permanecerão salvos.');
+  if (!ok) return;
+  currentCategories = currentCategories.filter(c => c.id !== catId);
+  localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(currentCategories));
+  renderCategoriesUI();
+  showToast('Categoria excluída com sucesso!', 'success');
 }
 
 function initDragAndDropHandlers() {
@@ -677,7 +621,7 @@ function setupDropZone(zoneId, callback) {
 
 function processFileToBase64(file, callback) {
   if (!file.type.startsWith('image/')) {
-    alert('Por favor, selecione apenas arquivos de imagem (.png, .jpg, .jpeg, .webp).');
+    showToast('Por favor, selecione apenas arquivos de imagem (.png, .jpg, .jpeg, .webp).', 'error');
     return;
   }
   uploadToCloudflareR2(file).then(url => callback(url));
@@ -703,7 +647,7 @@ function removeLogo() {
   const btn = document.getElementById('btnRemoveLogo');
   if (preview) preview.style.display = 'none';
   if (btn) btn.style.display = 'none';
-  alert('Logo removida com sucesso! O cardápio voltará a exibir a logo estilizada em texto.');
+  showToast('Logo removida com sucesso! O cardápio voltará a exibir a logo estilizada em texto.', 'success');
 }
 
 function previewBannerDeskUpload(input) {
@@ -726,7 +670,7 @@ function removeBannerDesk() {
   const btn = document.getElementById('btnRemoveBannerDesk');
   if (preview) preview.style.display = 'none';
   if (btn) btn.style.display = 'none';
-  alert('Banner Desktop removido com sucesso!');
+  showToast('Banner Desktop removido com sucesso!', 'success');
 }
 
 function previewBannerMobUpload(input) {
@@ -749,7 +693,7 @@ function removeBannerMob() {
   const btn = document.getElementById('btnRemoveBannerMob');
   if (preview) preview.style.display = 'none';
   if (btn) btn.style.display = 'none';
-  alert('Banner Mobile removido com sucesso!');
+  showToast('Banner Mobile removido com sucesso!', 'success');
 }
 
 function previewProductFileUpload(input) {
@@ -796,8 +740,7 @@ function saveBrandingConfig(event) {
 
   document.getElementById('adminStoreTitleDisplay').innerText = currentBranding.storeName;
   document.getElementById('currentWppDisplay').innerText = currentBranding.wppNumber;
-
-  alert('Configurações salvas com sucesso! A identidade visual, endereço, horários, banners e WhatsApp foram atualizados.');
+  showToast('Configurações salvas com sucesso! A identidade visual, endereço, horários, banners e WhatsApp foram atualizados.', 'success');
 }
 
 function updateStats() {
@@ -915,12 +858,12 @@ function addNewCoupon(event) {
   const val = parseFloat(valueInput.value) || 0;
 
   if (!code || val <= 0) {
-    alert('Por favor, preencha um código válido e um valor de desconto maior que zero.');
+    showToast('Por favor, preencha um código válido e um valor de desconto maior que zero.', 'error');
     return;
   }
 
   if (currentCoupons.some(c => c.code === code)) {
-    alert(`O cupom "${code}" já está cadastrado!`);
+    showToast(`O cupom "${code}" já está cadastrado!`, 'error');
     return;
   }
 
@@ -937,15 +880,15 @@ function addNewCoupon(event) {
   codeInput.value = '';
   valueInput.value = '';
   renderCouponsUI();
-  alert(`Cupom "${code}" criado com sucesso!`);
+  showToast(`Cupom "${code}" criado com sucesso!`, 'success');
 }
-
-function deleteCoupon(id) {
-  if (confirm('Tem certeza que deseja excluir este cupom de desconto?')) {
-    currentCoupons = currentCoupons.filter(c => c.id !== id);
-    localStorage.setItem(STORAGE_KEY_COUPONS, JSON.stringify(currentCoupons));
-    renderCouponsUI();
-  }
+async function deleteCoupon(id) {
+  const ok = await showConfirm('Tem certeza que deseja excluir este cupom de desconto?');
+  if (!ok) return;
+  currentCoupons = currentCoupons.filter(c => c.id !== id);
+  localStorage.setItem(STORAGE_KEY_COUPONS, JSON.stringify(currentCoupons));
+  renderCouponsUI();
+  showToast('Cupom excluído com sucesso!', 'success');
 }
 
 function switchAdminTab(tabName) {
@@ -1017,34 +960,27 @@ function saveProductItem(event) {
   const badge = document.getElementById('prodBadge').value.trim();
   const imgUrl = pendingProductImgBase64 || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
 
+  const candidate = {
+    id: editId || ('prod-' + Date.now()),
+    nome: name,
+    categoria: category,
+    preco: price,
+    preco_grande: price,
+    descricao: desc,
+    img_url: imgUrl,
+    badge: badge
+  };
+
+  const validation = validateProduct(candidate);
+  if (!validation.valid) {
+    showToast('Não foi possível salvar o produto:\n- ' + validation.errors.join('\n- '), 'error');
+    return;
+  }
   if (editId) {
     const idx = currentProducts.findIndex(p => p.id === editId);
-    if (idx !== -1) {
-      currentProducts[idx] = {
-        ...currentProducts[idx],
-        nome: name,
-        categoria: category,
-        preco: price,
-        preco_grande: price,
-        descricao: desc,
-        img_url: imgUrl,
-        badge: badge
-      };
-    }
+    if (idx !== -1) currentProducts[idx] = { ...currentProducts[idx], ...candidate };
   } else {
-    const newId = 'prod-' + Date.now();
-    currentProducts.push({
-      id: newId,
-      nome: name,
-      categoria: category,
-      preco: price,
-      preco_grande: price,
-      preco_media: price,
-      preco_broto: price,
-      descricao: desc,
-      img_url: imgUrl,
-      badge: badge
-    });
+    currentProducts.push({ ...candidate, preco_media: price, preco_broto: price });
   }
 
   localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(currentProducts));
@@ -1052,14 +988,14 @@ function saveProductItem(event) {
 
   closeProductFormModal();
   renderAdminTable();
-  alert('Produto salvo com sucesso no cardápio!');
+  showToast('Produto salvo com sucesso no cardápio!', 'success');
 }
-
-function deleteProductItem(id) {
-  if (confirm('Tem certeza que deseja excluir este produto do cardápio?')) {
-    currentProducts = currentProducts.filter(p => p.id !== id);
-    localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(currentProducts));
-    saveToSheets(currentProducts);
-    renderAdminTable();
-  }
+async function deleteProductItem(id) {
+  const ok = await showConfirm('Tem certeza que deseja excluir este produto do cardápio?');
+  if (!ok) return;
+  currentProducts = currentProducts.filter(p => p.id !== id);
+  localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(currentProducts));
+  saveToSheets(currentProducts);
+  renderAdminTable();
+  showToast('Produto excluído do cardápio.', 'success');
 }

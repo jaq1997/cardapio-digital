@@ -6,12 +6,7 @@ const STORAGE_KEY_DELIVERY_ZONES = 'ptd_delivery_zones';
 
 let WPP_NUMERO = '5531992082542';
 
-const defaultDeliveryZones = [
-  { id: "z-balcao", name: "Retirada no Balcão (Grátis)", price: 0.00 },
-  { id: "z-centro", name: "Centro / Bairros Próximos", price: 5.00 },
-  { id: "z-zonasul", name: "Zona Sul / Bairros Médios", price: 8.00 },
-  { id: "z-zonanorte", name: "Zona Norte / Bairros Distantes", price: 12.00 }
-];
+// Delivery zones default moved to `defaults.js`
 
 let catalogData = [];
 let deliveryZones = defaultDeliveryZones;
@@ -25,14 +20,7 @@ let currentSelectedProduct = null;
 let currentDeliveryFee = 5.00;
 let currentSelectedZoneName = "Entrega em Domicílio";
 
-const defaultProducts = [
-  { id: 'p-1', nome: 'Combo Família Todo Dia', categoria: 'combos', preco: 74.90, preco_grande: 74.90, badge: 'Combo Destaque', descricao: '2 Pizzas Grandes quentinhas + 1 Borda Recheada + 1 Guaraná 2L.', img_url: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80' },
-  { id: 'p-2', nome: 'Pizza Pepperoni Especial', categoria: 'pizzas-salgadas', preco: 64.90, preco_broto: 36.90, preco_media: 49.90, preco_grande: 64.90, preco_gigante: 79.90, badge: 'Mais Pedida', descricao: 'Massa crocante com molho artesanal, mussarela e Pepperoni crocante.', img_url: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=800&q=80' },
-  { id: 'p-3', nome: 'Pizza Calabresa Cremosa', categoria: 'pizzas-salgadas', preco: 59.90, preco_broto: 34.90, preco_media: 46.90, preco_grande: 59.90, preco_gigante: 74.90, badge: 'Tradicional', descricao: 'Fatias de calabresa acebolada especial com toque de orégano.', img_url: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=800&q=80' },
-  { id: 'p-4', nome: 'Pizza Margherita Suprema', categoria: 'pizzas-salgadas', preco: 59.90, preco_broto: 34.90, preco_media: 46.90, preco_grande: 59.90, preco_gigante: 74.90, badge: 'Vegetariana', descricao: 'Mussarela de cura, rodelas de tomate fresco e manjericão fresco.', img_url: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=800&q=80' },
-  { id: 'p-5', nome: 'Pizza Chocolate com Morango', categoria: 'pizzas-doces', preco: 54.90, preco_broto: 32.90, preco_media: 44.90, preco_grande: 54.90, preco_gigante: 68.90, badge: 'Sobremesa', descricao: 'Chocolate nobre derretido coberto com lâminas de morango fresco.', img_url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80' },
-  { id: 'p-6', nome: 'Guaraná Antarctica 2L', categoria: 'bebidas', preco: 12.00, preco_grande: 12.00, badge: 'Gelado', descricao: 'Refrigerante Guaraná Antarctica garrafa 2 Litros trincando de gelado.', img_url: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=800&q=80' }
-];
+// Default products moved to `defaults.js` (alias `defaultCatalogData`)
 
 document.addEventListener('DOMContentLoaded', () => {
   applyDynamicBranding();
@@ -384,11 +372,11 @@ function recalculateModalTotal() {
     }
   }
 
-  const selectBorda = document.getElementById('selectBorda');
-  const bordaPrice = selectBorda ? (parseFloat(selectBorda.options[selectBorda.selectedIndex]?.dataset.price) || 0) : 0;
+  const selectedBordaRadio = document.querySelector('input[name="bordaRadio"]:checked');
+  const bordaPrice = selectedBordaRadio ? (parseFloat(selectedBordaRadio.dataset.price) || 0) : 0;
 
-  const selectExtra = document.getElementById('selectAdicionaisExtra');
-  const extraPrice = selectExtra ? (parseFloat(selectExtra.options[selectExtra.selectedIndex]?.dataset.price) || 0) : 0;
+  const selectedExtraRadio = document.querySelector('input[name="extraRadio"]:checked');
+  const extraPrice = selectedExtraRadio ? (parseFloat(selectedExtraRadio.dataset.price) || 0) : 0;
 
   const grandTotal = basePrice + bordaPrice + extraPrice;
 
@@ -403,8 +391,9 @@ function addCustomPizzaToCart() {
   let detailsArr = [];
 
   if (flavorMode === 'half') {
-    const s2Id = document.getElementById('selectSabor2')?.value;
-    const p2 = catalogData.find(p => p.id === s2Id);
+    const s2Radio = document.querySelector('input[name="flavorRadio2"]:checked');
+    const s2Id = s2Radio ? s2Radio.value : null;
+    const p2 = catalogData.find(p => String(p.id) === String(s2Id));
     if (p2) {
       title = `Meio ${currentSelectedProduct.nome} + Meio ${p2.nome}`;
     }
@@ -412,21 +401,23 @@ function addCustomPizzaToCart() {
 
   detailsArr.push(`Tamanho: ${selectedSize.toUpperCase()}`);
 
-  const selectBorda = document.getElementById('selectBorda');
-  if (selectBorda && selectBorda.value !== 'nenhuma') {
-    detailsArr.push(`Borda: ${selectBorda.options[selectBorda.selectedIndex].text}`);
+  const selectedBordaRadio = document.querySelector('input[name="bordaRadio"]:checked');
+  if (selectedBordaRadio && selectedBordaRadio.value !== 'sem') {
+    const cardTitle = selectedBordaRadio.closest('.flavor-radio-card')?.querySelector('.flavor-radio-title')?.innerText || 'Borda Recheada';
+    detailsArr.push(`Borda: ${cardTitle}`);
   }
 
-  const selectExtra = document.getElementById('selectAdicionaisExtra');
-  if (selectExtra && selectExtra.value !== 'nenhum') {
-    detailsArr.push(`Extra: ${selectExtra.options[selectExtra.selectedIndex].text}`);
+  const selectedExtraRadio = document.querySelector('input[name="extraRadio"]:checked');
+  if (selectedExtraRadio && selectedExtraRadio.value !== 'nenhum') {
+    const extraTitle = selectedExtraRadio.closest('.flavor-radio-card')?.querySelector('.flavor-radio-title')?.innerText || 'Adicional Extra';
+    detailsArr.push(`Extra: ${extraTitle}`);
   }
 
   const obs = document.getElementById('modalObs')?.value.trim();
   if (obs) detailsArr.push(`Obs: ${obs}`);
 
   const calculatedStr = document.getElementById('modalCalculatedTotal')?.innerText || '0';
-  const finalPrice = parseFloat(calculatedStr.replace('R$', '').replace('.', '').replace(',', '.')) || 0;
+  const finalPrice = parseFloat(calculatedStr.replace('R$', '').replace('.', '').replace(',', '.').trim()) || 0;
 
   const cartItem = {
     id: currentSelectedProduct.id + '-' + Date.now(),
@@ -439,30 +430,36 @@ function addCustomPizzaToCart() {
   cart.push(cartItem);
   updateCartBadge();
   closePizzaCustomizerModal();
-  alert(`"${title}" adicionado ao seu pedido!`);
+  showToast(`"${title}" adicionado ao seu pedido!`, 'info');
 }
 
 function updateCartBadge() {
-  const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+  const totalQty = cart.reduce((sum, item) => sum + (parseInt(item.qty) || 1), 0);
   const badge = document.getElementById('cartCountBadge');
   if (badge) badge.innerText = totalQty;
 }
 
 function openCartModal() {
-  renderCartItems();
-  recalculateCartTotal();
-  document.getElementById('cartModal').classList.add('active');
+  try {
+    renderCartItems();
+    recalculateCartTotal();
+  } catch(e) {
+    console.error('Erro ao preparar carrinho:', e);
+  }
+  const modal = document.getElementById('cartModal');
+  if (modal) modal.classList.add('active');
 }
 
 function closeCartModal() {
-  document.getElementById('cartModal').classList.remove('active');
+  const modal = document.getElementById('cartModal');
+  if (modal) modal.classList.remove('active');
 }
 
 function renderCartItems() {
   const container = document.getElementById('cartItemsContainer');
   if (!container) return;
 
-  if (cart.length === 0) {
+  if (!cart || cart.length === 0) {
     container.innerHTML = `
       <div style="text-align: center; padding: 30px; color: #888;">
         Seu carrinho está vazio. Escolha um item no cardápio!
@@ -471,25 +468,32 @@ function renderCartItems() {
     return;
   }
 
-  container.innerHTML = cart.map((item, index) => `
-    <div style="background: var(--ph-gray-light); padding: 12px; border-radius: var(--radius-md); margin-bottom: 10px; border: 1px solid var(--ph-border);">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-        <div>
-          <strong style="font-size: 0.92rem; color: var(--ph-black);">${item.title}</strong>
-          <div style="font-size: 0.76rem; color: #666; margin-top: 2px;">${item.details || ''}</div>
+  container.innerHTML = cart.map((item, index) => {
+    const itemPrice = (parseFloat(item.price) || 0);
+    const itemQty = (parseInt(item.qty) || 1);
+    const totalItemPrice = (itemPrice * itemQty).toFixed(2).replace('.', ',');
+
+    return `
+      <div style="background: var(--ph-gray-light); padding: 12px; border-radius: var(--radius-md); margin-bottom: 10px; border: 1px solid var(--ph-border);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <strong style="font-size: 0.92rem; color: var(--ph-black);">${item.title}</strong>
+            <div style="font-size: 0.76rem; color: #666; margin-top: 2px;">${item.details || ''}</div>
+          </div>
+          <button onclick="removeCartItem(${index})" style="background: none; border: none; color: var(--ph-red); font-weight: 900; cursor: pointer;">✕</button>
         </div>
-        <button onclick="removeCartItem(${index})" style="background: none; border: none; color: var(--ph-red); font-weight: 900; cursor: pointer;">✕</button>
-      </div>
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-        <div style="display: flex; align-items: center; gap: 8px; background: #FFF; padding: 2px 8px; border-radius: 4px; border: 1px solid #DDD;">
-          <button onclick="updateItemQty(${index}, -1)" style="border: none; background: none; font-weight: 900; cursor: pointer;">-</button>
-          <span style="font-weight: 800; font-size: 0.85rem;">${item.qty}</span>
-          <button onclick="updateItemQty(${index}, 1)" style="border: none; background: none; font-weight: 900; cursor: pointer;">+</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px; background: #FFF; padding: 2px 8px; border-radius: 4px; border: 1px solid #DDD;">
+            <button onclick="updateItemQty(${index}, -1)" style="border: none; background: none; font-weight: 900; cursor: pointer;">-</button>
+            <span style="font-weight: 800; font-size: 0.85rem;">${itemQty}</span>
+            <button onclick="updateItemQty(${index}, 1)" style="border: none; background: none; font-weight: 900; cursor: pointer;">+</button>
+          </div>
+          <strong style="color: var(--ph-red); font-size: 0.95rem;">R$ ${totalItemPrice}</strong>
         </div>
-        <strong style="color: var(--ph-red); font-size: 0.95rem;">R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}</strong>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
+}
 }
 
 function updateItemQty(index, delta) {
@@ -612,7 +616,7 @@ function toggleSemNumero(chk) {
 function buscarCepViaAPI() {
   const cepInput = document.getElementById('inputCep').value.replace(/\D/g, '');
   if (cepInput.length !== 8) {
-    alert('Por favor, informe um CEP válido com 8 dígitos.');
+    showToast('Por favor, informe um CEP válido com 8 dígitos.', 'error');
     return;
   }
 
@@ -620,7 +624,7 @@ function buscarCepViaAPI() {
     .then(res => res.json())
     .then(data => {
       if (data.erro) {
-        alert('CEP não encontrado. Digite o endereço manualmente.');
+        showToast('CEP não encontrado. Digite o endereço manualmente.', 'error');
         return;
       }
       const box = document.getElementById('addressResultBox');
@@ -655,7 +659,7 @@ function buscarCepViaAPI() {
       recalculateCartTotal();
     })
     .catch(() => {
-      alert('Erro ao consultar o CEP. Verifique sua conexão.');
+      showToast('Erro ao consultar o CEP. Verifique sua conexão.', 'error');
     });
 }
 
@@ -680,13 +684,13 @@ function switchCheckoutTab(tabName) {
 function copiarPixChave() {
   const code = document.getElementById('pixCodeText').innerText;
   navigator.clipboard.writeText(code).then(() => {
-    alert('Chave PIX copiada para a área de transferência!');
+    showToast('Chave PIX copiada para a área de transferência!', 'success');
   });
 }
 
 function simularPagamentoMercadoPagoCard() {
   if (cart.length === 0) {
-    alert('Seu carrinho está vazio!');
+    showToast('Seu carrinho está vazio!', 'error');
     return;
   }
   showOrderConfirmationOnScreen('Pagamento com Cartão de Crédito');
@@ -736,7 +740,7 @@ function closeOrderConfirmedModal() {
 
 function enviarPedidoWhatsAppFinal() {
   if (cart.length === 0) {
-    alert('Seu carrinho está vazio!');
+    showToast('Seu carrinho está vazio!', 'error');
     return;
   }
 
