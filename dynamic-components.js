@@ -46,7 +46,7 @@ const SHARED_COMPONENTS = {
             </div>
         </nav>
 
-        <!-- CATEGORIAS CARDÁPIO COMPLETO POR PADRÃO -->
+        <!-- CATEGORIAS DINÂMICAS DO CARDÁPIO -->
         <div class="ph-categories-section">
             <div class="ph-categories-wrapper">
                 <div class="ph-categories-inner" id="categoriesTabContainer">
@@ -63,7 +63,7 @@ const SHARED_COMPONENTS = {
         <div class="mobile-drawer-overlay" id="drawerOverlay" onclick="toggleMobileDrawer(false)"></div>
         <div class="mobile-drawer-card" id="drawerCard">
             <div class="drawer-header">
-                <div class="drawer-title">PIZZA TODO DIA</div>
+                <div class="drawer-title" id="drawerStoreTitle">PIZZA TODO DIA</div>
                 <button class="drawer-close-btn" onclick="toggleMobileDrawer(false)">✕</button>
             </div>
             
@@ -71,7 +71,7 @@ const SHARED_COMPONENTS = {
                 <input type="text" class="ph-search-input" style="width: 100%;" placeholder="Buscar no cardápio..." oninput="handleSearch(this.value)">
             </div>
 
-            <div class="drawer-cat-list">
+            <div class="drawer-cat-list" id="drawerCategoryListContainer">
                 <div style="font-size: 0.7rem; font-weight: 900; color: #888; margin-bottom: 4px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div>
                 <button class="drawer-cat-item active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>
                 <button class="drawer-cat-item" onclick="selectDrawerCategory('combos')">PROMOS DO DIA</button>
@@ -100,11 +100,11 @@ const SHARED_COMPONENTS = {
         <footer>
             <div class="footer-inner">
                 <div class="footer-info-col">
-                    <h4 style="font-size: 1.4rem; font-weight: 900; font-style: italic; text-transform: uppercase;">PIZZA <span style="color: var(--ph-red);">TODO DIA</span></h4>
-                    <p style="font-size: 0.9rem; color: #CCC;">Antiga Tri Pizzas • Tradição e Sabor no Seu Bairro</p>
+                    <h4 style="font-size: 1.4rem; font-weight: 900; font-style: italic; text-transform: uppercase;" id="footerStoreTitle">PIZZA <span style="color: var(--ph-red);">TODO DIA</span></h4>
+                    <p style="font-size: 0.9rem; color: #CCC;" id="footerStoreSub">Antiga Tri Pizzas • Tradição e Sabor no Seu Bairro</p>
                     <div class="footer-info-item">
                         <svg class="lucide-icon-svg" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                        <span>Porto Alegre e Viamão (Atendimento Delivery)</span>
+                        <span id="footerCoverageTxt">Porto Alegre e Viamão (Atendimento Delivery)</span>
                     </div>
                     <div class="footer-info-item">
                         <svg class="lucide-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -112,8 +112,7 @@ const SHARED_COMPONENTS = {
                     </div>
                 </div>
                 <div style="font-size: 0.8rem; color: #AAA; text-align: right;">
-                    <p>© 2026 Pizza Todo Dia — Todos os direitos reservados.</p>
-                    <p style="font-size: 0.74rem; color: #777; margin-top: 4px;">CNPJ: 12.345.678/0001-90</p>
+                    <p>© 2026 Cardápio Digital — Todos os direitos reservados.</p>
                 </div>
             </div>
         </footer>
@@ -135,6 +134,35 @@ function toggleMobileDrawer(open) {
 function selectDrawerCategory(catName) {
     filterCategory(catName, null);
     toggleMobileDrawer(false);
+}
+
+function renderDynamicCategoriesInHeader() {
+    const savedCategories = localStorage.getItem('ptd_store_categories');
+    if (!savedCategories) return;
+
+    try {
+        const cats = JSON.parse(savedCategories);
+        if (!cats || cats.length === 0) return;
+
+        const navContainer = document.getElementById('categoriesTabContainer');
+        if (navContainer) {
+            let html = `<button class="ph-cat-pill active" data-cat="todos" onclick="filterCategory('todos', this)">TODOS OS PRODUTOS</button>`;
+            cats.forEach(c => {
+                html += `<button class="ph-cat-pill" data-cat="${c.id}" onclick="filterCategory('${c.id}', this)">${c.name.toUpperCase()}</button>`;
+            });
+            navContainer.innerHTML = html;
+        }
+
+        const drawerContainer = document.getElementById('drawerCategoryListContainer');
+        if (drawerContainer) {
+            let dHtml = `<div style="font-size: 0.7rem; font-weight: 900; color: #888; margin-bottom: 4px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div>`;
+            dHtml += `<button class="drawer-cat-item active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>`;
+            cats.forEach(c => {
+                dHtml += `<button class="drawer-cat-item" onclick="selectDrawerCategory('${c.id}')">${c.name.toUpperCase()}</button>`;
+            });
+            drawerContainer.innerHTML = dHtml;
+        }
+    } catch(e) {}
 }
 
 function initSharedComponents() {
@@ -160,6 +188,8 @@ function initSharedComponents() {
     const footerDiv = document.createElement('div');
     footerDiv.innerHTML = SHARED_COMPONENTS.footer;
     body.appendChild(footerDiv.firstElementChild);
+
+    renderDynamicCategoriesInHeader();
 }
 
 document.addEventListener('DOMContentLoaded', initSharedComponents);

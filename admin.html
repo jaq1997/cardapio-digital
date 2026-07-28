@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;0,900;1,900&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 
 <body>
@@ -34,6 +35,7 @@
   <!-- ABAS SUPERIORES DA CENTRAL DE COMANDO -->
   <nav class="admin-nav-tabs">
     <button class="nav-tab active" onclick="switchAdminTab('branding')">Identidade, Banners & WhatsApp</button>
+    <button class="nav-tab" onclick="switchAdminTab('sheets')">Integração Google Sheets</button>
     <button class="nav-tab" onclick="switchAdminTab('delivery')">Taxas de Entrega por Bairro</button>
     <button class="nav-tab" onclick="switchAdminTab('categories')">Categorias do Cardápio</button>
     <button class="nav-tab" onclick="switchAdminTab('items')">Produtos & Estoque</button>
@@ -56,8 +58,8 @@
         <div class="stat-value" id="totalDeliveryZonesCount">0</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">WhatsApp de Vendas</div>
-        <div class="stat-value" id="currentWppDisplay" style="font-size: 1.1rem; font-family: var(--font-mono); margin-top: 6px;">Não cadastrado</div>
+        <div class="stat-label">Status Google Sheets</div>
+        <div class="stat-value" id="sheetsStatusDisplay" style="font-size: 0.95rem; font-family: var(--font-mono); margin-top: 6px; color: #FFA000;">Local Storage</div>
       </div>
     </div>
 
@@ -173,7 +175,48 @@
       </div>
     </div>
 
-    <!-- TAB 2: TAXAS DE ENTREGA POR BAIRRO / REGIÃO -->
+    <!-- TAB NEW: INTEGRAÇÃO GOOGLE SHEETS & APPS SCRIPT -->
+    <div id="tabContentSheets" style="display: none;">
+      <div class="config-card">
+        <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display); color: var(--ph-black);">Conexão com Google Sheets via Apps Script</h3>
+        <p style="font-size: 0.84rem; color: #666; margin-bottom: 16px;">Conecte o seu cardápio a uma planilha remota do Google Sheets. Se a URL não for fornecida, o sistema opera via localStorage local automaticamente.</p>
+        
+        <form onsubmit="saveSheetsConfig(event)" style="display: flex; flex-direction: column; gap: 14px;">
+          <div>
+            <label class="admin-label">URL do Google Apps Script (Web App - GET/POST):</label>
+            <input type="url" id="cfgAppsScriptUrl" class="admin-input" placeholder="Ex: https://script.google.com/macros/s/AKfycb.../exec">
+            <div style="font-size: 0.74rem; color: #777; margin-top: 4px;">Utilizado para leitura remota em JSON (`fetchFromSheets`) e salvamento via `POST` (`saveToSheets`).</div>
+          </div>
+
+          <div>
+            <label class="admin-label">URL da Planilha Publicada em CSV (Fallback PapaParse):</label>
+            <input type="url" id="cfgSheetCsvUrl" class="admin-input" placeholder="Ex: https://docs.google.com/spreadsheets/d/.../pub?output=csv">
+            <div style="font-size: 0.74rem; color: #777; margin-top: 4px;">Usado como leitura estática ultrarrápida com PapaParse caso o Apps Script falhe.</div>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 8px;">
+            <button type="submit" class="btn-admin btn-admin-primary" style="padding: 10px 18px;">
+              <span>Salvar Configuração do Google Sheets</span>
+            </button>
+            <button type="button" class="btn-admin" style="padding: 10px 18px;" onclick="syncWithSheetsNow()">
+              <span>⚡ Sincronizar Agora com Google Sheets</span>
+            </button>
+            <button type="button" class="btn-admin" style="padding: 10px 18px;" onclick="pushCurrentToSheetsNow()">
+              <span>📤 Enviar Produtos para a Planilha</span>
+            </button>
+          </div>
+        </form>
+
+        <div style="margin-top: 20px; background: #FFF8E1; border: 1px solid #FFE082; padding: 14px; border-radius: 4px;">
+          <h4 style="font-size: 0.9rem; font-weight: 800; color: #896100; margin-bottom: 6px;">📄 Código de Exemplo do Google Apps Script</h4>
+          <p style="font-size: 0.8rem; color: #6D4C41; margin-bottom: 8px;">
+            O arquivo <code style="background:#FFF; padding:2px 4px;">google_apps_script_code.js</code> na raiz do projeto possui o código <code style="background:#FFF; padding:2px 4px;">Code.gs</code> para você colar no Google Apps Script.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: TAXAS DE ENTREGA POR BAIRRO / REGIÃO -->
     <div id="tabContentDelivery" style="display: none;">
       <div class="config-card">
         <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display); color: var(--ph-black);">Tabela de Taxas de Entrega por Bairro / Região</h3>
@@ -206,7 +249,7 @@
       </div>
     </div>
 
-    <!-- TAB 3: GERENCIAR CATEGORIAS DO CARDÁPIO -->
+    <!-- TAB 4: GERENCIAR CATEGORIAS DO CARDÁPIO -->
     <div id="tabContentCategories" style="display: none;">
       <div class="config-card">
         <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display); color: var(--ph-black);">Criar & Gerenciar Categorias</h3>
@@ -226,7 +269,7 @@
       </div>
     </div>
 
-    <!-- TAB 4: GERENCIAR PRODUTOS -->
+    <!-- TAB 5: GERENCIAR PRODUTOS -->
     <div id="tabContentItems" style="display: none;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <input type="text" id="adminSearchInput" class="admin-input" placeholder="Filtrar produtos por nome..." oninput="filterAdminTable(this.value)" style="max-width: 320px;">

@@ -1,11 +1,16 @@
 /* ==========================================================================
-   PIZZA TODO DIA — ADMIN COMMAND CENTER ENGINE (PREMIUM PDV STYLE)
+   CARDÁPIO DIGITAL & PDV — ENGINE DE GESTÃO (COM BUCKET CARDÁPIO-DIGITAL R2)
    ========================================================================== */
+
+const DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3UaSFxQeE9Wxj6BPuzC00T0k30eiq3EoZfTZgtwXqOCTL9IAuL9YMAytZX3ZyTACzw/exec';
+const DEFAULT_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTnWp67Ggx_hVGo4gLXJZtGJZa9ZrmO91sLF3cmzPqLOpgRhY-VdkWk3UyX5-eILluZJNxRIL4RdcRk/pub?output=csv';
+const BASE_URL_FOTOS = 'https://pub-67111bf9eee943e3aeaf4b493b4dd034.r2.dev/';
 
 const STORAGE_KEY_BRANDING = 'ptd_store_branding';
 const STORAGE_KEY_PRODUCTS = 'ptd_store_products';
 const STORAGE_KEY_CATEGORIES = 'ptd_store_categories';
 const STORAGE_KEY_DELIVERY_ZONES = 'ptd_delivery_zones';
+const STORAGE_KEY_SHEETS_CONFIG = 'ptd_sheets_config';
 
 const defaultBranding = {
   storeName: "Pizza Todo Dia",
@@ -173,6 +178,8 @@ let currentBranding = {};
 let currentCategories = [];
 let currentProducts = [];
 let currentDeliveryZones = [];
+let sheetsConfig = { appsScriptUrl: DEFAULT_APPS_SCRIPT_URL, sheetCsvUrl: DEFAULT_CSV_URL };
+
 let pendingLogoBase64 = '';
 let pendingBannerDeskBase64 = '';
 let pendingBannerMobBase64 = '';
@@ -185,6 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderDeliveryZonesUI();
   updateStats();
   initDragAndDropHandlers();
+  fetchFromSheets();
 });
 
 function applyUnifiedBrandingVariables(primaryColor, darkColor) {
@@ -209,6 +217,9 @@ function loadAdminSettings() {
   const savedZones = localStorage.getItem(STORAGE_KEY_DELIVERY_ZONES);
   currentDeliveryZones = savedZones ? JSON.parse(savedZones) : [ ...defaultDeliveryZones ];
 
+  const savedSheetsCfg = localStorage.getItem(STORAGE_KEY_SHEETS_CONFIG);
+  sheetsConfig = savedSheetsCfg ? JSON.parse(savedSheetsCfg) : { appsScriptUrl: DEFAULT_APPS_SCRIPT_URL, sheetCsvUrl: DEFAULT_CSV_URL };
+
   document.getElementById('cfgStoreName').value = currentBranding.storeName || '';
   document.getElementById('cfgStoreSub').value = currentBranding.storeSub || '';
   document.getElementById('cfgWppNumber').value = currentBranding.wppNumber || '';
@@ -218,6 +229,11 @@ function loadAdminSettings() {
   document.getElementById('cfgDarkColor').value = currentBranding.darkColor || '#C50303';
   document.getElementById('cfgDarkColorPicker').value = currentBranding.darkColor || '#C50303';
   document.getElementById('cfgCoverageCities').value = currentBranding.coverageCities || 'Porto Alegre, Viamão';
+
+  const scriptInput = document.getElementById('cfgAppsScriptUrl');
+  const csvInput = document.getElementById('cfgSheetCsvUrl');
+  if (scriptInput) scriptInput.value = sheetsConfig.appsScriptUrl || DEFAULT_APPS_SCRIPT_URL;
+  if (csvInput) csvInput.value = sheetsConfig.sheetCsvUrl || DEFAULT_CSV_URL;
 
   applyUnifiedBrandingVariables(currentBranding.primaryColor, currentBranding.darkColor);
 
@@ -252,12 +268,190 @@ function loadAdminSettings() {
   document.getElementById('currentWppDisplay').innerText = currentBranding.wppNumber || 'Não cadastrado';
 }
 
+function saveSheetsConfig(event) {
+  if (event) event.preventDefault();
+  sheetsConfig.appsScriptUrl = document.getElementById('cfgAppsScriptUrl').value.trim() || DEFAULT_APPS_SCRIPT_URL;
+  sheetsConfig.sheetCsvUrl = document.getElementById('cfgSheetCsvUrl').value.trim() || DEFAULT_CSV_URL;
+
+  localStorage.setItem(STORAGE_KEY_SHEETS_CONFIG, JSON.stringify(sheetsConfig));
+  alert('Configurações do Google Sheets salvas com sucesso!');
+  fetchFromSheets();
+}
+
+/**
+ * BUSCA DE DADOS NO GOOGLE SHEETS / APPS SCRIPT
+ */
+async function fetchFromSheets() {
+  const statusDisplay = document.getElementById('sheetsStatusDisplay');
+  const targetUrl = sheetsConfig.appsScriptUrl || DEFAULT_APPS_SCRIPT_URL;
+
+  if (targetUrl) {
+    if (statusDisplay) statusDisplay.innerText = "Conectando ao Apps Script...";
+    try {
+      const res = await fetch(targetUrl);
+      const json = await res.json();
+      if (json.ok && Array.isArray(json.data) && json.data.length > 0) {
+        currentProducts = json.data.map((p, i) => ({
+          id: p.id || String(i + 1),
+          nome: p.nome || '',
+          categoria: p.categoria || 'pizzas-salgadas',
+          descricao: p.descricao || '',
+          preco: parseFloat(p.preco || p.preco_brl) || 0,
+          preco_grande: parseFloat(p.preco || p.preco_brl) || 0,
+          badge: p.badge || '',
+          img_url: formatFotoUrl(p.img_url || p.img_1),
+          status: p.status || 'ativo'
+        }));
+
+        localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(currentProducts));
+        renderAdminTable();
+        if (statusDisplay) {
+          statusDisplay.innerText = `Conectado (${currentProducts.length} itens)`;
+          statusDisplay.style.color = "#2E7D32";
+        }
+        return;
+      }
+    } catch (err) {
+      console.warn('Apps Script não respondeu. Tentando CSV de backup...', err);
+    }
+  }
+
+  fetchFromCsvFallback();
+}
+
+function fetchFromCsvFallback() {
+  const statusDisplay = document.getElementById('sheetsStatusDisplay');
+  const csvUrl = sheetsConfig.sheetCsvUrl || DEFAULT_CSV_URL;
+  if (!csvUrl || typeof Papa === 'undefined') return;
+
+  Papa.parse(csvUrl, {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function(results) {
+      if (results.data && results.data.length > 0) {
+        const validRows = results.data.filter(p => p.nome || p.id);
+        if (validRows.length > 0) {
+          currentProducts = validRows.map((p, i) => ({
+            id: p.id || String(i + 1),
+            nome: p.nome || 'Sem Nome',
+            categoria: p.categoria || 'pizzas-salgadas',
+            descricao: p.descricao || '',
+            preco: parseFloat(p.preco || p.preco_brl) || 0,
+            preco_grande: parseFloat(p.preco || p.preco_brl) || 0,
+            badge: p.badge || '',
+            img_url: formatFotoUrl(p.img_url || p.img_1),
+            status: p.status || 'ativo'
+          }));
+
+          localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(currentProducts));
+          renderAdminTable();
+          if (statusDisplay) {
+            statusDisplay.innerText = "Conectado (CSV PapaParse)";
+            statusDisplay.style.color = "#1565C0";
+          }
+        }
+      }
+    }
+  });
+}
+
+function formatFotoUrl(val) {
+  if (!val) return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
+  const trimmed = val.trim();
+  if (trimmed.startsWith('http')) return trimmed;
+  return BASE_URL_FOTOS + encodeURI(trimmed);
+}
+
+/**
+ * SALVAMENTO REMOTO NO GOOGLE SHEETS VIA POST
+ */
+async function saveToSheets(productsToSave = currentProducts) {
+  const targetUrl = sheetsConfig.appsScriptUrl || DEFAULT_APPS_SCRIPT_URL;
+  if (!targetUrl) return;
+
+  try {
+    const res = await fetch(targetUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'save',
+        data: productsToSave
+      })
+    });
+    const json = await res.json();
+    if (json.ok) {
+      console.log('✓ Sincronizado com o Google Sheets!');
+    }
+  } catch (err) {
+    console.error('Erro ao salvar no Google Sheets:', err);
+  }
+}
+
+/**
+ * UPLOAD DE IMAGEM PARA O BUCKET CARDÁPIO-DIGITAL NO CLOUDFLARE R2
+ */
+async function uploadToCloudflareR2(file) {
+  const targetUrl = sheetsConfig.appsScriptUrl || DEFAULT_APPS_SCRIPT_URL;
+  const storeSlug = currentBranding.storeName ? currentBranding.storeName.toLowerCase().replace(/[^a-z0-9]/g, '') : 'pizzariatododia';
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onerror = () => reject(new Error('Erro ao ler o arquivo de imagem.'));
+    
+    reader.onload = async () => {
+      const base64 = reader.result.split(',')[1];
+      if (!targetUrl) {
+        resolve(reader.result);
+        return;
+      }
+
+      try {
+        const res = await fetch(targetUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'uploadR2',
+            folder: storeSlug,
+            fileName: file.name,
+            mimeType: file.type || 'image/png',
+            base64: base64
+          })
+        });
+
+        const json = await res.json();
+        if (json.ok && json.url) {
+          resolve(json.url);
+        } else {
+          resolve(reader.result);
+        }
+      } catch (err) {
+        console.error('Erro no upload Cloudflare R2 Proxy:', err);
+        resolve(reader.result);
+      }
+    };
+  });
+}
+
+function syncWithSheetsNow() {
+  fetchFromSheets();
+  alert('Sincronização iniciada com o Google Sheets!');
+}
+
+function pushCurrentToSheetsNow() {
+  saveToSheets().then(() => {
+    alert('Produtos enviados para a planilha com sucesso!');
+  });
+}
+
 function resetBrandingToDefault() {
   if (confirm('Deseja restaurar as configurações originais da marca Pizza Todo Dia?')) {
     localStorage.removeItem(STORAGE_KEY_BRANDING);
     localStorage.removeItem(STORAGE_KEY_CATEGORIES);
     localStorage.removeItem(STORAGE_KEY_PRODUCTS);
     localStorage.removeItem(STORAGE_KEY_DELIVERY_ZONES);
+    localStorage.removeItem(STORAGE_KEY_SHEETS_CONFIG);
     loadAdminSettings();
     renderAdminTable();
     renderCategoriesUI();
@@ -373,44 +567,44 @@ function deleteCategory(catId) {
 
 function initDragAndDropHandlers() {
   setupDropZone('logoDropZone', (file) => {
-    processFileToBase64(file, (base64) => {
-      pendingLogoBase64 = base64;
+    uploadToCloudflareR2(file).then(url => {
+      pendingLogoBase64 = url;
       const preview = document.getElementById('logoFilePreview');
       if (preview) {
-        preview.src = base64;
+        preview.src = url;
         preview.style.display = 'block';
       }
     });
   });
 
   setupDropZone('bannerDeskDropZone', (file) => {
-    processFileToBase64(file, (base64) => {
-      pendingBannerDeskBase64 = base64;
+    uploadToCloudflareR2(file).then(url => {
+      pendingBannerDeskBase64 = url;
       const preview = document.getElementById('bannerDeskPreview');
       if (preview) {
-        preview.src = base64;
+        preview.src = url;
         preview.style.display = 'block';
       }
     });
   });
 
   setupDropZone('bannerMobDropZone', (file) => {
-    processFileToBase64(file, (base64) => {
-      pendingBannerMobBase64 = base64;
+    uploadToCloudflareR2(file).then(url => {
+      pendingBannerMobBase64 = url;
       const preview = document.getElementById('bannerMobPreview');
       if (preview) {
-        preview.src = base64;
+        preview.src = url;
         preview.style.display = 'block';
       }
     });
   });
 
   setupDropZone('productDropZone', (file) => {
-    processFileToBase64(file, (base64) => {
-      pendingProductImgBase64 = base64;
+    uploadToCloudflareR2(file).then(url => {
+      pendingProductImgBase64 = url;
       const preview = document.getElementById('prodFilePreview');
       if (preview) {
-        preview.src = base64;
+        preview.src = url;
         preview.style.display = 'block';
       }
     });
@@ -450,20 +644,16 @@ function processFileToBase64(file, callback) {
     alert('Por favor, selecione apenas arquivos de imagem (.png, .jpg, .jpeg, .webp).');
     return;
   }
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    callback(e.target.result);
-  };
-  reader.readAsDataURL(file);
+  uploadToCloudflareR2(file).then(url => callback(url));
 }
 
 function previewLogoFileUpload(input) {
   if (input.files && input.files[0]) {
-    processFileToBase64(input.files[0], (base64) => {
-      pendingLogoBase64 = base64;
+    uploadToCloudflareR2(input.files[0]).then(url => {
+      pendingLogoBase64 = url;
       const preview = document.getElementById('logoFilePreview');
       if (preview) {
-        preview.src = base64;
+        preview.src = url;
         preview.style.display = 'block';
       }
     });
@@ -472,11 +662,11 @@ function previewLogoFileUpload(input) {
 
 function previewBannerDeskUpload(input) {
   if (input.files && input.files[0]) {
-    processFileToBase64(input.files[0], (base64) => {
-      pendingBannerDeskBase64 = base64;
+    uploadToCloudflareR2(input.files[0]).then(url => {
+      pendingBannerDeskBase64 = url;
       const preview = document.getElementById('bannerDeskPreview');
       if (preview) {
-        preview.src = base64;
+        preview.src = url;
         preview.style.display = 'block';
       }
     });
@@ -485,11 +675,11 @@ function previewBannerDeskUpload(input) {
 
 function previewBannerMobUpload(input) {
   if (input.files && input.files[0]) {
-    processFileToBase64(input.files[0], (base64) => {
-      pendingBannerMobBase64 = base64;
+    uploadToCloudflareR2(input.files[0]).then(url => {
+      pendingBannerMobBase64 = url;
       const preview = document.getElementById('bannerMobPreview');
       if (preview) {
-        preview.src = base64;
+        preview.src = url;
         preview.style.display = 'block';
       }
     });
@@ -498,11 +688,11 @@ function previewBannerMobUpload(input) {
 
 function previewProductFileUpload(input) {
   if (input.files && input.files[0]) {
-    processFileToBase64(input.files[0], (base64) => {
-      pendingProductImgBase64 = base64;
+    uploadToCloudflareR2(input.files[0]).then(url => {
+      pendingProductImgBase64 = url;
       const preview = document.getElementById('prodFilePreview');
       if (preview) {
-        preview.src = base64;
+        preview.src = url;
         preview.style.display = 'block';
       }
     });
@@ -602,6 +792,7 @@ function filterAdminTable(query) {
 function switchAdminTab(tabName) {
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('tabContentBranding').style.display = 'none';
+  document.getElementById('tabContentSheets').style.display = 'none';
   document.getElementById('tabContentDelivery').style.display = 'none';
   document.getElementById('tabContentCategories').style.display = 'none';
   document.getElementById('tabContentItems').style.display = 'none';
@@ -609,14 +800,17 @@ function switchAdminTab(tabName) {
   if (tabName === 'branding') {
     document.querySelectorAll('.nav-tab')[0].classList.add('active');
     document.getElementById('tabContentBranding').style.display = 'block';
-  } else if (tabName === 'delivery') {
+  } else if (tabName === 'sheets') {
     document.querySelectorAll('.nav-tab')[1].classList.add('active');
+    document.getElementById('tabContentSheets').style.display = 'block';
+  } else if (tabName === 'delivery') {
+    document.querySelectorAll('.nav-tab')[2].classList.add('active');
     document.getElementById('tabContentDelivery').style.display = 'block';
   } else if (tabName === 'categories') {
-    document.querySelectorAll('.nav-tab')[2].classList.add('active');
+    document.querySelectorAll('.nav-tab')[3].classList.add('active');
     document.getElementById('tabContentCategories').style.display = 'block';
   } else {
-    document.querySelectorAll('.nav-tab')[3].classList.add('active');
+    document.querySelectorAll('.nav-tab')[4].classList.add('active');
     document.getElementById('tabContentItems').style.display = 'block';
   }
 }
@@ -702,6 +896,7 @@ function saveProductItem(event) {
   }
 
   localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(currentProducts));
+  saveToSheets(currentProducts);
 
   closeProductFormModal();
   renderAdminTable();
@@ -712,6 +907,7 @@ function deleteProductItem(id) {
   if (confirm('Tem certeza que deseja excluir este produto do cardápio?')) {
     currentProducts = currentProducts.filter(p => p.id !== id);
     localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(currentProducts));
+    saveToSheets(currentProducts);
     renderAdminTable();
   }
 }

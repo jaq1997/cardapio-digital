@@ -1,174 +1,395 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+/* 
+   ==========================================================================
+   PIZZA TODO DIA — ADMIN COMMAND CENTER (PREMIUM PDV STYLE)
+   Visual de alta densidade, focado em operação de franquia.
+   ========================================================================== 
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;0,900;1,900&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;600;700&display=swap');
 
 :root {
-  --primary: #E51937;
-  --secondary: #FFB800;
-  --dark-bg: #0D0D11;
-  --surface-1: #15151C;
-  --surface-2: #1E1E28;
-  --surface-card: #252533;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --text-main: #F8F9FA;
-  --text-muted: #A0A0B2;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+    --ph-red: #E91C24;
+    --ph-red-dark: #C50303;
+    --ph-black: #1E1E1E;
+    --ph-black-pure: #000000;
+    --ph-white: #FFFFFF;
+    --ph-gray-bg: #F0F0F2;
+    --ph-gray-surface: #FFFFFF;
+    --ph-border: #D8D8DF;
+    
+    --font-display: 'Montserrat', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace; /* Para IDs e Preços de Alta Precisão */
 }
 
 body {
-  background-color: var(--dark-bg);
-  color: var(--text-main);
-  min-height: 100vh;
-  padding-bottom: 50px;
+    background-color: var(--ph-gray-bg);
+    font-family: var(--font-body);
+    margin: 0;
+    padding: 0;
+    color: var(--ph-black);
+    -webkit-font-smoothing: antialiased;
 }
 
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   HEADER (ESTILO TORRE DE CONTROLE)
+   ========================================================================== */
 .admin-header {
-  background: var(--surface-1);
-  border-bottom: 1px solid var(--border-color);
-  padding: 20px;
+    background: var(--ph-black-pure);
+    color: var(--ph-white);
+    padding: 12px 24px;
+    border-bottom: 4px solid var(--ph-red);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .admin-header-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .admin-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 2rem;
-  line-height: 1;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    font-size: 1.4rem;
+    margin: 0;
 }
 
-.admin-title span {
-  color: var(--primary);
+.admin-title span { color: var(--ph-red); }
+
+.admin-logo-badge {
+    width: 40px;
+    height: 40px;
+    background: var(--ph-red);
+    color: var(--ph-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    border-radius: 4px;
 }
 
 .admin-container {
-  max-width: 1200px;
-  margin: 30px auto;
-  padding: 0 20px;
+    max-width: 1400px;
+    margin: 20px auto;
+    padding: 0 20px;
 }
 
+/* ==========================================================================
+   SIDEBAR / NAV (SISTEMA DE ABAS ROBUSTO)
+   ========================================================================== */
+.admin-nav-tabs {
+    display: flex;
+    gap: 4px;
+    background: #DDD;
+    padding: 6px 8px 0 8px;
+    border-bottom: 2px solid var(--ph-border);
+    margin-bottom: 20px;
+}
+
+.nav-tab {
+    padding: 12px 24px;
+    background: #E5E5E5;
+    border: none;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    cursor: pointer;
+    color: #666;
+    border-radius: 4px 4px 0 0;
+    transition: all 0.2s ease;
+}
+
+.nav-tab.active {
+    background: var(--ph-white);
+    color: var(--ph-red);
+    box-shadow: 0 -4px 0 var(--ph-red);
+}
+
+/* ==========================================================================
+   CARDS DE STATUS (DASHBOARD)
+   ========================================================================== */
 .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
 }
 
 .stat-card {
-  background: var(--surface-card);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
+    background: var(--ph-white);
+    padding: 18px 20px;
+    border-left: 6px solid var(--ph-black);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    border-radius: 2px;
 }
 
-.stat-num {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 2.8rem;
-  color: var(--secondary);
-}
+.stat-card.active-orders { border-left-color: var(--ph-red); }
 
 .stat-label {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #888;
+    letter-spacing: 0.5px;
 }
 
-.admin-tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 10px;
+.stat-value {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--ph-black);
+    font-style: italic;
+    margin-top: 4px;
 }
 
-.admin-tab-btn {
-  background: var(--surface-2);
-  color: var(--text-muted);
-  border: 1px solid var(--border-color);
-  padding: 10px 20px;
-  border-radius: 30px;
-  font-weight: 700;
-  cursor: pointer;
+/* ==========================================================================
+   TABELAS DE ALTA DENSIDADE (ESTILO PDV)
+   ========================================================================== */
+.admin-table-container {
+    background: var(--ph-white);
+    border: 2px solid var(--ph-black);
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.1);
+    overflow-x: auto;
 }
 
-.admin-tab-btn.active {
-  background: var(--primary);
-  color: #FFF;
-  border-color: var(--primary);
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: var(--ph-black);
+    color: var(--ph-white);
+    text-align: left;
+    padding: 12px 14px;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    font-style: italic;
+}
+
+td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--ph-border);
+    font-size: 0.85rem;
+    vertical-align: middle;
+}
+
+.td-id { font-family: var(--font-mono); color: #888; font-size: 0.75rem; font-weight: 500; }
+.td-price { font-family: var(--font-mono); font-weight: 700; color: var(--ph-red); font-size: 0.9rem; }
+
+tr:hover { background-color: #F9F9FB; }
+
+.thumb-img {
+    width: 42px;
+    height: 42px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+/* ==========================================================================
+   BOTÕES DE AÇÃO (PDV STYLE)
+   ========================================================================== */
+.btn-admin {
+    padding: 8px 16px;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    border: 2px solid var(--ph-black);
+    background: var(--ph-white);
+    color: var(--ph-black);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+}
+
+.btn-admin:hover {
+    background: #E5E5E5;
+    transform: translate(-2px, -2px);
+    box-shadow: 2px 2px 0 var(--ph-black);
+}
+
+.btn-admin-primary {
+    background: var(--ph-red);
+    color: var(--ph-white);
+    border-color: var(--ph-red);
+}
+
+.btn-admin-primary:hover {
+    background: var(--ph-red-dark);
+    border-color: var(--ph-red-dark);
+    transform: translate(-2px, -2px);
+    box-shadow: 2px 2px 0 var(--ph-black);
+}
+
+.btn-admin:active {
+    transform: translate(0, 0);
+    box-shadow: none;
+}
+
+.btn-admin-danger {
+    background: #D9534F;
+    color: #FFFFFF;
+    border-color: #D9534F;
+}
+
+.btn-admin-danger:hover {
+    background: #C9302C;
+    border-color: #C9302C;
+    box-shadow: 2px 2px 0 var(--ph-black);
+}
+
+/* ==========================================================================
+   FORMULÁRIOS & CONFIG CARDS (LIMPOS E RÍGIDOS)
+   ========================================================================== */
+.config-card {
+    background: var(--ph-white);
+    padding: 24px;
+    border: 2px solid var(--ph-black);
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.1);
+}
+
+.admin-form-group { margin-bottom: 15px; }
+
+.admin-label { 
+    display: block; 
+    font-weight: 800; 
+    font-size: 0.75rem; 
+    text-transform: uppercase; 
+    margin-bottom: 5px;
+    color: var(--ph-black);
 }
 
 .admin-input {
-  background: var(--surface-2);
-  border: 1px solid var(--border-color);
-  color: var(--text-main);
-  padding: 10px 14px;
-  border-radius: 8px;
-  outline: none;
-  width: 100%;
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid var(--ph-border);
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 600;
+    outline: none;
+    background: #FAFAFC;
+    transition: border-color 0.15s ease;
 }
 
-.admin-label {
-  font-size: 0.84rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-  display: block;
+.admin-input:focus { border-color: var(--ph-black); background: #FFF; }
+
+.file-drop-zone {
+    background: #FAFAFC;
+    border: 2px dashed var(--ph-border);
+    padding: 14px 20px;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 0.8rem;
+    color: var(--ph-black);
+    transition: all 0.15s ease;
 }
 
-.btn-primary {
-  background: var(--primary);
-  color: #FFF;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 30px;
-  font-weight: 700;
-  cursor: pointer;
+.file-drop-zone:hover, .file-drop-zone.dragover {
+    border-color: var(--ph-black);
+    background: #FFF;
 }
 
-.table-responsive {
-  overflow-x: auto;
+.color-picker-input {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 2px solid var(--ph-black);
+    cursor: pointer;
+    background: none;
 }
 
-.admin-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--surface-card);
-  border-radius: 12px;
-  overflow: hidden;
+/* MODAL DE PRODUTO */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(3px);
+    z-index: 4000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
 }
 
-.admin-table th, .admin-table td {
-  padding: 12px 16px;
-  text-align: left;
-  border-bottom: 1px solid var(--border-color);
-  font-size: 0.88rem;
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
 }
 
-.admin-table th {
-  background: var(--surface-1);
-  color: var(--text-muted);
+.modal-card {
+    background: var(--ph-white);
+    border: 3px solid var(--ph-black);
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    color: var(--ph-black);
 }
 
-.thumb-img {
-  width: 44px;
-  height: 44px;
-  object-fit: cover;
-  border-radius: 6px;
+.modal-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--ph-black);
+    color: #FFF;
+    border: none;
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.config-card {
-  background: var(--surface-card);
-  border-radius: 12px;
-  padding: 24px;
-  border: 1px solid var(--border-color);
-  max-width: 600px;
+.modal-content-body {
+    padding: 20px;
+}
+
+.checkout-main-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.3rem;
+    margin-bottom: 14px;
+    border-bottom: 3px solid var(--ph-black);
+    padding-bottom: 6px;
+    color: var(--ph-black);
 }
