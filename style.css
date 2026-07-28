@@ -1144,13 +1144,13 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
   gap: 20px;
 }
 
-/* BOTÃO FLUTUANTE WHATSAPP */
+/* BOTÃO FLUTUANTE WHATSAPP COM ANIMAÇÃO DE PULSO */
 .ph-wpp-float {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  width: 56px;
-  height: 56px;
+  width: 58px;
+  height: 58px;
   background: #25D366;
   color: #FFF;
   border-radius: 50%;
@@ -1160,11 +1160,42 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
   box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4);
   z-index: 2500;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: wppPulse 2s infinite;
+}
+
+@keyframes wppPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(37, 211, 102, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+  }
 }
 
 .ph-wpp-float:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+  transform: scale(1.1);
+}
+
+/* ETIQUETA / BADGE NO TOPO DA FOTO DO PRODUTO */
+.ph-card-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #FFC72C;
+  color: #000000;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-style: italic;
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  z-index: 10;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  letter-spacing: 0.5px;
 }
 
 .footer-info-item {

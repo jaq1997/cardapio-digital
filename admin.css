@@ -355,11 +355,14 @@ tr:hover { background-color: #F9F9FB; }
     border: 3px solid var(--ph-black);
     box-shadow: 10px 10px 0 rgba(0,0,0,0.3);
     width: 100%;
-    max-width: 520px;
-    max-height: 90vh;
+    max-width: 540px;
+    max-height: 88vh;
     overflow-y: auto;
     position: relative;
     color: var(--ph-black);
+    padding: 28px;
+    box-sizing: border-box;
+    border-radius: 10px;
 }
 
 .modal-close-btn {

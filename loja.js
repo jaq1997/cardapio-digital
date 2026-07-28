@@ -243,7 +243,7 @@ function populateDeliveryZonesSelect() {
 }
 
 function openPizzaCustomizerModal(productId) {
-  const product = catalogData.find(p => p.id === productId);
+  const product = catalogData.find(p => String(p.id) === String(productId));
   if (!product) return;
 
   currentSelectedProduct = product;
@@ -254,9 +254,12 @@ function openPizzaCustomizerModal(productId) {
 
   flavorMode = 'single';
   selectedSize = 'grande';
-  document.getElementById('btnFlavor1').classList.add('active');
-  document.getElementById('btnFlavor2').classList.remove('active');
-  document.getElementById('secondFlavorWrapper').style.display = 'none';
+  const btn1 = document.getElementById('btnFlavor1');
+  const btn2 = document.getElementById('btnFlavor2');
+  if (btn1) btn1.classList.add('active');
+  if (btn2) btn2.classList.remove('active');
+  const secWrap = document.getElementById('secondFlavorWrapper');
+  if (secWrap) secWrap.style.display = 'none';
 
   recalculateModalTotal();
 
@@ -597,15 +600,12 @@ function enviarPedidoWhatsAppFinal() {
   const orderNum = Math.floor(1000 + Math.random() * 9000);
   const now = new Date();
   const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  const currentUrl = window.location.href.split('?')[0];
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const total = subtotal + currentDeliveryFee;
   const freteStr = currentDeliveryFee > 0 ? `R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}` : 'Grátis / Retirada no Balcão';
 
-  let msg = `⭐ GOSTOU DE PEDIR NO NOSSO APP? ⭐\n`;
-  msg += `Não precisa baixar nada, adicione o nosso restaurante na tela inicial do seu celular e peça com mais agilidade na próxima vez através do link abaixo:\n`;
-  msg += `${currentUrl}\n`;
+  let msg = `⭐ NOVO PEDIDO ⭐\n`;
   msg += `---------------------------------------\n`;
   msg += `Confira o pedido abaixo:\n`;
   msg += `Pedido #${orderNum} - ${storeName}\n`;
