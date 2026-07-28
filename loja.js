@@ -186,7 +186,7 @@ function renderCatalog() {
               <span class="ph-price-val">R$ ${priceDisplay}</span>
             </div>
             <button class="ph-btn-add" onclick="event.stopPropagation(); openPizzaCustomizerModal('${product.id}')">
-              <span>MONTAR</span>
+              <span>ADICIONAR</span>
             </button>
           </div>
         </div>
@@ -248,26 +248,35 @@ function openPizzaCustomizerModal(productId) {
 
   currentSelectedProduct = product;
 
-  document.getElementById('modalPizzaTitle').innerText = product.nome.toUpperCase();
-  document.getElementById('modalPizzaDesc').innerText = product.descricao || product.ingredientes || '';
-  document.getElementById('modalPizzaImg').src = product.img_url;
+  const titleEl = document.getElementById('modalPizzaTitle');
+  if (titleEl) titleEl.innerText = product.nome.toUpperCase();
+
+  const descEl = document.getElementById('modalPizzaDesc');
+  if (descEl) descEl.innerText = product.descricao || product.ingredientes || '';
+
+  const imgEl = document.getElementById('modalHeroBg') || document.getElementById('modalPizzaImg');
+  if (imgEl) imgEl.src = product.img_url;
 
   flavorMode = 'single';
   selectedSize = 'grande';
-  const btn1 = document.getElementById('btnFlavor1');
-  const btn2 = document.getElementById('btnFlavor2');
+  const btn1 = document.getElementById('btnSingleFlavor') || document.getElementById('btnFlavor1');
+  const btn2 = document.getElementById('btnHalfFlavor') || document.getElementById('btnFlavor2');
   if (btn1) btn1.classList.add('active');
   if (btn2) btn2.classList.remove('active');
-  const secWrap = document.getElementById('secondFlavorWrapper');
-  if (secWrap) secWrap.style.display = 'none';
 
   recalculateModalTotal();
 
-  document.getElementById('pizzaCustomizerModal').classList.add('active');
+  const modal = document.getElementById('pizzaModal') || document.getElementById('pizzaCustomizerModal');
+  if (modal) modal.classList.add('active');
+}
+
+function closePizzaModal() {
+  const modal = document.getElementById('pizzaModal') || document.getElementById('pizzaCustomizerModal');
+  if (modal) modal.classList.remove('active');
 }
 
 function closePizzaCustomizerModal() {
-  document.getElementById('pizzaCustomizerModal').classList.remove('active');
+  closePizzaModal();
   currentSelectedProduct = null;
 }
 
@@ -451,14 +460,76 @@ function removeCartItem(index) {
   recalculateCartTotal();
 }
 
+const STORAGE_KEY_COUPONS = 'ptd_store_coupons';
+let currentAppliedCoupon = null;
+
+function aplicarCupomDesconto() {
+  const input = document.getElementById('inputCouponCode');
+  const feedback = document.getElementById('couponFeedbackBox');
+  if (!input || !feedback) return;
+
+  const code = input.value.trim().toUpperCase();
+  if (!code) {
+    feedback.style.display = 'block';
+    feedback.style.color = '#D32F2F';
+    feedback.innerText = 'Digite um código de cupom.';
+    return;
+  }
+
+  const savedCoupons = localStorage.getItem(STORAGE_KEY_COUPONS);
+  let coupons = [
+    { id: 'c-1', code: 'PRIMEIRACOMPRA', type: 'percent', value: 10 },
+    { id: 'c-2', code: 'FRETEGRATIS', type: 'fixed', value: 5.00 }
+  ];
+
+  if (savedCoupons) {
+    try {
+      const parsed = JSON.parse(savedCoupons);
+      if (parsed.length > 0) coupons = parsed;
+    } catch(e) {}
+  }
+
+  const found = coupons.find(c => c.code.toUpperCase() === code);
+  if (!found) {
+    feedback.style.display = 'block';
+    feedback.style.color = '#D32F2F';
+    feedback.innerText = `Cupom "${code}" inválido ou expirado.`;
+    currentAppliedCoupon = null;
+    recalculateCartTotal();
+    return;
+  }
+
+  currentAppliedCoupon = found;
+  feedback.style.display = 'block';
+  feedback.style.color = '#2E7D32';
+  const descTxt = found.type === 'percent' ? `${found.value}% de desconto` : `R$ ${found.value.toFixed(2).replace('.', ',')} de desconto`;
+  feedback.innerText = `Cupom "${found.code}" aplicado com sucesso! (${descTxt})`;
+  recalculateCartTotal();
+}
+
 function recalculateCartTotal() {
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-  const total = subtotal + currentDeliveryFee;
+  let discount = 0;
+
+  if (currentAppliedCoupon) {
+    if (currentAppliedCoupon.type === 'percent') {
+      discount = subtotal * (currentAppliedCoupon.value / 100);
+    } else {
+      discount = currentAppliedCoupon.value;
+    }
+  }
+
+  const total = Math.max(0, subtotal + currentDeliveryFee - discount);
 
   const subEl = document.getElementById('txtSubtotalFrete');
   const totEl = document.getElementById('txtTotalCartFinal');
 
-  if (subEl) subEl.innerText = `Subtotal: R$ ${subtotal.toFixed(2).replace('.', ',')} | Frete (${currentSelectedZoneName}): R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}`;
+  let detailsText = `Subtotal: R$ ${subtotal.toFixed(2).replace('.', ',')} | Frete (${currentSelectedZoneName}): R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}`;
+  if (discount > 0) {
+    detailsText += ` | Cupom (${currentAppliedCoupon.code}): -R$ ${discount.toFixed(2).replace('.', ',')}`;
+  }
+
+  if (subEl) subEl.innerText = detailsText;
   if (totEl) totEl.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
 }
 
@@ -602,7 +673,16 @@ function enviarPedidoWhatsAppFinal() {
   const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-  const total = subtotal + currentDeliveryFee;
+  let discount = 0;
+  if (currentAppliedCoupon) {
+    if (currentAppliedCoupon.type === 'percent') {
+      discount = subtotal * (currentAppliedCoupon.value / 100);
+    } else {
+      discount = currentAppliedCoupon.value;
+    }
+  }
+
+  const total = Math.max(0, subtotal + currentDeliveryFee - discount);
   const freteStr = currentDeliveryFee > 0 ? `R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}` : 'Grátis / Retirada no Balcão';
 
   let msg = `⭐ NOVO PEDIDO ⭐\n`;
@@ -617,6 +697,10 @@ function enviarPedidoWhatsAppFinal() {
     msg += `\n`;
   });
 
+  msg += `Subtotal: R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+  if (currentAppliedCoupon && discount > 0) {
+    msg += `Cupom (${currentAppliedCoupon.code}): -R$ ${discount.toFixed(2).replace('.', ',')}\n`;
+  }
   msg += `Taxa de entrega: ${freteStr}\n`;
   msg += `Total: R$ ${total.toFixed(2).replace('.', ',')}\n\n`;
   msg += `---------------------------------------\n\n`;

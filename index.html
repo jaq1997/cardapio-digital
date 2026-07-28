@@ -233,6 +233,16 @@
           </div>
         </div>
 
+        <!-- CUPOM DE DESCONTO -->
+        <div class="checkout-section-box">
+          <div class="option-group-title">Cupom de Desconto (Opcional)</div>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" class="cep-input" id="inputCouponCode" placeholder="Digite seu cupom (ex: PRIMEIRACOMPRA)" style="text-transform: uppercase; flex: 1;">
+            <button class="btn-cep-search" onclick="aplicarCupomDesconto()">APLICAR</button>
+          </div>
+          <div id="couponFeedbackBox" style="font-size: 0.8rem; font-weight: 800; margin-top: 6px; display: none;"></div>
+        </div>
+
         <!-- FORMAS DE PAGAMENTO -->
         <div class="checkout-section-box">
           <div class="option-group-title">Forma de Pagamento</div>

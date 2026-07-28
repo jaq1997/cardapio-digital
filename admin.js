@@ -853,30 +853,114 @@ function filterAdminTable(query) {
   renderAdminTable(filtered);
 }
 
+const STORAGE_KEY_COUPONS = 'ptd_store_coupons';
+
+let currentCoupons = [
+  { id: 'c-1', code: 'PRIMEIRACOMPRA', type: 'percent', value: 10 },
+  { id: 'c-2', code: 'FRETEGRATIS', type: 'fixed', value: 5.00 }
+];
+
+function loadCouponsData() {
+  const saved = localStorage.getItem(STORAGE_KEY_COUPONS);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (parsed.length >= 0) currentCoupons = parsed;
+    } catch(e) {}
+  }
+}
+
+function renderCouponsUI() {
+  const tbody = document.getElementById('couponsTableBody');
+  if (!tbody) return;
+
+  const totalCountEl = document.getElementById('totalCouponsCount');
+  if (totalCountEl) totalCountEl.innerText = currentCoupons.length;
+
+  if (currentCoupons.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" style="text-align: center; padding: 20px; color: #888;">
+          Nenhum cupom cadastrado. Crie um cupom acima para oferecer descontos aos clientes!
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = currentCoupons.map(c => `
+    <tr>
+      <td><strong>${c.code.toUpperCase()}</strong></td>
+      <td>${c.type === 'percent' ? 'Porcentagem (%)' : 'Valor Fixo (R$)'}</td>
+      <td style="font-weight: 800; color: #2E7D32;">${c.type === 'percent' ? c.value + '%' : 'R$ ' + c.value.toFixed(2).replace('.', ',')}</td>
+      <td>
+        <button class="btn-admin btn-admin-danger" onclick="deleteCoupon('${c.id}')">Excluir</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function addNewCoupon(event) {
+  event.preventDefault();
+  const codeInput = document.getElementById('newCouponCodeInput');
+  const typeInput = document.getElementById('newCouponTypeInput');
+  const valueInput = document.getElementById('newCouponValueInput');
+
+  const code = codeInput.value.trim().toUpperCase();
+  const type = typeInput.value;
+  const val = parseFloat(valueInput.value) || 0;
+
+  if (!code || val <= 0) {
+    alert('Por favor, preencha um código válido e um valor de desconto maior que zero.');
+    return;
+  }
+
+  if (currentCoupons.some(c => c.code === code)) {
+    alert(`O cupom "${code}" já está cadastrado!`);
+    return;
+  }
+
+  const newCoupon = {
+    id: 'c-' + Date.now(),
+    code: code,
+    type: type,
+    value: val
+  };
+
+  currentCoupons.push(newCoupon);
+  localStorage.setItem(STORAGE_KEY_COUPONS, JSON.stringify(currentCoupons));
+
+  codeInput.value = '';
+  valueInput.value = '';
+  renderCouponsUI();
+  alert(`Cupom "${code}" criado com sucesso!`);
+}
+
+function deleteCoupon(id) {
+  if (confirm('Tem certeza que deseja excluir este cupom de desconto?')) {
+    currentCoupons = currentCoupons.filter(c => c.id !== id);
+    localStorage.setItem(STORAGE_KEY_COUPONS, JSON.stringify(currentCoupons));
+    renderCouponsUI();
+  }
+}
+
 function switchAdminTab(tabName) {
   document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('tabContentItems').style.display = 'none';
-  document.getElementById('tabContentCategories').style.display = 'none';
-  document.getElementById('tabContentDelivery').style.display = 'none';
-  document.getElementById('tabContentBranding').style.display = 'none';
-  document.getElementById('tabContentSheets').style.display = 'none';
+  const tabs = ['items', 'categories', 'delivery', 'coupons', 'branding', 'sheets'];
+  tabs.forEach(t => {
+    const el = document.getElementById('tabContent' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (el) el.style.display = 'none';
+  });
 
-  if (tabName === 'items') {
-    document.querySelectorAll('.nav-tab')[0].classList.add('active');
-    document.getElementById('tabContentItems').style.display = 'block';
-  } else if (tabName === 'categories') {
-    document.querySelectorAll('.nav-tab')[1].classList.add('active');
-    document.getElementById('tabContentCategories').style.display = 'block';
-  } else if (tabName === 'delivery') {
-    document.querySelectorAll('.nav-tab')[2].classList.add('active');
-    document.getElementById('tabContentDelivery').style.display = 'block';
-  } else if (tabName === 'branding') {
-    document.querySelectorAll('.nav-tab')[3].classList.add('active');
-    document.getElementById('tabContentBranding').style.display = 'block';
-  } else if (tabName === 'sheets') {
-    document.querySelectorAll('.nav-tab')[4].classList.add('active');
-    document.getElementById('tabContentSheets').style.display = 'block';
+  const idx = tabs.indexOf(tabName);
+  if (idx !== -1) {
+    const btn = document.querySelectorAll('.nav-tab')[idx];
+    if (btn) btn.classList.add('active');
+    const content = document.getElementById('tabContent' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+    if (content) content.style.display = 'block';
   }
+
+  if (tabName === 'coupons') renderCouponsUI();
 }
 
 function openAddProductModal() {

@@ -352,17 +352,17 @@ tr:hover { background-color: #F9F9FB; }
 
 .modal-card {
     background: var(--ph-white);
-    border: 3px solid var(--ph-black);
-    box-shadow: 10px 10px 0 rgba(0,0,0,0.3);
+    border: 2px solid var(--ph-black);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
     width: 100%;
-    max-width: 540px;
+    max-width: 780px;
     max-height: 88vh;
     overflow-y: auto;
     position: relative;
     color: var(--ph-black);
-    padding: 28px;
+    padding: 32px;
     box-sizing: border-box;
-    border-radius: 10px;
+    border-radius: 12px;
 }
 
 .modal-close-btn {
