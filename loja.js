@@ -1,12 +1,22 @@
 /* ==========================================================================
-   PIZZA TODO DIA (ANTIGA TRI PIZZAS) — ENGINE DE VENDAS RESPONSIVA (LOJA.JS)
+   PIZZA TODO DIA (ANTIGA TRI PIZZAS) — ENGINE DE VENDAS FRANQUIA (LOJA.JS)
    ========================================================================== */
 
-const WPP_NUMERO = '5531992082542';
+const STORAGE_KEY_BRANDING = 'ptd_store_branding';
+const STORAGE_KEY_PRODUCTS = 'ptd_store_products';
+const STORAGE_KEY_CATEGORIES = 'ptd_store_categories';
+const STORAGE_KEY_DELIVERY_ZONES = 'ptd_delivery_zones';
 
-// BASE DE DADOS OFICIAL PIZZA TODO DIA
-const catalogData = [
-  // PROMOS DO DIA
+let WPP_NUMERO = '5531992082542';
+
+const defaultDeliveryZones = [
+  { id: "z-balcao", name: "Retirada no Balcão (Grátis)", price: 0.00 },
+  { id: "z-centro", name: "Centro / Bairros Próximos", price: 5.00 },
+  { id: "z-zonasul", name: "Zona Sul / Bairros Médios", price: 8.00 },
+  { id: "z-zonanorte", name: "Zona Norte / Bairros Distantes", price: 12.00 }
+];
+
+const defaultCatalogData = [
   {
     id: "combo-familia",
     nome: "Combo Família Todo Dia",
@@ -18,9 +28,7 @@ const catalogData = [
     preco_gigante: 0,
     badge: "Combo Destaque",
     img_url: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80",
-    ingredientes: "2 Pizzas Grandes + Borda Recheada + Guaraná 2L",
-    is_popular: true,
-    is_veggie: false
+    ingredientes: "2 Pizzas Grandes + Borda Recheada + Guaraná 2L"
   },
   {
     id: "combo-individual",
@@ -33,12 +41,8 @@ const catalogData = [
     preco_gigante: 0,
     badge: "Promoção",
     img_url: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80",
-    ingredientes: "1 Pizza Broto + 1 Pão de Alho + 1 Refri",
-    is_popular: true,
-    is_veggie: false
+    ingredientes: "1 Pizza Broto + 1 Pão de Alho + 1 Refri"
   },
-
-  // PIZZAS SALGADAS
   {
     id: "pizza-pepperoni",
     nome: "Pepperoni Especial",
@@ -50,9 +54,7 @@ const catalogData = [
     preco_gigante: 79.90,
     badge: "Mais Pedida",
     img_url: "https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=800&q=80",
-    ingredientes: "Pepperoni; Mussarela Especial; Molho Artesanal",
-    is_popular: true,
-    is_veggie: false
+    ingredientes: "Pepperoni; Mussarela Especial; Molho Artesanal"
   },
   {
     id: "pizza-pepperoni-requeijao",
@@ -65,9 +67,7 @@ const catalogData = [
     preco_gigante: 84.90,
     badge: "",
     img_url: "https://images.unsplash.com/photo-1541745537411-b8046dc6d66c?auto=format&fit=crop&w=800&q=80",
-    ingredientes: "Pepperoni; Requeijão Cremoso; Mussarela",
-    is_popular: true,
-    is_veggie: false
+    ingredientes: "Pepperoni; Requeijão Cremoso; Mussarela"
   },
   {
     id: "pizza-calabresa",
@@ -80,9 +80,7 @@ const catalogData = [
     preco_gigante: 74.90,
     badge: "",
     img_url: "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=800&q=80",
-    ingredientes: "Calabresa Defumada; Cebola Roxa; Azeitonas",
-    is_popular: true,
-    is_veggie: false
+    ingredientes: "Calabresa Defumada; Cebola Roxa; Azeitonas"
   },
   {
     id: "pizza-supreme",
@@ -95,9 +93,7 @@ const catalogData = [
     preco_gigante: 89.90,
     badge: "Especialidade",
     img_url: "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?auto=format&fit=crop&w=800&q=80",
-    ingredientes: "Pepperoni; Carne Temperada; Champignon; Pimentão",
-    is_popular: true,
-    is_veggie: false
+    ingredientes: "Pepperoni; Carne Temperada; Champignon; Pimentão"
   },
   {
     id: "pizza-frango-requeijao",
@@ -110,9 +106,7 @@ const catalogData = [
     preco_gigante: 79.90,
     badge: "",
     img_url: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80",
-    ingredientes: "Frango Desfiado; Catupiry Original; Milho",
-    is_popular: true,
-    is_veggie: false
+    ingredientes: "Frango Desfiado; Catupiry Original; Milho"
   },
   {
     id: "pizza-4queijos",
@@ -125,12 +119,8 @@ const catalogData = [
     preco_gigante: 82.90,
     badge: "",
     img_url: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80",
-    ingredientes: "Mussarela; Provolone; Gorgonzola; Requeijão",
-    is_popular: false,
-    is_veggie: true
+    ingredientes: "Mussarela; Provolone; Gorgonzola; Requeijão"
   },
-
-  // PIZZAS DOCES
   {
     id: "pizza-doce-nutella",
     nome: "Nutella com Morango",
@@ -142,12 +132,8 @@ const catalogData = [
     preco_gigante: 0,
     badge: "Doce Mais Pedida",
     img_url: "https://images.unsplash.com/photo-1588315029754-2dd089d39a1a?auto=format&fit=crop&w=800&q=80",
-    ingredientes: "Nutella® Original; Morango Fresco",
-    is_popular: true,
-    is_veggie: true
+    ingredientes: "Nutella® Original; Morango Fresco"
   },
-
-  // BEBIDAS
   {
     id: "bebida-coca-2l",
     nome: "Coca-Cola Garrafa 2L",
@@ -159,9 +145,7 @@ const catalogData = [
     preco_gigante: 0,
     badge: "",
     img_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=800&q=80",
-    ingredientes: "Garrafa 2 Litros",
-    is_popular: true,
-    is_veggie: true
+    ingredientes: "Garrafa 2 Litros"
   },
   {
     id: "bebida-guarana-2l",
@@ -174,25 +158,151 @@ const catalogData = [
     preco_gigante: 0,
     badge: "",
     img_url: "https://images.unsplash.com/photo-1581006852262-e4307cf6283a?auto=format&fit=crop&w=800&q=80",
-    ingredientes: "Garrafa 2 Litros",
-    is_popular: true,
-    is_veggie: true
+    ingredientes: "Garrafa 2 Litros"
   }
 ];
 
+let catalogData = defaultCatalogData;
+let deliveryZones = defaultDeliveryZones;
 let cart = [];
-let activeCategory = 'todos'; // CARDÁPIO COMPLETO LISTADO NA PÁGINA INICIAL
+let activeCategory = 'todos';
 let currentSearchQuery = '';
 
 let selectedSize = 'grande';
 let flavorMode = 'single';
 let currentSelectedProduct = null;
 let currentDeliveryFee = 5.00;
+let currentSelectedZoneName = "Padrão";
 
 document.addEventListener('DOMContentLoaded', () => {
+  applyDynamicBranding();
+  loadCatalogData();
+  loadDeliveryZonesData();
   renderCatalog();
   populateFlavorDropdowns();
+  populateDeliveryZonesSelect();
 });
+
+function applyDynamicBranding() {
+  const savedBranding = localStorage.getItem(STORAGE_KEY_BRANDING);
+  if (!savedBranding) return;
+
+  try {
+    const cfg = JSON.parse(savedBranding);
+
+    if (cfg.wppNumber) WPP_NUMERO = cfg.wppNumber;
+    if (cfg.frete) currentDeliveryFee = parseFloat(cfg.frete);
+
+    if (cfg.primaryColor) {
+      document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
+    }
+    if (cfg.darkColor) {
+      document.documentElement.style.setProperty('--ph-red-dark', cfg.darkColor);
+    }
+
+    if (cfg.storeName) {
+      const logoText = document.querySelector('.ph-logo-text');
+      if (logoText) logoText.innerHTML = `${cfg.storeName.toUpperCase()}`;
+    }
+    if (cfg.storeSub) {
+      const logoSub = document.querySelector('.ph-logo-sub');
+      if (logoSub) logoSub.innerText = cfg.storeSub.toUpperCase();
+    }
+    if (cfg.logoUrl) {
+      const logoBadge = document.querySelector('.ph-logo-badge');
+      if (logoBadge) logoBadge.innerHTML = `<img src="${cfg.logoUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+    }
+
+    const heroCard = document.querySelector('.ph-hero-card');
+    if (heroCard) {
+      if (window.innerWidth <= 768 && cfg.bannerMobUrl) {
+        heroCard.style.backgroundImage = `url('${cfg.bannerMobUrl}')`;
+        heroCard.style.backgroundSize = 'cover';
+        heroCard.style.backgroundPosition = 'center';
+      } else if (cfg.bannerDeskUrl) {
+        heroCard.style.backgroundImage = `url('${cfg.bannerDeskUrl}')`;
+        heroCard.style.backgroundSize = 'cover';
+        heroCard.style.backgroundPosition = 'center';
+      }
+    }
+
+    if (cfg.coverageCities) {
+      const cities = cfg.coverageCities.split(',');
+      if (cities[0]) {
+        const c1 = document.getElementById('covCity1');
+        if (c1) c1.innerText = cities[0].trim().toUpperCase();
+      }
+      if (cities[1]) {
+        const c2 = document.getElementById('covCity2');
+        if (c2) c2.innerText = cities[1].trim().toUpperCase();
+      }
+    }
+  } catch (e) {
+    console.error('Erro ao carregar branding customizado:', e);
+  }
+}
+
+function loadCatalogData() {
+  const savedProducts = localStorage.getItem(STORAGE_KEY_PRODUCTS);
+  if (savedProducts) {
+    try {
+      const parsed = JSON.parse(savedProducts);
+      if (parsed.length > 0) {
+        catalogData = parsed.map(item => ({
+          ...item,
+          preco_grande: item.preco_grande || item.preco || 0,
+          preco_media: item.preco_media || item.preco || 0,
+          preco_broto: item.preco_broto || item.preco || 0
+        }));
+        return;
+      }
+    } catch (e) {}
+  }
+  catalogData = defaultCatalogData;
+}
+
+function loadDeliveryZonesData() {
+  const savedZones = localStorage.getItem(STORAGE_KEY_DELIVERY_ZONES);
+  if (savedZones) {
+    try {
+      const parsed = JSON.parse(savedZones);
+      if (parsed.length > 0) {
+        deliveryZones = parsed;
+        return;
+      }
+    } catch(e) {}
+  }
+  deliveryZones = defaultDeliveryZones;
+}
+
+function populateDeliveryZonesSelect() {
+  const select = document.getElementById('selectBairroFrete');
+  if (!select) return;
+
+  if (deliveryZones.length === 0) {
+    select.innerHTML = `<option value="default" data-price="${currentDeliveryFee}">Taxa Padrão - R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}</option>`;
+    return;
+  }
+
+  select.innerHTML = deliveryZones.map(z => {
+    const priceTxt = z.price === 0 ? 'Grátis (R$ 0,00)' : `R$ ${z.price.toFixed(2).replace('.', ',')}`;
+    return `<option value="${z.id}" data-price="${z.price}" data-name="${z.name}">${z.name} (${priceTxt})</option>`;
+  }).join('');
+
+  recalculateDeliveryZoneFee();
+}
+
+function recalculateDeliveryZoneFee() {
+  const select = document.getElementById('selectBairroFrete');
+  if (!select) return;
+
+  const opt = select.options[select.selectedIndex];
+  if (opt) {
+    currentDeliveryFee = parseFloat(opt.dataset.price) || 0;
+    currentSelectedZoneName = opt.dataset.name || opt.text;
+  }
+  updateCartTotals();
+}
 
 function renderCatalog() {
   const container = document.getElementById('productGridContainer');
@@ -208,8 +318,8 @@ function renderCatalog() {
     const q = currentSearchQuery.toLowerCase();
     filtered = filtered.filter(item =>
       item.nome.toLowerCase().includes(q) ||
-      item.descricao.toLowerCase().includes(q) ||
-      item.ingredientes.toLowerCase().includes(q)
+      (item.descricao && item.descricao.toLowerCase().includes(q)) ||
+      (item.ingredientes && item.ingredientes.toLowerCase().includes(q))
     );
   }
 
@@ -220,7 +330,7 @@ function renderCatalog() {
     container.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #777777;">
         <h3 style="font-weight: 800; font-size: 1.1rem;">NENHUM ITEM ENCONTRADO</h3>
-        <p style="font-size: 0.84rem; margin-top: 6px;">Selecione outra categoria no menu acima.</p>
+        <p style="font-size: 0.84rem; margin-top: 6px;">Selecione outra categoria no menu acima ou cadastre pratos no Painel Admin.</p>
       </div>
     `;
     return;
@@ -228,7 +338,7 @@ function renderCatalog() {
 
   container.innerHTML = filtered.map(item => {
     const isPizza = item.categoria.includes('pizzas');
-    const priceDisplay = isPizza ? item.preco_grande : (item.preco_grande || item.preco_media || item.preco_broto);
+    const priceDisplay = isPizza ? item.preco_grande : (item.preco_grande || item.preco || item.preco_media || item.preco_broto);
 
     return `
       <div class="ph-card">
@@ -239,12 +349,12 @@ function renderCatalog() {
         <div class="ph-card-body">
           <div>
             <h3 class="ph-card-name">${item.nome}</h3>
-            <p class="ph-card-desc">${item.descricao}</p>
+            <p class="ph-card-desc">${item.descricao || ''}</p>
           </div>
           <div class="ph-card-footer">
             <div>
               <div class="ph-card-price-label">${isPizza ? 'Grande' : 'Preço'}</div>
-              <div class="ph-card-price-val">R$ ${priceDisplay.toFixed(2).replace('.', ',')}</div>
+              <div class="ph-card-price-val">R$ ${(priceDisplay || 0).toFixed(2).replace('.', ',')}</div>
             </div>
             ${isPizza ? `
               <button class="ph-btn-add" onclick="openPizzaCustomizerModal('${item.id}')">
@@ -265,7 +375,6 @@ function renderCatalog() {
 function filterCategory(catName, btnElement) {
   activeCategory = catName;
 
-  // ESCONDER BANNER HERO AO FILTRAR CATEGORIAS ESPECÍFICAS (MOSTRAR OS PRODUTOS IMEDIATAMENTE)
   const hero = document.querySelector('.ph-hero-section');
   if (hero) {
     if (catName === 'combos' || catName === 'todos') {
@@ -275,7 +384,6 @@ function filterCategory(catName, btnElement) {
     }
   }
 
-  // ATUALIZAR TÍTULO DA SEÇÃO
   const titleHeading = document.querySelector('.ph-section-heading');
   if (titleHeading) {
     const catLabels = {
@@ -285,7 +393,7 @@ function filterCategory(catName, btnElement) {
       'pizzas-doces': 'PIZZAS <span>DOCES</span>',
       'bebidas': 'BEBIDAS <span>GELADAS</span>'
     };
-    titleHeading.innerHTML = catLabels[catName] || 'CARDÁPIO <span>PIZZA TODO DIA</span>';
+    titleHeading.innerHTML = catLabels[catName] || `CARDÁPIO <span>${catName.replace('-', ' ').toUpperCase()}</span>`;
   }
 
   document.querySelectorAll('.ph-cat-pill').forEach(b => b.classList.remove('active'));
@@ -299,7 +407,6 @@ function filterCategory(catName, btnElement) {
 
   renderCatalog();
 
-  // ROLAGEM SUAVE ATÉ A SEÇÃO DE PRODUTOS SE ESTIVER EM CATEGORIA ESPECÍFICA
   if (catName !== 'todos') {
     const catalogSection = document.getElementById('catalogSection');
     if (catalogSection) {
@@ -322,14 +429,19 @@ function openPizzaCustomizerModal(productId) {
   flavorMode = 'single';
 
   document.getElementById('modalPizzaTitle').innerText = product.nome;
-  document.getElementById('modalPizzaDesc').innerText = product.descricao;
+  document.getElementById('modalPizzaDesc').innerText = product.descricao || '';
   const imgBg = document.getElementById('modalHeroBg');
   if (imgBg) imgBg.src = product.img_url;
 
-  document.getElementById('priceBrotoVal').innerText = `R$ ${product.preco_broto.toFixed(2).replace('.', ',')}`;
-  document.getElementById('priceMediaVal').innerText = `R$ ${product.preco_media.toFixed(2).replace('.', ',')}`;
-  document.getElementById('priceGrandeVal').innerText = `R$ ${product.preco_grande.toFixed(2).replace('.', ',')}`;
-  document.getElementById('priceGiganteVal').innerText = `R$ ${product.preco_gigante.toFixed(2).replace('.', ',')}`;
+  const pBroto = product.preco_broto || product.preco || 0;
+  const pMedia = product.preco_media || product.preco || 0;
+  const pGrande = product.preco_grande || product.preco || 0;
+  const pGigante = product.preco_gigante || product.preco || 0;
+
+  document.getElementById('priceBrotoVal').innerText = `R$ ${pBroto.toFixed(2).replace('.', ',')}`;
+  document.getElementById('priceMediaVal').innerText = `R$ ${pMedia.toFixed(2).replace('.', ',')}`;
+  document.getElementById('priceGrandeVal').innerText = `R$ ${pGrande.toFixed(2).replace('.', ',')}`;
+  document.getElementById('priceGiganteVal').innerText = `R$ ${pGigante.toFixed(2).replace('.', ',')}`;
 
   document.querySelectorAll('.size-option-card').forEach(c => c.classList.remove('selected'));
   const defaultSizeCard = document.querySelector('.size-option-card[data-size="grande"]');
@@ -394,12 +506,12 @@ function recalculateModalTotal() {
   if (selectedSize === 'media') keyPrice = 'preco_media';
   if (selectedSize === 'gigante') keyPrice = 'preco_gigante';
 
-  const price1 = p1 ? p1[keyPrice] : 64.90;
-  const price2 = p2 ? p2[keyPrice] : 64.90;
+  const price1 = p1 ? (p1[keyPrice] || p1.preco || 0) : 64.90;
+  const price2 = p2 ? (p2[keyPrice] || p2.preco || 0) : 64.90;
   const basePizzaPrice = Math.max(price1, price2);
 
   const selectBorda = document.getElementById('selectBorda');
-  const bordaPrice = parseFloat(selectBorda.options[selectBorda.selectedIndex].dataset.price) || 0;
+  const bordaPrice = selectBorda ? (parseFloat(selectBorda.options[selectBorda.selectedIndex].dataset.price) || 0) : 0;
 
   const selectAdicional = document.getElementById('selectAdicionaisExtra');
   const adicionalPrice = selectAdicional ? (parseFloat(selectAdicional.options[selectAdicional.selectedIndex].dataset.price) || 0) : 0;
@@ -415,8 +527,8 @@ function addCustomPizzaToCart() {
   const p2 = (flavorMode === 'half' && s2Id) ? catalogData.find(p => p.id === s2Id) : p1;
 
   const selectBorda = document.getElementById('selectBorda');
-  const bordaText = selectBorda.options[selectBorda.selectedIndex].text;
-  const bordaPrice = parseFloat(selectBorda.options[selectBorda.selectedIndex].dataset.price) || 0;
+  const bordaText = selectBorda ? selectBorda.options[selectBorda.selectedIndex].text : '';
+  const bordaPrice = selectBorda ? (parseFloat(selectBorda.options[selectBorda.selectedIndex].dataset.price) || 0) : 0;
 
   const selectAdicional = document.getElementById('selectAdicionaisExtra');
   const adicionalText = selectAdicional ? selectAdicional.options[selectAdicional.selectedIndex].text : '';
@@ -430,7 +542,7 @@ function addCustomPizzaToCart() {
   if (selectedSize === 'media') { keyPrice = 'preco_media'; sizeLabel = 'Média'; }
   if (selectedSize === 'gigante') { keyPrice = 'preco_gigante'; sizeLabel = 'Gigante'; }
 
-  const basePrice = Math.max(p1[keyPrice], p2[keyPrice]);
+  const basePrice = Math.max((p1[keyPrice] || p1.preco || 0), (p2[keyPrice] || p2.preco || 0));
   const itemPrice = basePrice + bordaPrice + adicionalPrice;
 
   let title = `Pizza ${sizeLabel}`;
@@ -456,12 +568,12 @@ function addDirectToCart(productId) {
   const product = catalogData.find(p => p.id === productId);
   if (!product) return;
 
-  const itemPrice = product.preco_grande || product.preco_media || product.preco_broto;
+  const itemPrice = product.preco || product.preco_grande || product.preco_media || product.preco_broto;
 
   cart.push({
     cartId: Date.now() + Math.random(),
     title: product.nome,
-    details: product.descricao,
+    details: product.descricao || '',
     price: itemPrice,
     qty: 1
   });
@@ -472,6 +584,7 @@ function addDirectToCart(productId) {
 
 function openCartModal() {
   renderCartItems();
+  populateDeliveryZonesSelect();
   document.getElementById('cartModal').classList.add('active');
 }
 
@@ -534,7 +647,7 @@ function updateCartTotals() {
 
   const subEl = document.getElementById('txtSubtotalFrete');
   const totEl = document.getElementById('txtTotalCartFinal');
-  if (subEl) subEl.innerText = `Subtotal: R$ ${subtotal.toFixed(2).replace('.', ',')} | Frete: R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}`;
+  if (subEl) subEl.innerText = `Subtotal: R$ ${subtotal.toFixed(2).replace('.', ',')} | Frete (${currentSelectedZoneName}): R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}`;
   if (totEl) totEl.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
 }
 
@@ -582,15 +695,56 @@ function switchCheckoutTab(tabName) {
 function copiarPixChave() {
   const code = document.getElementById('pixCodeText').innerText;
   navigator.clipboard.writeText(code).then(() => {
-    alert('✅ Chave PIX fictícia copiada para demonstração!');
+    alert('Chave PIX copiada para a área de transferência!');
   });
 }
 
 function simularPagamentoMercadoPagoCard() {
-  alert('🎉 DEMO DE VENDAS: Pagamento com Cartão Simulado Aprovado!\n\nNa versão integrada final o pagamento cai direto na conta do Mercado Pago da pizzaria.');
+  if (cart.length === 0) {
+    alert('Seu carrinho está vazio!');
+    return;
+  }
+  showOrderConfirmationOnScreen('Pagamento Online (Mercado Pago / PIX)');
+}
+
+function showOrderConfirmationOnScreen(paymentMethodLabel) {
+  const orderNum = '#PED-' + Math.floor(1000 + Math.random() * 9000);
+  document.getElementById('confirmedOrderNum').innerText = orderNum;
+
+  const numComp = document.getElementById('inputNumeroComp').value.trim() || 'Não informado';
+  const enderecoInfo = document.getElementById('txtRuaBairro').innerText || 'Retirada no Balcão';
+
+  let html = `<div style="margin-bottom: 8px;"><strong>Forma de Pagamento:</strong> ${paymentMethodLabel}</div>`;
+  html += `<div style="margin-bottom: 8px;"><strong>Região/Taxa de Entrega:</strong> ${currentSelectedZoneName} (R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')})</div>`;
+  html += `<div style="margin-bottom: 8px;"><strong>Endereço:</strong> ${enderecoInfo} (${numComp})</div>`;
+  html += `<div style="margin-bottom: 8px; border-top: 1px solid #DDD; padding-top: 6px;"><strong>Itens:</strong></div>`;
+
+  cart.forEach(item => {
+    html += `<div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+      <span>${item.qty}x ${item.title}</span>
+      <span>R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}</span>
+    </div>`;
+  });
+
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const total = subtotal + currentDeliveryFee;
+
+  html += `<div style="border-top: 1px solid #DDD; margin-top: 8px; padding-top: 6px; display: flex; justify-content: space-between; font-weight: 800;">
+    <span>Total Pago:</span>
+    <span style="color: var(--ph-red);">R$ ${total.toFixed(2).replace('.', ',')}</span>
+  </div>`;
+
+  document.getElementById('confirmedReceiptBody').innerHTML = html;
+
   cart = [];
   updateCartBadge();
   closeCartModal();
+
+  document.getElementById('orderConfirmedModal').classList.add('active');
+}
+
+function closeOrderConfirmedModal() {
+  document.getElementById('orderConfirmedModal').classList.remove('active');
 }
 
 function enviarPedidoWhatsAppFinal() {
@@ -599,16 +753,33 @@ function enviarPedidoWhatsAppFinal() {
     return;
   }
 
+  const savedBranding = localStorage.getItem(STORAGE_KEY_BRANDING);
+  let storeName = "CARDÁPIO DIGITAL";
+  let targetWpp = WPP_NUMERO;
+
+  if (savedBranding) {
+    try {
+      const cfg = JSON.parse(savedBranding);
+      if (cfg.storeName) storeName = cfg.storeName.toUpperCase();
+      if (cfg.wppNumber) targetWpp = cfg.wppNumber;
+    } catch(e) {}
+  }
+
+  if (!targetWpp || targetWpp === 'Não cadastrado' || targetWpp.trim() === '') {
+    showOrderConfirmationOnScreen('Pedido no Balcão / Sem WhatsApp');
+    return;
+  }
+
   const numComp = document.getElementById('inputNumeroComp').value.trim() || 'Não informado';
   const enderecoInfo = document.getElementById('txtRuaBairro').innerText || 'Retirada no Balcão';
 
-  let msg = `*NOVO PEDIDO - PIZZA TODO DIA*\n`;
+  let msg = `*NOVO PEDIDO - ${storeName}*\n`;
   msg += `-------------------------------------------\n`;
   msg += `*ITENS DO PEDIDO:*\n`;
 
   cart.forEach(item => {
     msg += `• *${item.qty}x ${item.title}*\n`;
-    msg += `   _${item.details}_\n`;
+    if (item.details) msg += `   _${item.details}_\n`;
     msg += `   Subtotal: R$ ${(item.price * item.qty).toFixed(2).replace('.', ',')}\n\n`;
   });
 
@@ -618,11 +789,13 @@ function enviarPedidoWhatsAppFinal() {
   msg += `-------------------------------------------\n`;
   msg += `*ENDEREÇO:* ${enderecoInfo}\n`;
   msg += `*NÚMERO/COMPL:* ${numComp}\n`;
-  msg += `*TAXA DE ENTREGA:* R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}\n`;
+  msg += `*REGIÃO/FRETE:* ${currentSelectedZoneName} (R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')})\n`;
   msg += `*TOTAL FINAL:* R$ ${total.toFixed(2).replace('.', ',')}\n`;
   msg += `-------------------------------------------\n`;
-  msg += `*Aguardando confirmação da cozinha!*`;
+  msg += `*Aguardando confirmação!*`;
 
   const encodedMsg = encodeURIComponent(msg);
-  window.open(`https://wa.me/${WPP_NUMERO}?text=${encodedMsg}`, '_blank');
+  window.open(`https://wa.me/${targetWpp}?text=${encodedMsg}`, '_blank');
+
+  showOrderConfirmationOnScreen('Enviado via WhatsApp');
 }
