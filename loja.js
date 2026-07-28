@@ -396,12 +396,6 @@ function recalculateModalTotal() {
   if (totalEl) totalEl.innerText = `R$ ${grandTotal.toFixed(2).replace('.', ',')}`;
 }
 
-  const displayEl = document.getElementById('modalCalculatedTotal');
-  if (displayEl) {
-    displayEl.innerText = `R$ ${grandTotal.toFixed(2).replace('.', ',')}`;
-  }
-}
-
 function addCustomPizzaToCart() {
   if (!currentSelectedProduct) return;
 
