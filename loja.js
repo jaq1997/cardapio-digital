@@ -1,6 +1,3 @@
-/* ==========================================================================
-   PIZZA TODO DIA (ANTIGA TRI PIZZAS) — ENGINE DE VENDAS FRANQUIA (LOJA.JS)
-   ========================================================================== */
 
 const STORAGE_KEY_BRANDING = 'ptd_store_branding';
 const STORAGE_KEY_PRODUCTS = 'ptd_store_products';
@@ -83,8 +80,11 @@ function applyDynamicBranding() {
         heroCard.style.backgroundSize = 'cover';
         heroCard.style.backgroundPosition = 'center';
         heroCard.classList.add('has-custom-banner');
+        heroCard.style.cursor = 'pointer';
+        heroCard.onclick = () => handleBannerClick();
       } else {
         heroCard.classList.remove('has-custom-banner');
+        heroCard.onclick = null;
       }
     }
 

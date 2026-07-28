@@ -222,6 +222,8 @@ function loadAdminSettings() {
 
   document.getElementById('cfgStoreName').value = currentBranding.storeName || '';
   document.getElementById('cfgStoreSub').value = currentBranding.storeSub || '';
+  if (document.getElementById('cfgStoreAddress')) document.getElementById('cfgStoreAddress').value = currentBranding.storeAddress || '';
+  if (document.getElementById('cfgStoreHours')) document.getElementById('cfgStoreHours').value = currentBranding.storeHours || '';
   document.getElementById('cfgWppNumber').value = currentBranding.wppNumber || '';
   document.getElementById('cfgFrete').value = currentBranding.frete || 5.00;
   document.getElementById('cfgPrimaryColor').value = currentBranding.primaryColor || '#E91C24';
@@ -768,6 +770,8 @@ function saveBrandingConfig(event) {
 
   currentBranding.storeName = document.getElementById('cfgStoreName').value.trim();
   currentBranding.storeSub = document.getElementById('cfgStoreSub').value.trim();
+  currentBranding.storeAddress = document.getElementById('cfgStoreAddress')?.value.trim() || '';
+  currentBranding.storeHours = document.getElementById('cfgStoreHours')?.value.trim() || '';
   currentBranding.wppNumber = document.getElementById('cfgWppNumber').value.trim().replace(/\D/g, '');
   currentBranding.frete = parseFloat(document.getElementById('cfgFrete').value) || 5.00;
   currentBranding.primaryColor = document.getElementById('cfgPrimaryColor').value.trim();
@@ -793,7 +797,7 @@ function saveBrandingConfig(event) {
   document.getElementById('adminStoreTitleDisplay').innerText = currentBranding.storeName;
   document.getElementById('currentWppDisplay').innerText = currentBranding.wppNumber;
 
-  alert('Configurações salvas com sucesso! A identidade visual, banners e WhatsApp foram atualizados.');
+  alert('Configurações salvas com sucesso! A identidade visual, endereço, horários, banners e WhatsApp foram atualizados.');
 }
 
 function updateStats() {

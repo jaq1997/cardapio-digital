@@ -101,11 +101,13 @@ const SHARED_COMPONENTS = {
                 <div class="ph-footer-col">
                     <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; margin-bottom: 6px; font-style: italic;" id="footerStoreTitle">PIZZA TODO DIA</div>
                     <p style="font-size: 0.82rem; color: #888888; margin-bottom: 10px;" id="footerStoreSub">Cardápio Digital & Delivery Direto do Forno.</p>
-                    <div class="footer-info-item" style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #CCCCCC; margin-top: 6px;">
-                        <span>📍 Rua Santa Isabel, 236 - Porto Alegre/RS</span>
+                    <div class="footer-info-item" id="footerAddressBox" style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #CCCCCC; margin-top: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <span id="footerAddressText">Endereço sob consulta</span>
                     </div>
-                    <div class="footer-info-item" style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #CCCCCC; margin-top: 4px;">
-                        <span>⏰ Horário: Terça a Domingo das 18h às 23h30</span>
+                    <div class="footer-info-item" id="footerHoursBox" style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #CCCCCC; margin-top: 4px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span id="footerHoursText">Consulte o horário de funcionamento</span>
                     </div>
                 </div>
                 <div class="ph-footer-col" style="text-align: right;">
@@ -171,6 +173,16 @@ function applyBrandingToUI() {
             if (subEl) subEl.innerText = cfg.storeSub.toUpperCase();
             const footerSub = document.getElementById('footerStoreSub');
             if (footerSub) footerSub.innerText = cfg.storeSub;
+        }
+
+        if (cfg.storeAddress) {
+            const addrEl = document.getElementById('footerAddressText');
+            if (addrEl) addrEl.innerText = cfg.storeAddress;
+        }
+
+        if (cfg.storeHours) {
+            const hoursEl = document.getElementById('footerHoursText');
+            if (hoursEl) hoursEl.innerText = cfg.storeHours;
         }
 
         // SE SUBIU LOGO EM IMAGEM (.PNG / .JPG), SUBSTITUI PELO LOGO DA IMAGEM E ATUALIZA FAVICON DA ABA
