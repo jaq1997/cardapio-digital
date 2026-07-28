@@ -28,13 +28,21 @@ let currentSelectedProduct = null;
 let currentDeliveryFee = 5.00;
 let currentSelectedZoneName = "Entrega em Domicílio";
 
+const defaultProducts = [
+  { id: 'p-1', nome: 'Combo Família Todo Dia', categoria: 'combos', preco: 74.90, preco_grande: 74.90, badge: 'Combo Destaque', descricao: '2 Pizzas Grandes quentinhas + 1 Borda Recheada + 1 Guaraná 2L.', img_url: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80' },
+  { id: 'p-2', nome: 'Pizza Pepperoni Especial', categoria: 'pizzas-salgadas', preco: 64.90, preco_broto: 36.90, preco_media: 49.90, preco_grande: 64.90, preco_gigante: 79.90, badge: 'Mais Pedida', descricao: 'Massa crocante com molho artesanal, mussarela e Pepperoni crocante.', img_url: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=800&q=80' },
+  { id: 'p-3', nome: 'Pizza Calabresa Cremosa', categoria: 'pizzas-salgadas', preco: 59.90, preco_broto: 34.90, preco_media: 46.90, preco_grande: 59.90, preco_gigante: 74.90, badge: 'Tradicional', descricao: 'Fatias de calabresa acebolada especial com toque de orégano.', img_url: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=800&q=80' },
+  { id: 'p-4', nome: 'Pizza Margherita Suprema', categoria: 'pizzas-salgadas', preco: 59.90, preco_broto: 34.90, preco_media: 46.90, preco_grande: 59.90, preco_gigante: 74.90, badge: 'Vegetariana', descricao: 'Mussarela de cura, rodelas de tomate fresco e manjericão fresco.', img_url: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=800&q=80' },
+  { id: 'p-5', nome: 'Pizza Chocolate com Morango', categoria: 'pizzas-doces', preco: 54.90, preco_broto: 32.90, preco_media: 44.90, preco_grande: 54.90, preco_gigante: 68.90, badge: 'Sobremesa', descricao: 'Chocolate nobre derretido coberto com lâminas de morango fresco.', img_url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80' },
+  { id: 'p-6', nome: 'Guaraná Antarctica 2L', categoria: 'bebidas', preco: 12.00, preco_grande: 12.00, badge: 'Gelado', descricao: 'Refrigerante Guaraná Antarctica garrafa 2 Litros trincando de gelado.', img_url: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=800&q=80' }
+];
+
 document.addEventListener('DOMContentLoaded', () => {
   applyDynamicBranding();
   loadCatalogData();
   loadDeliveryZonesData();
   renderCatalog();
-  populateFlavorDropdowns();
-  populateDeliveryZonesSelect();
+  populateFlavorRadioLists();
 });
 
 function applyDynamicBranding() {
@@ -69,11 +77,11 @@ function applyDynamicBranding() {
 
     const heroCard = document.querySelector('.ph-hero-card');
     if (heroCard) {
-      if (window.innerWidth <= 768 && cfg.bannerMobUrl) {
-        heroCard.style.backgroundImage = `url('${cfg.bannerMobUrl}')`;
-        heroCard.classList.add('has-custom-banner');
-      } else if (cfg.bannerDeskUrl) {
-        heroCard.style.backgroundImage = `url('${cfg.bannerDeskUrl}')`;
+      const bannerUrl = (window.innerWidth <= 768 && cfg.bannerMobUrl) ? cfg.bannerMobUrl : (cfg.bannerDeskUrl || cfg.bannerMobUrl);
+      if (bannerUrl) {
+        heroCard.style.backgroundImage = `url('${bannerUrl}')`;
+        heroCard.style.backgroundSize = 'cover';
+        heroCard.style.backgroundPosition = 'center';
         heroCard.classList.add('has-custom-banner');
       } else {
         heroCard.classList.remove('has-custom-banner');
@@ -92,7 +100,7 @@ function applyDynamicBranding() {
       }
     }
   } catch (e) {
-    console.error('Erro ao carregar branding customizado:', e);
+    console.error('Erro ao carregar branding:', e);
   }
 }
 
@@ -101,23 +109,25 @@ function loadCatalogData() {
   if (savedProducts) {
     try {
       const parsed = JSON.parse(savedProducts);
-      catalogData = parsed.map(p => ({
-        id: p.id,
-        nome: p.nome,
-        categoria: p.categoria || 'pizzas-salgadas',
-        descricao: p.descricao || '',
-        preco_broto: p.preco_broto || 0,
-        preco_media: p.preco_media || 0,
-        preco_grande: p.preco_grande || p.preco || 0,
-        preco_gigante: p.preco_gigante || 0,
-        badge: p.badge || '',
-        img_url: p.img_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
-        ingredientes: p.descricao || ''
-      }));
-      return;
+      if (parsed && parsed.length > 0) {
+        catalogData = parsed.map(p => ({
+          id: p.id,
+          nome: p.nome,
+          categoria: p.categoria || 'pizzas-salgadas',
+          descricao: p.descricao || '',
+          preco_broto: p.preco_broto || 0,
+          preco_media: p.preco_media || 0,
+          preco_grande: p.preco_grande || p.preco || 0,
+          preco_gigante: p.preco_gigante || 0,
+          badge: p.badge || '',
+          img_url: p.img_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+          ingredientes: p.descricao || ''
+        }));
+        return;
+      }
     } catch(e) {}
   }
-  catalogData = [];
+  catalogData = defaultProducts;
 }
 
 function loadDeliveryZonesData() {
@@ -130,8 +140,14 @@ function loadDeliveryZonesData() {
   }
 }
 
+function scrollToCatalogSection() {
+  const sec = document.getElementById('catalogSection');
+  if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+}
+
 function renderCatalog() {
   const container = document.getElementById('productGridContainer');
+  const countEl = document.getElementById('itemCountDisplay');
   if (!container) return;
 
   let filtered = catalogData;
@@ -140,11 +156,10 @@ function renderCatalog() {
     filtered = filtered.filter(p => p.categoria === activeCategory);
   }
 
-  if (currentSearchQuery.trim() !== '') {
-    const q = currentSearchQuery.toLowerCase().trim();
+  if (currentSearchQuery) {
+    const q = currentSearchQuery.toLowerCase();
     filtered = filtered.filter(p =>
       p.nome.toLowerCase().includes(q) ||
-      (p.descricao && p.descricao.toLowerCase().includes(q)) ||
       (p.categoria && p.categoria.toLowerCase().includes(q))
     );
   }

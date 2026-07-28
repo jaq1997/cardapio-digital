@@ -89,7 +89,7 @@ const SHARED_COMPONENTS = {
         </a>
     `,
     mobileBar: `
-        <div class="mobile-sticky-checkout">
+        <div class="mobile-sticky-bar">
             <button class="ph-btn-red-lg" style="width: 100%; font-size: 0.9rem;" onclick="openCartModal()">
                 <span>VER CARRINHO</span>
             </button>
@@ -99,12 +99,18 @@ const SHARED_COMPONENTS = {
         <footer class="ph-footer">
             <div class="ph-footer-inner">
                 <div class="ph-footer-col">
-                    <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.1rem; margin-bottom: 6px; font-style: italic;" id="footerStoreTitle">PIZZA TODO DIA</div>
-                    <p style="font-size: 0.8rem; color: #888888;" id="footerStoreSub">Cardápio Digital & Delivery Direto do Forno.</p>
+                    <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; margin-bottom: 6px; font-style: italic;" id="footerStoreTitle">PIZZA TODO DIA</div>
+                    <p style="font-size: 0.82rem; color: #888888; margin-bottom: 10px;" id="footerStoreSub">Cardápio Digital & Delivery Direto do Forno.</p>
+                    <div class="footer-info-item" style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #CCCCCC; margin-top: 6px;">
+                        <span>📍 Rua Santa Isabel, 236 - Porto Alegre/RS</span>
+                    </div>
+                    <div class="footer-info-item" style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #CCCCCC; margin-top: 4px;">
+                        <span>⏰ Horário: Terça a Domingo das 18h às 23h30</span>
+                    </div>
                 </div>
                 <div class="ph-footer-col" style="text-align: right;">
-                    <div style="font-size: 0.75rem; color: #666666;">© 2026 Todos os direitos reservados.</div>
-                    <div style="font-size: 0.75rem; color: #888; margin-top: 4px;">Powered by Cardápio Digital Engine</div>
+                    <div style="font-size: 0.78rem; color: #666666;">© 2026 Todos os direitos reservados.</div>
+                    <div style="font-size: 0.78rem; color: #888; margin-top: 4px;">Powered by Cardápio Digital Engine</div>
                 </div>
             </div>
         </footer>
