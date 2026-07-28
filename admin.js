@@ -35,41 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchFromSheets();
 });
 
-/**
- * Helper de requisição com timeout e validação de resposta
- * Retorna JSON quando aplicável, lança erro em timeouts ou resposta não-ok
- */
-async function apiRequest(url, options = {}, timeout = 8000) {
-  const controller = new AbortController();
-  const signal = controller.signal;
-  const timer = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const fetchOptions = { ...options, signal };
-    const res = await fetch(url, fetchOptions);
-    clearTimeout(timer);
-
-    if (!res.ok) {
-      const txt = await res.text().catch(() => '');
-      throw new Error(`HTTP ${res.status} - ${txt}`);
-    }
-
-    const ct = (res.headers.get('content-type') || '').toLowerCase();
-    if (ct.includes('application/json') || ct.includes('text/plain')) {
-      try {
-        return await res.json();
-      } catch (e) {
-        throw new Error('Resposta JSON inválida');
-      }
-    }
-
-    // fallback para texto/HTML
-    return await res.text();
-  } catch (err) {
-    if (err.name === 'AbortError') throw new Error('Timeout de requisição');
-    throw err;
-  }
-}
+// apiRequest helper e fornecido centralidamente pelo defaults.js
 
 function applyUnifiedBrandingVariables(primaryColor, darkColor) {
   if (primaryColor) {

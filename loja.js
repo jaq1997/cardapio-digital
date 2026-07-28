@@ -97,10 +97,10 @@ function loadCatalogData() {
   if (savedProducts) {
     try {
       const parsed = JSON.parse(savedProducts);
-      if (parsed && parsed.length > 0) {
+      if (parsed && Array.isArray(parsed) && parsed.length > 0) {
         catalogData = parsed.map(p => ({
           id: p.id,
-          nome: p.nome,
+          nome: p.nome || 'Produto',
           categoria: p.categoria || 'pizzas-salgadas',
           descricao: p.descricao || '',
           preco_broto: p.preco_broto || 0,
@@ -115,7 +115,7 @@ function loadCatalogData() {
       }
     } catch(e) {}
   }
-  catalogData = defaultProducts;
+  catalogData = (typeof defaultProducts !== 'undefined' && Array.isArray(defaultProducts)) ? defaultProducts : [];
 }
 
 function loadDeliveryZonesData() {
