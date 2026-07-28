@@ -205,51 +205,65 @@
         <!-- ITENS DO CARRINHO -->
         <div id="cartItemsContainer"></div>
 
-        <!-- ENDEREÇO POR CEP -->
+        <!-- FORMA DE ENVIO & ENDEREÇO -->
         <div class="checkout-section-box">
-          <div class="option-group-title">Endereço de Entrega (CEP)</div>
-          <div class="cep-row">
-            <input type="text" class="cep-input" id="inputCep" placeholder="Digite seu CEP (ex: 90010-000)" maxlength="9">
-            <button class="btn-cep-search" onclick="buscarCepViaAPI()">BUSCAR</button>
+          <div class="option-group-title">Forma de Envio</div>
+          <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+            <label style="flex: 1; background: #FFF; border: 2px solid var(--ph-border); padding: 10px; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 700;">
+              <input type="radio" name="deliveryType" value="entrega" checked onchange="toggleDeliveryTypeUI('entrega')">
+              <span>🛵 Entrega</span>
+            </label>
+            <label style="flex: 1; background: #FFF; border: 2px solid var(--ph-border); padding: 10px; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 700;">
+              <input type="radio" name="deliveryType" value="balcao" onchange="toggleDeliveryTypeUI('balcao')">
+              <span>🛍️ Retirada (Grátis)</span>
+            </label>
           </div>
-          <div class="address-result-box" id="addressResultBox" style="display: none;">
-            <div id="txtRuaBairro">Rua Principal, Centro</div>
-            <div class="txt-frete-val" id="txtFreteVal">Taxa de Entrega: R$ 5,00</div>
+
+          <div id="deliveryAddressBox">
+            <div class="option-group-title">Endereço de Entrega (CEP)</div>
+            <div class="cep-row">
+              <input type="text" class="cep-input" id="inputCep" placeholder="Digite seu CEP (ex: 90010-000)" maxlength="9">
+              <button class="btn-cep-search" onclick="buscarCepViaAPI()">BUSCAR</button>
+            </div>
+            <div class="address-result-box" id="addressResultBox" style="display: none;">
+              <div id="txtRuaBairro">Rua Principal, Centro</div>
+              <div class="txt-frete-val" id="txtFreteVal">Taxa de Entrega: R$ 5,00</div>
+            </div>
+            <input type="text" class="cep-input" id="inputNumeroComp" placeholder="Número e complemento (ex: Ap 202)" style="margin-top: 8px;">
           </div>
-          <input type="text" class="cep-input" id="inputNumeroComp" placeholder="Número e complemento (ex: Ap 202)" style="margin-top: 8px;">
         </div>
 
         <!-- FORMAS DE PAGAMENTO -->
         <div class="checkout-section-box">
           <div class="option-group-title">Forma de Pagamento</div>
           <div class="mp-checkout-tabs">
-            <button class="mp-tab-btn active" id="tabMpPix" onclick="switchCheckoutTab('pix')">PIX (DEMO)</button>
-            <button class="mp-tab-btn" id="tabMpCard" onclick="switchCheckoutTab('card')">CARTÃO (DEMO)</button>
+            <button class="mp-tab-btn active" id="tabMpPix" onclick="switchCheckoutTab('pix')">PIX</button>
+            <button class="mp-tab-btn" id="tabMpCard" onclick="switchCheckoutTab('card')">CARTÃO DE CRÉDITO</button>
             <button class="mp-tab-btn" id="tabWpp" onclick="switchCheckoutTab('wpp')">WHATSAPP</button>
           </div>
 
-          <!-- TAB 1: PIX FICTÍCIO -->
+          <!-- TAB 1: PIX -->
           <div id="contentCheckoutPix" class="tab-content-box">
-            <div class="pix-title">Pagamento via PIX (Demonstração)</div>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=00020126580014BR.GOV.BCB.PIX013612345678-DEMO-PIZZA-TODO-DIA520400005303986540578.905802BR5920PIZZA%20TODO%20DIA6009SAO%20PAULO62070503***6304ABCD" class="pix-qr-img" alt="QR Code PIX">
-            <div class="pix-code-str" id="pixCodeText">00020126580014BR.GOV.BCB.PIX013612345678-DEMO-PIZZA-TODO-DIA520400005303986540578.905802BR5920PIZZA%20TODO%20DIA6009SAO%20PAULO62070503***6304ABCD</div>
+            <div class="pix-title">Pagamento Instantâneo via PIX</div>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=00020126580014BR.GOV.BCB.PIX013612345678-PIZZA-TODO-DIA520400005303986540578.905802BR5920PIZZA%20TODO%20DIA6009SAO%20PAULO62070503***6304ABCD" class="pix-qr-img" alt="QR Code PIX">
+            <div class="pix-code-str" id="pixCodeText">00020126580014BR.GOV.BCB.PIX013612345678-PIZZA-TODO-DIA520400005303986540578.905802BR5920PIZZA%20TODO%20DIA6009SAO%20PAULO62070503***6304ABCD</div>
             <button class="ph-btn-add" style="width: 100%; justify-content: center;" onclick="copiarPixChave()">COPIAR CHAVE PIX</button>
           </div>
 
-          <!-- TAB 2: CARTÃO FICTÍCIO -->
+          <!-- TAB 2: CARTÃO -->
           <div id="contentCheckoutCard" class="tab-content-box" style="display: none;">
-            <input type="text" class="cep-input" placeholder="Número do Cartão (Simulação Mercado Pago)">
+            <input type="text" class="cep-input" placeholder="Número do Cartão" style="margin-bottom: 8px;">
             <div class="row-inputs">
               <input type="text" class="cep-input" placeholder="MM/AA">
               <input type="text" class="cep-input" placeholder="CVV">
             </div>
             <input type="text" class="cep-input" placeholder="Nome do Titular" style="margin-top: 8px;">
-            <button class="ph-btn-red-lg" style="margin-top: 10px;" onclick="simularPagamentoMercadoPagoCard()">SIMULAR PAGAMENTO</button>
+            <button class="ph-btn-red-lg" style="margin-top: 10px; width: 100%;" onclick="simularPagamentoMercadoPagoCard()">PAGAR COM CARTÃO</button>
           </div>
 
           <!-- TAB 3: WHATSAPP DIRETO -->
           <div id="contentCheckoutWpp" class="tab-content-box" style="display: none; text-align: center;">
-            <p class="wpp-notice">Seu pedido será enviado formatado direto para o WhatsApp do nosso balcão!</p>
+            <p class="wpp-notice">Seu pedido será enviado formatado direto para o WhatsApp do atendimento!</p>
           </div>
         </div>
 

@@ -84,7 +84,7 @@
               <th>Foto</th>
               <th>Nome do Produto</th>
               <th>Categoria</th>
-              <th>Descrição</th>
+              <th>Selo / Destaque</th>
               <th>Preço (R$)</th>
               <th>Ações</th>
             </tr>
@@ -202,8 +202,9 @@
               </div>
             </div>
             <input type="file" id="cfgLogoFile" style="display: none;" accept="image/*" onchange="previewLogoFileUpload(this)">
-            <div style="margin-top: 8px;">
+            <div style="margin-top: 8px; display: flex; align-items: center; gap: 10px;">
               <img id="logoFilePreview" style="max-height: 70px; border-radius: 4px; display: none; border: 2px solid var(--ph-black);" alt="Pré-visualização da Logo">
+              <button type="button" id="btnRemoveLogo" class="btn-admin btn-admin-danger" style="display: none;" onclick="removeLogo()">Remover Logo</button>
             </div>
           </div>
 
@@ -214,12 +215,13 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
               <div>
                 <strong>Clique para selecionar o Banner Desktop (1200x400 px)</strong>
-                <div style="font-size: 0.74rem; color: #777; margin-top: 2px;">Ou gere no ChatGPT/Midjourney e arraste para cá</div>
+                <div style="font-size: 0.74rem; color: #777; margin-top: 2px;">Arraste o arquivo de imagem diretamente para esta área</div>
               </div>
             </div>
             <input type="file" id="cfgBannerDeskFile" style="display: none;" accept="image/*" onchange="previewBannerDeskUpload(this)">
-            <div style="margin-top: 8px;">
+            <div style="margin-top: 8px; display: flex; align-items: center; gap: 10px;">
               <img id="bannerDeskPreview" style="max-height: 100px; border-radius: 4px; display: none; border: 2px solid var(--ph-black);" alt="Pré-visualização Banner Desktop">
+              <button type="button" id="btnRemoveBannerDesk" class="btn-admin btn-admin-danger" style="display: none;" onclick="removeBannerDesk()">Remover Banner Desktop</button>
             </div>
           </div>
 
@@ -234,8 +236,9 @@
               </div>
             </div>
             <input type="file" id="cfgBannerMobFile" style="display: none;" accept="image/*" onchange="previewBannerMobUpload(this)">
-            <div style="margin-top: 8px;">
+            <div style="margin-top: 8px; display: flex; align-items: center; gap: 10px;">
               <img id="bannerMobPreview" style="max-height: 100px; border-radius: 4px; display: none; border: 2px solid var(--ph-black);" alt="Pré-visualização Banner Mobile">
+              <button type="button" id="btnRemoveBannerMob" class="btn-admin btn-admin-danger" style="display: none;" onclick="removeBannerMob()">Remover Banner Mobile</button>
             </div>
           </div>
 
@@ -322,7 +325,7 @@
           </div>
           <div>
             <label class="admin-label">Preço (R$):</label>
-            <input type="number" id="prodPrice" class="admin-input" step="0.50" placeholder="59.90" required>
+            <input type="number" id="prodPrice" class="admin-input" step="0.01" placeholder="59.90" required>
           </div>
         </div>
 

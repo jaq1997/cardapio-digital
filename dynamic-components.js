@@ -13,7 +13,7 @@ const SHARED_COMPONENTS = {
                 </svg>
             </button>
 
-            <a href="index.html" class="ph-brand-logo">
+            <a href="index.html" class="ph-brand-logo" id="headerBrandLogo">
                 <div class="ph-logo-badge">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 2L2 7l10 15 10-15-10-5z"></path>
@@ -21,8 +21,8 @@ const SHARED_COMPONENTS = {
                     </svg>
                 </div>
                 <div class="ph-logo-text-wrap">
-                    <div class="ph-logo-text">PIZZA <span>TODO DIA</span></div>
-                    <div class="ph-logo-sub">ANTIGA TRI PIZZAS</div>
+                    <div class="ph-logo-text" id="headerLogoText">PIZZA <span>TODO DIA</span></div>
+                    <div class="ph-logo-sub" id="headerLogoSub">ANTIGA TRI PIZZAS</div>
                 </div>
             </a>
 
@@ -82,37 +82,29 @@ const SHARED_COMPONENTS = {
         </div>
     `,
     wppFloat: `
-        <a href="https://wa.me/5531992082542?text=Olá!%20Vim%20pelo%20site%20da%20Pizza%20Todo%20Dia%20e%20gostaria%20de%20fazer%20um%20pedido!" target="_blank" class="wpp-float-btn" id="wppFloatBtn" aria-label="Atendimento via WhatsApp">
-            <svg class="wpp-icon-svg" width="30" height="30" viewBox="0 0 24 24">
-                <path d="M12.031 0c-6.627 0-12 5.373-12 12 0 2.159.57 4.26 1.654 6.105l-1.685 6.155 6.302-1.653c1.782.971 3.799 1.493 5.729 1.493 6.627 0 12-5.373 12-12 0-6.627-5.373-12-12-12zm.009 22c-1.808 0-3.578-.484-5.128-1.402l-.367-.22-3.81 1 .997-3.712-.24-.383c-1.026-1.636-1.57-3.538-1.57-5.483 0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10zm5.498-7.443c-.301-.151-1.782-.879-2.058-.979-.275-.101-.476-.151-.677.151-.201.301-.778.979-.954 1.18-.176.201-.351.226-.652.075-1.758-.881-2.91-1.573-4.062-3.551-.308-.528.308-.49.881-1.637.101-.201.05-.377-.025-.528-.075-.151-.677-1.632-.929-2.235-.245-.587-.495-.508-.677-.517-.176-.008-.377-.008-.578-.008s-.528.075-.804.377c-.276.301-1.055 1.03-1.055 2.513s1.08 2.914 1.231 3.115c.151.201 2.125 3.245 5.15 4.552.719.31 1.281.496 1.719.635.724.23 1.382.197 1.902.12.579-.086 1.782-.728 2.033-1.431.251-.703.251-1.306.176-1.431-.075-.126-.276-.226-.577-.377z"/>
+        <a href="https://wa.me/5531992082542" target="_blank" class="ph-wpp-float" id="floatWppBtn" aria-label="Fazer pedido no WhatsApp">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.485 1.332 5.001l-1.415 5.166 5.289-1.385c1.464.798 3.116 1.218 4.783 1.219h.004c5.505 0 9.988-4.478 9.989-9.984 0-2.667-1.038-5.174-2.926-7.062a9.923 9.923 0 0 0-7.066-2.939zm5.952 14.502c-.251.706-1.458 1.348-2.022 1.433-.518.078-1.196.111-3.447-.818-2.879-1.189-4.735-4.116-4.879-4.307-.143-.191-1.168-1.554-1.168-2.964 0-1.41.741-2.104 1.004-2.387.263-.283.573-.354.765-.354.192 0 .383.003.548.01.175.008.411-.067.643.489.239.574.814 1.986.886 2.13.072.144.119.311.024.499-.096.188-.144.306-.287.474-.143.167-.301.373-.43.501-.143.143-.293.299-.126.586.167.287.74 1.22 1.587 1.975 1.09.972 2.008 1.274 2.295 1.417.287.143.454.119.622-.072.167-.191.718-.838.91-1.125.191-.287.383-.239.646-.143.263.096 1.674.79 1.961.933.287.143.479.215.55.335.072.12.072.694-.179 1.401z"/>
             </svg>
         </a>
     `,
     mobileBar: `
-        <div class="mobile-sticky-bar" id="mobileStickyFooter">
-            <button class="mobile-sticky-btn" onclick="openCartModal()">
-                <span>VER MEU PEDIDO</span>
-                <span style="background:#FFC72C; color:#000; padding:2px 8px; border-radius:50px; font-weight:900;" id="mobileStickyCartBadge">0</span>
+        <div class="mobile-sticky-checkout">
+            <button class="ph-btn-red-lg" style="width: 100%; font-size: 0.9rem;" onclick="openCartModal()">
+                <span>VER CARRINHO</span>
             </button>
         </div>
     `,
     footer: `
-        <footer>
-            <div class="footer-inner">
-                <div class="footer-info-col">
-                    <h4 style="font-size: 1.4rem; font-weight: 900; font-style: italic; text-transform: uppercase;" id="footerStoreTitle">PIZZA <span style="color: var(--ph-red);">TODO DIA</span></h4>
-                    <p style="font-size: 0.9rem; color: #CCC;" id="footerStoreSub">Antiga Tri Pizzas • Tradição e Sabor no Seu Bairro</p>
-                    <div class="footer-info-item">
-                        <svg class="lucide-icon-svg" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                        <span id="footerCoverageTxt">Porto Alegre e Viamão (Atendimento Delivery)</span>
-                    </div>
-                    <div class="footer-info-item">
-                        <svg class="lucide-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        <span>Terça a Domingo: 18h às 23h30</span>
-                    </div>
+        <footer class="ph-footer">
+            <div class="ph-footer-inner">
+                <div class="ph-footer-col">
+                    <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.1rem; margin-bottom: 6px; font-style: italic;" id="footerStoreTitle">PIZZA TODO DIA</div>
+                    <p style="font-size: 0.8rem; color: #888888;" id="footerStoreSub">Cardápio Digital & Delivery Direto do Forno.</p>
                 </div>
-                <div style="font-size: 0.8rem; color: #AAA; text-align: right;">
-                    <p>© 2026 Cardápio Digital — Todos os direitos reservados.</p>
+                <div class="ph-footer-col" style="text-align: right;">
+                    <div style="font-size: 0.75rem; color: #666666;">© 2026 Todos os direitos reservados.</div>
+                    <div style="font-size: 0.75rem; color: #888; margin-top: 4px;">Powered by Cardápio Digital Engine</div>
                 </div>
             </div>
         </footer>
@@ -134,6 +126,60 @@ function toggleMobileDrawer(open) {
 function selectDrawerCategory(catName) {
     filterCategory(catName, null);
     toggleMobileDrawer(false);
+}
+
+function applyBrandingToUI() {
+    const savedBranding = localStorage.getItem('ptd_store_branding');
+    if (!savedBranding) return;
+
+    try {
+        const cfg = JSON.parse(savedBranding);
+
+        if (cfg.primaryColor) {
+            document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
+        }
+        if (cfg.darkColor) {
+            document.documentElement.style.setProperty('--ph-red-dark', cfg.darkColor);
+        }
+
+        if (cfg.storeName) {
+            const name = cfg.storeName.trim();
+            const textEl = document.getElementById('headerLogoText');
+            if (textEl) {
+                const words = name.split(' ');
+                if (words.length > 1) {
+                    textEl.innerHTML = `${words[0]} <span>${words.slice(1).join(' ')}</span>`;
+                } else {
+                    textEl.innerText = name;
+                }
+            }
+            const drawerTitle = document.getElementById('drawerStoreTitle');
+            if (drawerTitle) drawerTitle.innerText = name.toUpperCase();
+
+            const footerTitle = document.getElementById('footerStoreTitle');
+            if (footerTitle) footerTitle.innerText = name.toUpperCase();
+        }
+
+        if (cfg.storeSub) {
+            const subEl = document.getElementById('headerLogoSub');
+            if (subEl) subEl.innerText = cfg.storeSub.toUpperCase();
+            const footerSub = document.getElementById('footerStoreSub');
+            if (footerSub) footerSub.innerText = cfg.storeSub;
+        }
+
+        // SE SUBIU LOGO EM IMAGEM (.PNG / .JPG), SUBSTITUI PELO LOGO DA IMAGEM
+        if (cfg.logoUrl) {
+            const brandLogoAnchor = document.getElementById('headerBrandLogo');
+            if (brandLogoAnchor) {
+                brandLogoAnchor.innerHTML = `<img src="${cfg.logoUrl}" style="max-height: 44px; border-radius: 4px; object-fit: contain;" alt="${cfg.storeName || 'Logo'}">`;
+            }
+        }
+
+        if (cfg.wppNumber) {
+            const wppFloat = document.getElementById('floatWppBtn');
+            if (wppFloat) wppFloat.href = `https://wa.me/${cfg.wppNumber}`;
+        }
+    } catch(e) {}
 }
 
 function renderDynamicCategoriesInHeader() {
@@ -190,6 +236,7 @@ function initSharedComponents() {
     body.appendChild(footerDiv.firstElementChild);
 
     renderDynamicCategoriesInHeader();
+    applyBrandingToUI();
 }
 
 document.addEventListener('DOMContentLoaded', initSharedComponents);

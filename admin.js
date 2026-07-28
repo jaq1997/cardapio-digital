@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CARDÁPIO DIGITAL & PDV — ENGINE DE GESTÃO (COM BUCKET CARDÁPIO-DIGITAL R2)
+   CARDÁPIO DIGITAL & PDV — ENGINE DE GESTÃO (BANCO DE DADOS REMOTO & FALLBACK)
    ========================================================================== */
 
 const DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3UaSFxQeE9Wxj6BPuzC00T0k30eiq3EoZfTZgtwXqOCTL9IAuL9YMAytZX3ZyTACzw/exec';
@@ -274,7 +274,7 @@ function saveSheetsConfig(event) {
   sheetsConfig.sheetCsvUrl = document.getElementById('cfgSheetCsvUrl').value.trim() || DEFAULT_CSV_URL;
 
   localStorage.setItem(STORAGE_KEY_SHEETS_CONFIG, JSON.stringify(sheetsConfig));
-  alert('Configurações do Google Sheets salvas com sucesso!');
+  alert('Configurações salvas com sucesso!');
   fetchFromSheets();
 }
 
@@ -286,33 +286,49 @@ async function fetchFromSheets() {
   const targetUrl = sheetsConfig.appsScriptUrl || DEFAULT_APPS_SCRIPT_URL;
 
   if (targetUrl) {
-    if (statusDisplay) statusDisplay.innerText = "Conectando ao Apps Script...";
+    if (statusDisplay) {
+      statusDisplay.innerText = "Conectando ao Servidor...";
+      statusDisplay.style.color = "#FFA000";
+    }
     try {
       const res = await fetch(targetUrl);
       const json = await res.json();
-      if (json.ok && Array.isArray(json.data) && json.data.length > 0) {
-        currentProducts = json.data.map((p, i) => ({
-          id: p.id || String(i + 1),
-          nome: p.nome || '',
-          categoria: p.categoria || 'pizzas-salgadas',
-          descricao: p.descricao || '',
-          preco: parseFloat(p.preco || p.preco_brl) || 0,
-          preco_grande: parseFloat(p.preco || p.preco_brl) || 0,
-          badge: p.badge || '',
-          img_url: formatFotoUrl(p.img_url || p.img_1),
-          status: p.status || 'ativo'
-        }));
+      if (json.ok && Array.isArray(json.data)) {
+        if (json.data.length > 0) {
+          currentProducts = json.data.map((p, i) => ({
+            id: p.id || String(i + 1),
+            nome: p.nome || '',
+            categoria: p.categoria || 'pizzas-salgadas',
+            descricao: p.descricao || '',
+            preco: parseFloat(p.preco || p.preco_brl) || 0,
+            preco_grande: parseFloat(p.preco || p.preco_brl) || 0,
+            badge: p.badge || '',
+            img_url: formatFotoUrl(p.img_url || p.img_1),
+            status: p.status || 'ativo'
+          }));
 
-        localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(currentProducts));
-        renderAdminTable();
-        if (statusDisplay) {
-          statusDisplay.innerText = `Conectado (${currentProducts.length} itens)`;
-          statusDisplay.style.color = "#2E7D32";
+          localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(currentProducts));
+          renderAdminTable();
+          if (statusDisplay) {
+            statusDisplay.innerText = `Conectado (${currentProducts.length} itens)`;
+            statusDisplay.style.color = "#2E7D32";
+          }
+          return;
+        } else {
+          // SE A PLANILHA REMOTA ESTIVER VAZIA
+          if (currentProducts.length === 0) {
+            currentProducts = [ ...defaultProducts ];
+          }
+          renderAdminTable();
+          if (statusDisplay) {
+            statusDisplay.innerText = "Conectado (Planilha Vazia)";
+            statusDisplay.style.color = "#FFA000";
+          }
+          return;
         }
-        return;
       }
     } catch (err) {
-      console.warn('Apps Script não respondeu. Tentando CSV de backup...', err);
+      console.warn('Servidor proxy não respondeu. Tentando CSV...', err);
     }
   }
 
@@ -322,7 +338,13 @@ async function fetchFromSheets() {
 function fetchFromCsvFallback() {
   const statusDisplay = document.getElementById('sheetsStatusDisplay');
   const csvUrl = sheetsConfig.sheetCsvUrl || DEFAULT_CSV_URL;
-  if (!csvUrl || typeof Papa === 'undefined') return;
+  if (!csvUrl || typeof Papa === 'undefined') {
+    if (statusDisplay) {
+      statusDisplay.innerText = "Modo Local Storage";
+      statusDisplay.style.color = "#E65100";
+    }
+    return;
+  }
 
   Papa.parse(csvUrl, {
     download: true,
@@ -347,10 +369,21 @@ function fetchFromCsvFallback() {
           localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(currentProducts));
           renderAdminTable();
           if (statusDisplay) {
-            statusDisplay.innerText = "Conectado (CSV PapaParse)";
+            statusDisplay.innerText = "Conectado (CSV)";
             statusDisplay.style.color = "#1565C0";
           }
+          return;
         }
+      }
+
+      // Se a planilha CSV estiver vazia
+      if (currentProducts.length === 0) {
+        currentProducts = [ ...defaultProducts ];
+      }
+      renderAdminTable();
+      if (statusDisplay) {
+        statusDisplay.innerText = "Conectado (Aguardando Dados)";
+        statusDisplay.style.color = "#FFA000";
       }
     }
   });
@@ -381,10 +414,10 @@ async function saveToSheets(productsToSave = currentProducts) {
     });
     const json = await res.json();
     if (json.ok) {
-      console.log('✓ Sincronizado com o Google Sheets!');
+      console.log('✓ Sincronizado com a Planilha Remota!');
     }
   } catch (err) {
-    console.error('Erro ao salvar no Google Sheets:', err);
+    console.error('Erro ao salvar na Planilha Remota:', err);
   }
 }
 
@@ -436,12 +469,12 @@ async function uploadToCloudflareR2(file) {
 
 function syncWithSheetsNow() {
   fetchFromSheets();
-  alert('Sincronização iniciada com o Google Sheets!');
+  alert('Sincronização iniciada!');
 }
 
 function pushCurrentToSheetsNow() {
-  saveToSheets().then(() => {
-    alert('Produtos enviados para a planilha com sucesso!');
+  saveToSheets(currentProducts).then(() => {
+    alert('Produtos e categorias enviados para a planilha remota com sucesso!');
   });
 }
 
@@ -542,12 +575,13 @@ function addNewCategory(event) {
   const catName = input.value.trim();
   if (!catName) return;
 
-  const catId = 'cat-' + catName.toLowerCase().replace(/[^a-z0-9]/g, '-');
-  
-  if (currentCategories.some(c => c.id === catId || c.name.toLowerCase() === catName.toLowerCase())) {
-    alert('Esta categoria já existe!');
-    return;
+  const exists = currentCategories.some(c => c.name.toLowerCase() === catName.toLowerCase());
+  if (exists) {
+    const confirmCreate = confirm(`Já existe uma categoria cadastrada com o nome "${catName}". Deseja criar outra categoria com este mesmo nome assim mesmo?`);
+    if (!confirmCreate) return;
   }
+
+  const catId = 'cat-' + Date.now();
 
   currentCategories.push({ id: catId, name: catName });
   localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(currentCategories));
@@ -652,12 +686,22 @@ function previewLogoFileUpload(input) {
     uploadToCloudflareR2(input.files[0]).then(url => {
       pendingLogoBase64 = url;
       const preview = document.getElementById('logoFilePreview');
-      if (preview) {
-        preview.src = url;
-        preview.style.display = 'block';
-      }
+      const btn = document.getElementById('btnRemoveLogo');
+      if (preview) { preview.src = url; preview.style.display = 'block'; }
+      if (btn) btn.style.display = 'inline-block';
     });
   }
+}
+
+function removeLogo() {
+  currentBranding.logoUrl = '';
+  pendingLogoBase64 = '';
+  localStorage.setItem(STORAGE_KEY_BRANDING, JSON.stringify(currentBranding));
+  const preview = document.getElementById('logoFilePreview');
+  const btn = document.getElementById('btnRemoveLogo');
+  if (preview) preview.style.display = 'none';
+  if (btn) btn.style.display = 'none';
+  alert('Logo removida com sucesso! O cardápio voltará a exibir a logo estilizada em texto.');
 }
 
 function previewBannerDeskUpload(input) {
@@ -665,12 +709,22 @@ function previewBannerDeskUpload(input) {
     uploadToCloudflareR2(input.files[0]).then(url => {
       pendingBannerDeskBase64 = url;
       const preview = document.getElementById('bannerDeskPreview');
-      if (preview) {
-        preview.src = url;
-        preview.style.display = 'block';
-      }
+      const btn = document.getElementById('btnRemoveBannerDesk');
+      if (preview) { preview.src = url; preview.style.display = 'block'; }
+      if (btn) btn.style.display = 'inline-block';
     });
   }
+}
+
+function removeBannerDesk() {
+  currentBranding.bannerDeskUrl = '';
+  pendingBannerDeskBase64 = '';
+  localStorage.setItem(STORAGE_KEY_BRANDING, JSON.stringify(currentBranding));
+  const preview = document.getElementById('bannerDeskPreview');
+  const btn = document.getElementById('btnRemoveBannerDesk');
+  if (preview) preview.style.display = 'none';
+  if (btn) btn.style.display = 'none';
+  alert('Banner Desktop removido com sucesso!');
 }
 
 function previewBannerMobUpload(input) {
@@ -678,12 +732,22 @@ function previewBannerMobUpload(input) {
     uploadToCloudflareR2(input.files[0]).then(url => {
       pendingBannerMobBase64 = url;
       const preview = document.getElementById('bannerMobPreview');
-      if (preview) {
-        preview.src = url;
-        preview.style.display = 'block';
-      }
+      const btn = document.getElementById('btnRemoveBannerMob');
+      if (preview) { preview.src = url; preview.style.display = 'block'; }
+      if (btn) btn.style.display = 'inline-block';
     });
   }
+}
+
+function removeBannerMob() {
+  currentBranding.bannerMobUrl = '';
+  pendingBannerMobBase64 = '';
+  localStorage.setItem(STORAGE_KEY_BRANDING, JSON.stringify(currentBranding));
+  const preview = document.getElementById('bannerMobPreview');
+  const btn = document.getElementById('btnRemoveBannerMob');
+  if (preview) preview.style.display = 'none';
+  if (btn) btn.style.display = 'none';
+  alert('Banner Mobile removido com sucesso!');
 }
 
 function previewProductFileUpload(input) {
@@ -759,14 +823,14 @@ function renderAdminTable(dataToRender = currentProducts) {
     const catNameDisplay = catObj ? catObj.name : item.categoria;
 
     return `
-      <tr>
+      <tr onclick="editProductItem('${item.id}')" style="cursor: pointer;">
         <td class="td-id">#${item.id}</td>
         <td><img src="${item.img_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=150&q=80'}" class="thumb-img" alt="${item.nome}"></td>
         <td><strong>${item.nome}</strong></td>
         <td><span style="background: #E5E5E5; color: var(--ph-black); padding: 3px 8px; border-radius: 2px; font-weight: 800; font-size: 0.72rem; text-transform: uppercase;">${catNameDisplay}</span></td>
-        <td style="max-width: 260px; font-size: 0.8rem; color: #666;">${item.descricao || '-'}</td>
-        <td class="td-price">R$ ${(item.preco_grande || item.preco || 0).toFixed(2).replace('.', ',')}</td>
-        <td>
+        <td>${item.badge ? `<span style="background: #FFF3E0; color: #E65100; padding: 3px 8px; border-radius: 2px; font-weight: 800; font-size: 0.72rem;">${item.badge}</span>` : '<span style="color:#BBB;">-</span>'}</td>
+        <td class="td-price" style="font-weight: 900; font-size: 1.05rem; color: var(--ph-red);">R$ ${(item.preco_grande || item.preco || 0).toFixed(2).replace('.', ',')}</td>
+        <td onclick="event.stopPropagation()">
           <div style="display: flex; gap: 6px;">
             <button class="btn-admin" onclick="editProductItem('${item.id}')">Editar</button>
             <button class="btn-admin btn-admin-danger" onclick="deleteProductItem('${item.id}')">Excluir</button>
