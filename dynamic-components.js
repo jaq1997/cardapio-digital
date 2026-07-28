@@ -1,146 +1,165 @@
 /**
- * SPORT CLOSET — Componentes Dinâmicos
- * Centraliza o Cabeçalho, Navegação, Rodapé e Modal para evitar repetição.
+ * PIZZA TODO DIA — COMPONENTES DE ATENDIMENTO & DYNAMIC SHARED UI (INSTADELIVERY CLEAN)
  */
 
 const SHARED_COMPONENTS = {
-    ticker: `
-        <div class="ticker">
-            <div class="ticker-inner">
-                <span>BEM-VINDO À SPORT CLOSET</span><span>✦</span>
-                <span>OS LANÇAMENTOS PARA A COPA DO MUNDO 2026 ESTÃO AQUI</span><span>✦</span>
-                <span>BEM-VINDO À SPORT CLOSET</span><span>✦</span>
-                <span>OS LANÇAMENTOS PARA A COPA DO MUNDO 2026 ESTÃO AQUI</span><span>✦</span>
-            </div>
-        </div>
-    `,
     nav: `
-        <nav>
-            <div class="nav-left">
-                <div class="brands-toggle-mobile" onclick="toggleBrandsDropdown(event)">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <line x1="3" y1="18" x2="21" y2="18"></line>
+        <nav class="ph-main-nav">
+            <button class="mobile-hamburger-btn" onclick="toggleMobileDrawer(true)" aria-label="Abrir Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            <a href="index.html" class="ph-brand-logo">
+                <div class="ph-logo-badge">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 15 10-15-10-5z"></path>
+                        <path d="M12 22V12"></path>
                     </svg>
                 </div>
-            </div>
-            <a href="index.html" class="nav-logo-link">
-                <img src="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/logo-horizontal.png" class="logo-horizontal" alt="Sport Closet">
+                <div class="ph-logo-text-wrap">
+                    <div class="ph-logo-text">PIZZA <span>TODO DIA</span></div>
+                    <div class="ph-logo-sub">ANTIGA TRI PIZZAS</div>
+                </div>
             </a>
-            <div class="nav-search nav-search-desktop">
-                <input type="text" class="nav-search-input" placeholder="Pesquisar produtos (nome, marca, tipo)..." oninput="handleSearch(this.value)">
+
+            <div class="ph-search-wrap">
+                <svg class="ph-search-icon-svg" width="16" height="16" viewBox="0 0 24 24">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+                <input type="text" class="ph-search-input" id="globalSearchInput" placeholder="Buscar no cardápio..." oninput="handleSearch(this.value)">
             </div>
-            <div class="nav-right">
-                <button class="region-btn" onclick="toggleRegion()" id="regionBtn" data-usa="0">🇧🇷 Brasil (R$)</button>
+            
+            <div class="ph-nav-right">
+                <button class="ph-cart-btn" onclick="openCartModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span class="cart-btn-txt">CARRINHO</span>
+                    <span class="ph-cart-badge" id="cartCountBadge">0</span>
+                </button>
             </div>
         </nav>
-        <div class="brand-bar">
-            <div class="nav-search nav-search-mobile">
-                <input type="text" class="nav-search-input" placeholder="Pesquisar produtos..." oninput="handleSearch(this.value)">
+
+        <!-- CATEGORIAS CARDÁPIO COMPLETO POR PADRÃO -->
+        <div class="ph-categories-section">
+            <div class="ph-categories-wrapper">
+                <div class="ph-categories-inner" id="categoriesTabContainer">
+                    <button class="ph-cat-pill active" data-cat="todos" onclick="filterCategory('todos', this)">TODOS OS PRODUTOS</button>
+                    <button class="ph-cat-pill" data-cat="combos" onclick="filterCategory('combos', this)">PROMOS DO DIA</button>
+                    <button class="ph-cat-pill" data-cat="pizzas-salgadas" onclick="filterCategory('pizzas-salgadas', this)">PIZZAS SALGADAS</button>
+                    <button class="ph-cat-pill" data-cat="pizzas-doces" onclick="filterCategory('pizzas-doces', this)">PIZZAS DOCES</button>
+                    <button class="ph-cat-pill" data-cat="bebidas" onclick="filterCategory('bebidas', this)">BEBIDAS</button>
+                </div>
             </div>
-            <ul class="brand-links brand-links-desktop">
-                <li><a href="copa2026.html" data-nav="copa2026">Copa 2026</a></li>
-                <li><a href="camisas.html" data-nav="camisas">Camisas de Time</a></li>
-                <li><a href="tenis.html" data-nav="tenis">Tênis</a></li>
-                <li><a href="roupas-verao.html" data-nav="roupas-verao">Roupas de Verão</a></li>
-            </ul>
-        </div>
-        <div class="brands-dropdown" id="brandsDropdown">
-            <ul class="brand-links">
-                <li><a href="copa2026.html" data-nav="copa2026">Copa 2026</a></li>
-                <li><a href="camisas.html" data-nav="camisas">Camisas de Time</a></li>
-                <li><a href="tenis.html" data-nav="tenis">Tênis</a></li>
-                <li><a href="roupas-verao.html" data-nav="roupas-verao">Roupas de Verão</a></li>
-            </ul>
         </div>
     `,
-    modal: `
-        <div class="overlay" id="overlay" onclick="closeModal(event)">
-            <div class="modal" onclick="event.stopPropagation()">
-                <button class="mcls" onclick="closeModal()">✕</button>
-                <div class="modal-img-wrap">
-                    <button class="carousel-chevron left" id="chevronLeft" onclick="carouselStep(-1)">‹</button>
-                    <div class="carousel-track" id="carouselTrack"></div>
-                    <button class="carousel-chevron right" id="chevronRight" onclick="carouselStep(1)">›</button>
-                    <div class="carousel-dots" id="carouselDots"></div>
-                </div>
-                <div class="modal-body">
-                    <div class="m-brand" id="mBrand"></div>
-                    <div class="m-name" id="mName"></div>
-                    <div class="m-type" id="mType"></div>
-                    <div class="m-price" id="mPrice"></div>
-                    <div class="m-price-alt" id="mPriceAlt"></div>
-                    <div class="m-label">Tamanho</div>
-                    <div class="sizes" id="mSizes"></div>
-                    <div class="m-desc" id="mDesc"></div>
-                    <button class="m-wpp" id="mWpp">Pedir pelo WhatsApp</button>
-                </div>
+    drawer: `
+        <div class="mobile-drawer-overlay" id="drawerOverlay" onclick="toggleMobileDrawer(false)"></div>
+        <div class="mobile-drawer-card" id="drawerCard">
+            <div class="drawer-header">
+                <div class="drawer-title">PIZZA TODO DIA</div>
+                <button class="drawer-close-btn" onclick="toggleMobileDrawer(false)">✕</button>
             </div>
+            
+            <div style="margin-bottom: 14px;">
+                <input type="text" class="ph-search-input" style="width: 100%;" placeholder="Buscar no cardápio..." oninput="handleSearch(this.value)">
+            </div>
+
+            <div class="drawer-cat-list">
+                <div style="font-size: 0.7rem; font-weight: 900; color: #888; margin-bottom: 4px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div>
+                <button class="drawer-cat-item active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>
+                <button class="drawer-cat-item" onclick="selectDrawerCategory('combos')">PROMOS DO DIA</button>
+                <button class="drawer-cat-item" onclick="selectDrawerCategory('pizzas-salgadas')">PIZZAS SALGADAS</button>
+                <button class="drawer-cat-item" onclick="selectDrawerCategory('pizzas-doces')">PIZZAS DOCES</button>
+                <button class="drawer-cat-item" onclick="selectDrawerCategory('bebidas')">BEBIDAS</button>
+            </div>
+        </div>
+    `,
+    wppFloat: `
+        <a href="https://wa.me/5531992082542?text=Olá!%20Vim%20pelo%20site%20da%20Pizza%20Todo%20Dia%20e%20gostaria%20de%20fazer%20um%20pedido!" target="_blank" class="wpp-float-btn" id="wppFloatBtn" aria-label="Atendimento via WhatsApp">
+            <svg class="wpp-icon-svg" width="30" height="30" viewBox="0 0 24 24">
+                <path d="M12.031 0c-6.627 0-12 5.373-12 12 0 2.159.57 4.26 1.654 6.105l-1.685 6.155 6.302-1.653c1.782.971 3.799 1.493 5.729 1.493 6.627 0 12-5.373 12-12 0-6.627-5.373-12-12-12zm.009 22c-1.808 0-3.578-.484-5.128-1.402l-.367-.22-3.81 1 .997-3.712-.24-.383c-1.026-1.636-1.57-3.538-1.57-5.483 0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10zm5.498-7.443c-.301-.151-1.782-.879-2.058-.979-.275-.101-.476-.151-.677.151-.201.301-.778.979-.954 1.18-.176.201-.351.226-.652.075-1.758-.881-2.91-1.573-4.062-3.551-.308-.528.308-.49.881-1.637.101-.201.05-.377-.025-.528-.075-.151-.677-1.632-.929-2.235-.245-.587-.495-.508-.677-.517-.176-.008-.377-.008-.578-.008s-.528.075-.804.377c-.276.301-1.055 1.03-1.055 2.513s1.08 2.914 1.231 3.115c.151.201 2.125 3.245 5.15 4.552.719.31 1.281.496 1.719.635.724.23 1.382.197 1.902.12.579-.086 1.782-.728 2.033-1.431.251-.703.251-1.306.176-1.431-.075-.126-.276-.226-.577-.377z"/>
+            </svg>
+        </a>
+    `,
+    mobileBar: `
+        <div class="mobile-sticky-bar" id="mobileStickyFooter">
+            <button class="mobile-sticky-btn" onclick="openCartModal()">
+                <span>VER MEU PEDIDO</span>
+                <span style="background:#FFC72C; color:#000; padding:2px 8px; border-radius:50px; font-weight:900;" id="mobileStickyCartBadge">0</span>
+            </button>
         </div>
     `,
     footer: `
         <footer>
-            <div class="footer-content">
-                <div class="footer-col">
-                    <h4>EXPLORE</h4>
-                    <ul>
-                        <li><a href="camisas.html">Camisas de Time</a></li>
-                        <li><a href="tenis.html">Tênis Lifestyle</a></li>
-                        <li><a href="copa2026.html">Copa do Mundo 2026</a></li>
-                        <li><a href="roupas-verao.html">Roupas de Verão</a></li>
-                    </ul>
+            <div class="footer-inner">
+                <div class="footer-info-col">
+                    <h4 style="font-size: 1.4rem; font-weight: 900; font-style: italic; text-transform: uppercase;">PIZZA <span style="color: var(--ph-red);">TODO DIA</span></h4>
+                    <p style="font-size: 0.9rem; color: #CCC;">Antiga Tri Pizzas • Tradição e Sabor no Seu Bairro</p>
+                    <div class="footer-info-item">
+                        <svg class="lucide-icon-svg" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <span>Porto Alegre e Viamão (Atendimento Delivery)</span>
+                    </div>
+                    <div class="footer-info-item">
+                        <svg class="lucide-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>Terça a Domingo: 18h às 23h30</span>
+                    </div>
                 </div>
-                <div class="footer-col">
-                    <h4>SUPORTE</h4>
-                    <ul>
-                        <li><a href="https://wa.me/5531992082542?text=Olá!%20Tenho%20uma%20dúvida%20sobre%20o%20Sport%20Closet...">Dúvidas Frequentes (FAQ)</a></li>
-                        <li><a href="https://wa.me/5531992082542">Fale Conosco</a></li>
-                    </ul>
+                <div style="font-size: 0.8rem; color: #AAA; text-align: right;">
+                    <p>© 2026 Pizza Todo Dia — Todos os direitos reservados.</p>
+                    <p style="font-size: 0.74rem; color: #777; margin-top: 4px;">CNPJ: 12.345.678/0001-90</p>
                 </div>
-                <div class="footer-col">
-                    <h4>SOBRE NÓS</h4>
-                    <p style="font-size:12px; line-height:1.6; color:var(--muted);">O esporte mantém nossa forma. Mantém nosso foco. Nos une. Através dos esportes, temos o poder de mudar vidas — com histórias de atletas inspiradores e tecnologias inovadoras.</p>
-                </div>
-                <div class="footer-col">
-                    <h4>SOCIAL</h4>
-                    <a href="https://www.instagram.com/sportcloset.co" target="_blank" class="insta-circle">
-                        <img src="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/instagram.svg" alt="Instagram">
-                    </a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <a href="index.html" class="nav-logo-link" style="margin-bottom:10px;">
-                    <img src="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/logo-vertical.png" class="logo-vertical" alt="Sport Closet Seal">
-                </a>
-                <div class="footer-legal">© 2026 Sport Closet — Todos os direitos reservados.</div>
             </div>
         </footer>
-    `,
-    whatsapp: `
-        <a class="wpp-float" href="https://wa.me/5531992082542?text=Olá!%20Estou%20no%20site%20da%20Sport%20Closet%20e%20gostaria%20de%20atendimento." target="_blank" rel="noopener noreferrer" aria-label="Falar no WhatsApp">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.535 5.858L.057 23.633a.5.5 0 0 0 .61.61l5.775-1.478A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.944 9.944 0 0 1-5.088-1.392l-.363-.216-3.763.963.982-3.637-.237-.376A9.944 9.944 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
-        </a>
     `
 };
 
-function injectSharedComponents() {
-    const body = document.body;
-    const page = body.dataset.page;
-
-    // Injeção de Cabeçalho (Ticker + Nav)
-    const headerWrap = document.createElement('header');
-    headerWrap.innerHTML = SHARED_COMPONENTS.ticker + SHARED_COMPONENTS.nav;
-    body.prepend(headerWrap);
-
-    // Injeção de Modal e Footer no final
-    const footerWrap = document.createElement('div');
-    footerWrap.innerHTML = SHARED_COMPONENTS.modal + SHARED_COMPONENTS.footer + SHARED_COMPONENTS.whatsapp;
-    body.appendChild(footerWrap);
-
-    // Ativar o link correto na navegação
-    document.querySelectorAll(`[data-nav="${page}"]`).forEach(a => a.classList.add('active'));
+function toggleMobileDrawer(open) {
+    const overlay = document.getElementById('drawerOverlay');
+    const card = document.getElementById('drawerCard');
+    if (open) {
+        overlay.classList.add('active');
+        card.classList.add('active');
+    } else {
+        overlay.classList.remove('active');
+        card.classList.remove('active');
+    }
 }
 
-// Iniciar injeção imediatamente
-injectSharedComponents();
+function selectDrawerCategory(catName) {
+    filterCategory(catName, null);
+    toggleMobileDrawer(false);
+}
+
+function initSharedComponents() {
+    const body = document.body;
+    
+    const headerWrap = document.createElement('header');
+    headerWrap.className = 'ph-header';
+    headerWrap.innerHTML = SHARED_COMPONENTS.nav;
+    body.insertBefore(headerWrap, body.firstChild);
+
+    const drawerWrap = document.createElement('div');
+    drawerWrap.innerHTML = SHARED_COMPONENTS.drawer;
+    body.appendChild(drawerWrap);
+
+    const wppDiv = document.createElement('div');
+    wppDiv.innerHTML = SHARED_COMPONENTS.wppFloat;
+    body.appendChild(wppDiv.firstElementChild);
+
+    const mobileSticky = document.createElement('div');
+    mobileSticky.innerHTML = SHARED_COMPONENTS.mobileBar;
+    body.appendChild(mobileSticky.firstElementChild);
+
+    const footerDiv = document.createElement('div');
+    footerDiv.innerHTML = SHARED_COMPONENTS.footer;
+    body.appendChild(footerDiv.firstElementChild);
+}
+
+document.addEventListener('DOMContentLoaded', initSharedComponents);

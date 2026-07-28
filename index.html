@@ -4,148 +4,275 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sport Closet — Camisas de Time, Tênis e Roupas de Verão</title>
+  <title>Pizza Todo Dia — Cardápio Digital & Delivery (Antiga Tri Pizzas)</title>
+
+  <!-- META TAGS DE COMPARTILHAMENTO -->
+  <meta name="description" content="Cardápio digital e delivery da Pizza Todo Dia (antiga Tri Pizzas). Pizzas artesanais assadas no forno de pedra, combos família e entrega rápida em Porto Alegre e Viamão!">
+  <meta property="og:title" content="Pizza Todo Dia — Cardápio & Delivery">
+  <meta property="og:description" content="Peça sua pizza favorita online! Entrega rápida no seu bairro.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80">
+  <meta property="og:type" content="website">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E91C24'><path d='M12 2L2 7l10 15 10-15-10-5z'/></svg>">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;0,900;1,800;1,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="home is-loading" data-page="index">
+<body data-page="index">
 
-  <div class="hero-slider" id="heroSlider">
-    <div class="slide active" onclick="window.location='copa2026.html'">
-      <picture>
-        <source media="(max-width: 768px)" srcset="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/banner-hero-mobile-copa2026.png">
-        <img src="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/banner-hero-desktop-copa2026.png" alt="Banner Copa 2026" loading="eager">
-      </picture>
-      <div class="slide-content">
-        <div class="slide-subtitle">RUMO AO HEXA</div>
-        <div class="slide-title">CAMISAS DE<br>SELEÇÃO</div>
-        <button class="slide-btn">VER COLEÇÃO</button>
+  <!-- HERO SECTION COMERCIAL DE ALTO IMPACTO -->
+  <section class="ph-hero-section">
+    <div class="ph-hero-card">
+      <div class="ph-hero-text-side">
+        <div class="ph-hero-badge">OFERTA DO DIA</div>
+        <h1 class="ph-hero-title">COMBO FAMÍLIA <span>TODO DIA</span></h1>
+        <p class="ph-hero-subtitle">2 Pizzas Grandes quentinhas + 1 Borda Recheada Grátis + 1 Guaraná Antarctica 2L trincando de gelado!</p>
+        <button class="ph-btn-red-lg" onclick="openPizzaCustomizerModal('combo-familia')">
+          <span>MONTE SEU COMBO</span>
+        </button>
       </div>
-    </div>
-    <div class="slide" onclick="window.location='camisas.html'">
-      <picture>
-        <source media="(max-width: 768px)" srcset="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/banner-hero-mobile-camisas-de-time.png">
-        <img src="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/banner-hero-desktop-camisas-de-time.png" alt="Banner Camisas de Time" loading="lazy">
-      </picture>
-      <div class="slide-content">
-        <div class="slide-subtitle">LEVE A PAIXÃO</div>
-        <div class="slide-title">CAMISAS<br>DE <span>TIME</span></div>
-        <button class="slide-btn">CONFERIR</button>
+      <div class="ph-hero-img-side">
+        <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80" alt="Combo Família Pizza Todo Dia">
       </div>
-    </div>
-    <div class="slide" onclick="window.location='tenis.html'">
-      <picture>
-        <source media="(max-width: 768px)" srcset="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/banner-hero-mobile-tenis.png">
-        <img src="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/banner-hero-desktop-tenis.png" alt="Banner Tênis" loading="lazy">
-      </picture>
-      <div class="slide-content">
-        <div class="slide-subtitle">PISANDO COM ESTILO</div>
-        <div class="slide-title">ADIDAS CAMPUS<br>GREEN</div>
-        <button class="slide-btn">EXPLORE AGORA</button>
-      </div>
-    </div>
-    <div class="slide" onclick="window.location='roupas-verao.html'">
-      <picture>
-        <source media="(max-width: 768px)" srcset="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/banner-hero-mobile-roupas-verao.png">
-        <img src="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/banner-hero-desktop-roupas-verao.png" alt="Banner Roupas de Verão" loading="lazy">
-      </picture>
-      <div class="slide-content">
-        <div class="slide-subtitle">PARA O DIA A DIA</div>
-        <div class="slide-title">ROUPAS DE <span>VERÃO</span></div>
-        <button class="slide-btn">CONFERIR</button>
-      </div>
-    </div>
-    <div class="slider-dots" id="sliderDots"></div>
-  </div>
-
-
-  <!-- 1. MOSAICO 2x2 (ESTILO NIKE PREMIUM) -->
-  <section class="lifestyle-mosaic">
-    <div class="mosaic-grid">
-      <a href="camisas.html" class="mosaic-item">
-        <img src="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/grid-times-europeus-desktop.png" alt="Clubes Europeus">
-        <div class="mosaic-overlay">
-          <div class="m-sub">EM CAMPO</div>
-          <div class="m-tit">CLUBES EUROPEUS</div>
-          <span class="m-cta">Explorar</span>
-        </div>
-      </a>
-      <a href="tenis.html" class="mosaic-item">
-        <img src="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/grid-tenis-desktop.png" alt="Tênis Lifestyle">
-        <div class="mosaic-overlay">
-          <div class="m-sub">PISANDO COM ESTILO</div>
-          <div class="m-tit">OS MELHORES TÊNIS</div>
-          <span class="m-cta">Comprar</span>
-        </div>
-      </a>
-      <a href="copa2026.html" class="mosaic-item">
-        <img src="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/grid-copa2026-desktop.png" alt="Copa 2026">
-        <div class="mosaic-overlay">
-          <div class="m-sub">RUMO AO HEXA</div>
-          <div class="m-tit">COPA DO MUNDO 2026</div>
-          <span class="m-cta">Ver Agora</span>
-        </div>
-      </a>
-      <a href="roupas-verao.html" class="mosaic-item">
-        <img src="https://pub-4af8db08776e49b78718c90c788bddab.r2.dev/grid-nike-palace-desktop.png" alt="Collab Nike x Palace">
-        <div class="mosaic-overlay">
-          <div class="m-sub">PARA O DIA A DIA</div>
-          <div class="m-tit">COLLAB NIKE X PALACE</div>
-          <span class="m-cta">Descobrir</span>
-        </div>
-      </a>
     </div>
   </section>
 
+  <!-- CATALOG SECTION -->
+  <main class="ph-section-container" id="catalogSection">
+    <div class="ph-section-title-row">
+      <h2 class="ph-section-heading">CARDÁPIO <span>PIZZA TODO DIA</span></h2>
+      <div style="font-size: 0.85rem; font-weight: 800; color: #777777;" id="itemCountDisplay">Carregando cardápio...</div>
+    </div>
 
+    <!-- PRODUCT GRID CONTAINER -->
+    <div class="ph-product-grid" id="productGridContainer">
+      <!-- Injetado via loja.js -->
+    </div>
+  </main>
 
-  <!-- 2. SEÇÃO LANÇAMENTOS (IMEDIATAMENTE APÓS O GRID) -->
-  <div class="filter-section">
-    <div class="section-title">LANÇAMENTOS <span>IMPERDÍVEIS</span></div>
-  </div>
+  <!-- MODAL: ÁREA DE COBERTURA (PORTO ALEGRE E VIAMÃO) -->
+  <div class="modal-overlay" id="coverageModal">
+    <div class="modal-card" style="max-width: 440px;">
+      <button class="modal-close-btn" onclick="closeCoverageModal()">✕</button>
+      <div class="modal-content-body">
+        <h2 class="checkout-main-title">ÁREA DE COBERTURA</h2>
+        <p style="font-size: 0.86rem; color: #555;">Entregamos quentinho e direto do forno nas seguintes cidades:</p>
+        
+        <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="background: var(--ph-gray-light); padding: 14px; border-radius: var(--radius-md); border-left: 4px solid var(--ph-red);">
+            <div style="font-family: var(--font-display); font-weight: 900; font-style: italic; font-size: 1.1rem; color: var(--ph-black);">PORTO ALEGRE</div>
+            <div style="font-size: 0.8rem; color: #666; margin-top: 4px;">Atendimento em todos os bairros da Zona Norte, Leste, Sul e Centro Histórico. Tempo médio de entrega: 30 a 45 min.</div>
+          </div>
 
-  <div class="products-section">
-    <div class="grid" id="grid-drop-exclusivo"></div>
-  </div>
+          <div style="background: var(--ph-gray-light); padding: 14px; border-radius: var(--radius-md); border-left: 4px solid var(--ph-red);">
+            <div style="font-family: var(--font-display); font-weight: 900; font-style: italic; font-size: 1.1rem; color: var(--ph-black);">VIAMÃO</div>
+            <div style="font-size: 0.8rem; color: #666; margin-top: 4px;">Atendimento na região Central, Santa Isabel, Viamópolis e bairros vizinhos. Tempo médio de entrega: 35 a 50 min.</div>
+          </div>
+        </div>
 
-  <!-- 3. SEÇÃO ENCONTRE O SEU TIME (ESTILO ADIDAS) -->
-  <section class="team-finder-section">
-    <div class="section-header-wrap">
-      <h2 class="finder-title">ENCONTRE SEU <span>NOVO MANTO</span></h2>
-
-
-      <div class="finder-filters">
-        <button class="fp active" onclick="filterTeamSlider('todos', this)">TODOS</button>
-        <button class="fp" onclick="filterTeamSlider('europeus', this)">EUROPEUS</button>
-        <button class="fp" onclick="filterTeamSlider('brasileiros', this)">BRASILEIROS</button>
-        <button class="fp" onclick="filterTeamSlider('selecoes', this)">SELEÇÕES</button>
+        <button class="ph-btn-red-lg" style="width: 100%; margin-top: 10px;" onclick="closeCoverageModal()">
+          ENTENDI, VER CARDÁPIO
+        </button>
       </div>
     </div>
-    
-    <div class="slider-wrapper">
-      <button class="s-arrow s-prev" onclick="scrollTeamSlider(-1)">‹</button>
-      <div class="team-slider" id="homeTeamSlider">
-        <!-- Injetado via JS -->
-      </div>
-      <button class="s-arrow s-next" onclick="scrollTeamSlider(1)">›</button>
-    </div>
-  </section>
-
-  <!-- 4. SEÇÃO MAIS PROCURADOS -->
-  <div class="filter-section">
-    <div class="section-title">MAIS <span>PROCURADOS</span></div>
   </div>
 
+  <!-- MODAL 1: CUSTOMIZADOR DE PIZZA -->
+  <div class="modal-overlay" id="pizzaModal">
+    <div class="modal-card">
+      <button class="modal-close-btn" onclick="closePizzaModal()">✕</button>
+      <div class="modal-header-banner" style="height: 160px; position: relative; overflow: hidden;">
+        <img id="modalHeroBg" src="https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=800&q=80" alt="Customizador Pizza Todo Dia" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div class="modal-content-body">
+        <div style="border-bottom: 2px solid var(--ph-black); padding-bottom: 10px;">
+          <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--ph-black); text-transform: uppercase; font-style: italic;" id="modalPizzaTitle">Pepperoni Especial</h3>
+          <p style="font-size: 0.82rem; color: #777777;" id="modalPizzaDesc">Massa crocante com molho de tomate artesanal da casa e mussarela derretida.</p>
+        </div>
 
-  <div class="products-section">
-    <div class="grid" id="grid-mais-vistos"></div>
+        <!-- 1. SELEÇÃO DE TAMANHO -->
+        <div>
+          <div class="option-group-title">
+            <span>1. Escolha o Tamanho</span>
+          </div>
+          <div class="grid-sizes" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+            <div class="size-option-card" data-size="broto" onclick="selectPizzaSize('broto', this)">
+              <div class="size-name">Broto</div>
+              <div class="size-slices" style="font-size: 0.68rem; color: #777;">4 Fatias (15cm)</div>
+              <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem; margin-top: 2px;" id="priceBrotoVal">R$ 36,90</div>
+            </div>
+            <div class="size-option-card" data-size="media" onclick="selectPizzaSize('media', this)">
+              <div class="size-name">Média</div>
+              <div class="size-slices" style="font-size: 0.68rem; color: #777;">6 Fatias (25cm)</div>
+              <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem; margin-top: 2px;" id="priceMediaVal">R$ 49,90</div>
+            </div>
+            <div class="size-option-card selected" data-size="grande" onclick="selectPizzaSize('grande', this)">
+              <div class="size-name">Grande</div>
+              <div class="size-slices" style="font-size: 0.68rem; color: #777;">8 Fatias (35cm)</div>
+              <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem; margin-top: 2px;" id="priceGrandeVal">R$ 64,90</div>
+            </div>
+            <div class="size-option-card" data-size="gigante" onclick="selectPizzaSize('gigante', this)">
+              <div class="size-name">Gigante</div>
+              <div class="size-slices" style="font-size: 0.68rem; color: #777;">12 Fatias (40cm)</div>
+              <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem; margin-top: 2px;" id="priceGiganteVal">R$ 79,90</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. DIVISÃO DE SABORES -->
+        <div>
+          <div class="option-group-title">
+            <span>2. Divisão de Sabores</span>
+          </div>
+          <div class="flavor-toggle-bar" style="display: flex; background: var(--ph-gray-light); padding: 4px; border-radius: var(--radius-pill); border: 1px solid var(--ph-border); gap: 4px;">
+            <button class="flavor-toggle-btn active" id="btnSingleFlavor" onclick="setFlavorMode('single')">1 Sabor (Inteira)</button>
+            <button class="flavor-toggle-btn" id="btnHalfFlavor" onclick="setFlavorMode('half')">2 Sabores (Meio a Meio)</button>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+            <div>
+              <label style="font-size: 0.74rem; font-weight: 800; color: #777777; text-transform: uppercase;">1º Sabor (ou Inteira):</label>
+              <select class="cep-input" style="width: 100%; border-radius: 4px;" id="selectFlavor1" onchange="recalculateModalTotal()">
+              </select>
+            </div>
+            <div id="containerFlavor2" style="display: none;">
+              <label style="font-size: 0.74rem; font-weight: 800; color: #777777; text-transform: uppercase;">2º Sabor (Meio a Meio):</label>
+              <select class="cep-input" style="width: 100%; border-radius: 4px;" id="selectFlavor2" onchange="recalculateModalTotal()">
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. BORDA RECHEADA -->
+        <div>
+          <div class="option-group-title">
+            <span>3. Escolha a Borda</span>
+          </div>
+          <select class="cep-input" style="width: 100%; border-radius: 4px;" id="selectBorda" onchange="recalculateModalTotal()">
+            <option value="nenhuma" data-price="0">Massa Tradicional (Sem Borda Recheada)</option>
+            <option value="catupiry" data-price="12.90">Borda Vulcão de Catupiry Original (+ R$ 12,90)</option>
+            <option value="cheddar" data-price="12.90">Borda Recheada de Cheddar Cremoso (+ R$ 12,90)</option>
+            <option value="chocolate" data-price="13.90">Borda Recheada de Chocolate ao Leite (+ R$ 13,90)</option>
+          </select>
+        </div>
+
+        <!-- 4. ADICIONAIS EXTRAS -->
+        <div>
+          <div class="option-group-title">
+            <span>4. Adicionais Extras (Opcional)</span>
+          </div>
+          <select class="cep-input" style="width: 100%; border-radius: 4px;" id="selectAdicionaisExtra" onchange="recalculateModalTotal()">
+            <option value="nenhum" data-price="0">Nenhum adicional extra</option>
+            <option value="bacon" data-price="6.90">Extra Bacon Crispy (+ R$ 6,90)</option>
+            <option value="alho" data-price="4.90">Extra Molho Especial de Alho (+ R$ 4,90)</option>
+            <option value="catupiry-extra" data-price="7.90">Extra Requeijão Cremoso (+ R$ 7,90)</option>
+          </select>
+        </div>
+
+        <!-- 5. OBSERVAÇÕES -->
+        <div>
+          <div class="option-group-title">
+            <span>5. Observações do Pedido</span>
+          </div>
+          <textarea id="modalObs" rows="2" class="cep-input" style="width: 100%; border-radius: 4px;" placeholder="Ex: Tirar a cebola, massa bem assada..."></textarea>
+        </div>
+
+        <!-- FOOTER DO MODAL -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 2px solid var(--ph-black);">
+          <div>
+            <span style="font-size: 0.7rem; color: #777777; text-transform: uppercase; font-weight: 800;">TOTAL DA PIZZA:</span>
+            <div style="font-size: 2rem; font-weight: 900; color: var(--ph-red);" id="modalCalculatedTotal">R$ 64,90</div>
+          </div>
+          <button class="ph-btn-red-lg" style="width: auto; padding: 12px 24px;" onclick="addCustomPizzaToCart()">
+            <span>ADICIONAR AO PEDIDO</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: CHECKOUT PIZZA HUT FRANQUIA -->
+  <div class="modal-overlay" id="cartModal">
+    <div class="modal-card" style="max-width: 480px;">
+      <button class="modal-close-btn" onclick="closeCartModal()">✕</button>
+      <div class="modal-content-body">
+        <h2 class="checkout-main-title">SEU PEDIDO</h2>
+        
+        <!-- ITENS DO CARRINHO -->
+        <div id="cartItemsContainer"></div>
+
+        <!-- ENDEREÇO POR CEP -->
+        <div class="checkout-section-box">
+          <div class="option-group-title">Endereço de Entrega (CEP)</div>
+          <div class="cep-row">
+            <input type="text" class="cep-input" id="inputCep" placeholder="Digite seu CEP (ex: 90010-000)" maxlength="9">
+            <button class="btn-cep-search" onclick="buscarCepViaAPI()">BUSCAR</button>
+          </div>
+          <div class="address-result-box" id="addressResultBox" style="display: none;">
+            <div id="txtRuaBairro">Rua Principal, Centro</div>
+            <div class="txt-frete-val" id="txtFreteVal">Taxa de Entrega: R$ 5,00</div>
+          </div>
+          <input type="text" class="cep-input" id="inputNumeroComp" placeholder="Número e complemento (ex: Ap 202)" style="margin-top: 8px;">
+        </div>
+
+        <!-- FORMAS DE PAGAMENTO -->
+        <div class="checkout-section-box">
+          <div class="option-group-title">Forma de Pagamento</div>
+          <div class="mp-checkout-tabs">
+            <button class="mp-tab-btn active" id="tabMpPix" onclick="switchCheckoutTab('pix')">PIX (DEMO)</button>
+            <button class="mp-tab-btn" id="tabMpCard" onclick="switchCheckoutTab('card')">CARTÃO (DEMO)</button>
+            <button class="mp-tab-btn" id="tabWpp" onclick="switchCheckoutTab('wpp')">WHATSAPP</button>
+          </div>
+
+          <!-- TAB 1: PIX FICTÍCIO -->
+          <div id="contentCheckoutPix" class="tab-content-box">
+            <div class="pix-title">Pagamento via PIX (Demonstração)</div>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=00020126580014BR.GOV.BCB.PIX013612345678-DEMO-PIZZA-TODO-DIA520400005303986540578.905802BR5920PIZZA%20TODO%20DIA6009SAO%20PAULO62070503***6304ABCD" class="pix-qr-img" alt="QR Code PIX">
+            <div class="pix-code-str" id="pixCodeText">00020126580014BR.GOV.BCB.PIX013612345678-DEMO-PIZZA-TODO-DIA520400005303986540578.905802BR5920PIZZA%20TODO%20DIA6009SAO%20PAULO62070503***6304ABCD</div>
+            <button class="ph-btn-add" style="width: 100%; justify-content: center;" onclick="copiarPixChave()">COPIAR CHAVE PIX</button>
+          </div>
+
+          <!-- TAB 2: CARTÃO FICTÍCIO -->
+          <div id="contentCheckoutCard" class="tab-content-box" style="display: none;">
+            <input type="text" class="cep-input" placeholder="Número do Cartão (Simulação Mercado Pago)">
+            <div class="row-inputs">
+              <input type="text" class="cep-input" placeholder="MM/AA">
+              <input type="text" class="cep-input" placeholder="CVV">
+            </div>
+            <input type="text" class="cep-input" placeholder="Nome do Titular" style="margin-top: 8px;">
+            <button class="ph-btn-red-lg" style="margin-top: 10px;" onclick="simularPagamentoMercadoPagoCard()">SIMULAR PAGAMENTO</button>
+          </div>
+
+          <!-- TAB 3: WHATSAPP DIRETO -->
+          <div id="contentCheckoutWpp" class="tab-content-box" style="display: none; text-align: center;">
+            <p class="wpp-notice">Seu pedido será enviado formatado direto para o WhatsApp do nosso balcão!</p>
+          </div>
+        </div>
+
+        <!-- TOTAL GIGANTE EM NEGRITO -->
+        <div class="checkout-total-row">
+          <div class="checkout-total-label">
+            <span>TOTAL</span>
+            <span class="txt-subtotal-sub" id="txtSubtotalFrete">Subtotal: R$ 0,00 | Frete: R$ 5,00</span>
+          </div>
+          <span class="checkout-total-val" id="txtTotalCartFinal">R$ 0,00</span>
+        </div>
+
+        <!-- BOTÃO DE FINALIZAR PRINCIPAL -->
+        <button class="ph-btn-red-lg" style="width: 100%;" onclick="enviarPedidoWhatsAppFinal()">
+          FINALIZAR PEDIDO
+        </button>
+
+      </div>
+    </div>
   </div>
 
   <script src="dynamic-components.js"></script>
   <script src="loja.js"></script>
-  <script src="animacoes.js"></script>
 </body>
+
 </html>

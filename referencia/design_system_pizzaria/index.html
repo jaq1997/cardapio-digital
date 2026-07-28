@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Showcase - Design System Pizzaria</title>
+    <link rel="stylesheet" href="style-guide.css">
+    <style>
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        .section { margin-bottom: 60px; padding: 20px; border-bottom: 1px solid #eee; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px; }
+        .color-swatch { height: 80px; border-radius: 8px; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Design System: Pizzaria "Hut Style"</h1>
+        
+        <div class="section">
+            <h2>Cores</h2>
+            <div class="grid">
+                <div>
+                    <div class="color-swatch" style="background: #e91c24;"></div>
+                    <strong>Primary Red</strong><br>#E91C24
+                </div>
+                <div>
+                    <div class="color-swatch" style="background: #1e1e1e;"></div>
+                    <strong>Neutral Black</strong><br>#1E1E1E
+                </div>
+                <div>
+                    <div class="color-swatch" style="background: #f4f4f4; border: 1px solid #ddd;"></div>
+                    <strong>Gray Light</strong><br>#F4F4F4
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Botões</h2>
+            <button class="btn btn-primary">Peça pelo site</button>
+            <button class="btn btn-outline">Ver Cardápio</button>
+        </div>
+
+        <div class="section">
+            <h2>Cards de Produto</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-image" style="background: url('https://contents.hanzo.com.br/provider/1798/3741/37419999-f7a0-4000-8ff0-fa484a6492e3.webp') center/cover;"></div>
+                    <div class="card-body">
+                        <div class="card-title">Pizza Pepperoni</div>
+                        <p>A clássica com molho de tomate, mussarela e fatias de pepperoni.</p>
+                        <div class="card-price">R$ 59,90</div>
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 16px;">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Formulários</h2>
+            <div class="input-group" style="max-width: 300px;">
+                <label class="input-label">Insira seu CEP</label>
+                <input type="text" class="input-field" placeholder="00000-000">
+                <button class="btn btn-primary" style="margin-top: 10px; width: 100%;">Buscar Unidade</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
