@@ -22,13 +22,19 @@ let currentSelectedZoneName = "Entrega em Domicílio";
 
 // Default products moved to `defaults.js` (alias `defaultCatalogData`)
 
-document.addEventListener('DOMContentLoaded', () => {
+function initLojaEngine() {
   applyDynamicBranding();
   loadCatalogData();
   loadDeliveryZonesData();
   renderCatalog();
   populateFlavorRadioLists();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initLojaEngine);
+} else {
+  initLojaEngine();
+}
 
 function applyDynamicBranding() {
   const savedBranding = localStorage.getItem(STORAGE_KEY_BRANDING);
