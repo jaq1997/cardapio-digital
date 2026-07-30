@@ -19,8 +19,8 @@ const SHARED_COMPONENTS = {
                     </svg>
                 </div>
                 <div class="ph-logo-text-wrap">
-                    <div class="ph-logo-text" id="headerLogoText">PIZZA <span>TODO DIA</span></div>
-                    <div class="ph-logo-sub" id="headerLogoSub">ANTIGA TRI PIZZAS</div>
+                    <div class="ph-logo-text" id="headerLogoText">MINHA <span>LOJA</span></div>
+                    <div class="ph-logo-sub" id="headerLogoSub">CARDÁPIO DIGITAL</div>
                 </div>
             </a>
 
@@ -49,9 +49,8 @@ const SHARED_COMPONENTS = {
             <div class="ph-categories-wrapper">
                 <div class="ph-categories-inner" id="categoriesTabContainer">
                     <button class="ph-cat-pill active" data-cat="todos" onclick="filterCategory('todos', this)">TODOS OS PRODUTOS</button>
-                    <button class="ph-cat-pill" data-cat="combos" onclick="filterCategory('combos', this)">PROMOS DO DIA</button>
-                    <button class="ph-cat-pill" data-cat="pizzas-salgadas" onclick="filterCategory('pizzas-salgadas', this)">PIZZAS SALGADAS</button>
-                    <button class="ph-cat-pill" data-cat="pizzas-doces" onclick="filterCategory('pizzas-doces', this)">PIZZAS DOCES</button>
+                    <button class="ph-cat-pill" data-cat="destaques" onclick="filterCategory('destaques', this)">DESTAQUES</button>
+                    <button class="ph-cat-pill" data-cat="pratos" onclick="filterCategory('pratos', this)">PRATOS</button>
                     <button class="ph-cat-pill" data-cat="bebidas" onclick="filterCategory('bebidas', this)">BEBIDAS</button>
                 </div>
             </div>

@@ -19,10 +19,10 @@ let currentSelectedZoneName = "Entrega em Domicílio";
 
 // Default products moved to `defaults.js` (alias `defaultCatalogData`)
 
-function initLojaEngine() {
-  applyDynamicBranding();
-  loadCatalogData();
-  loadDeliveryZonesData();
+async function initLojaEngine() {
+  await applyDynamicBranding();
+  await loadCatalogData();
+  await loadDeliveryZonesData();
   renderCatalog();
   populateFlavorRadioLists();
 }
@@ -33,12 +33,30 @@ if (document.readyState === 'loading') {
   initLojaEngine();
 }
 
-function applyDynamicBranding() {
-  const savedBranding = localStorage.getItem(STORAGE_KEY_BRANDING);
-  if (!savedBranding) return;
+async function applyDynamicBranding() {
+  let cfg = null;
+
+  // 1. Tenta Supabase primeiro
+  if (window.DbService) {
+    try {
+      cfg = await DbService.getBranding();
+    } catch(e) {
+      console.warn('[Branding] Erro ao ler do Supabase:', e);
+    }
+  }
+
+  // 2. Fallback: localStorage
+  if (!cfg) {
+    const saved = localStorage.getItem(STORAGE_KEY_BRANDING);
+    if (saved) {
+      try { cfg = JSON.parse(saved); } catch(e) {}
+    }
+  }
+
+  // 3. Fallback final: defaults neutros
+  if (!cfg) cfg = defaultBranding;
 
   try {
-    const cfg = JSON.parse(savedBranding);
 
     if (cfg.wppNumber) WPP_NUMERO = cfg.wppNumber;
     if (cfg.frete) currentDeliveryFee = parseFloat(cfg.frete);

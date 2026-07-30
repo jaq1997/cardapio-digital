@@ -17,7 +17,11 @@ let pendingBannerMobBase64 = '';
 let pendingProductImgBase64 = '';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  await loadAdminSettings();
+  try {
+    await loadAdminSettings();
+  } catch (e) {
+    console.error('[Admin] Erro ao carregar configurações:', e);
+  }
   renderAdminTable();
   renderCategoriesUI();
   renderDeliveryZonesUI();
@@ -945,3 +949,10 @@ async function deleteProductItem(id) {
   renderAdminTable();
   showToast('Produto excluído do cardápio.', 'success');
 }
+
+// Bind explicit para uso nos botões HTML (onclick)
+window.switchAdminTab = switchAdminTab;
+window.openAddProductModal = openAddProductModal;
+window.closeProductFormModal = closeProductFormModal;
+window.deleteProductItem = deleteProductItem;
+window.editProductItem = editProductItem;

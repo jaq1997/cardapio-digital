@@ -4,16 +4,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pizza Todo Dia — Cardápio Digital & Delivery (Antiga Tri Pizzas)</title>
+  <title>Cardápio Digital — Faça seu Pedido Online</title>
 
   <!-- META TAGS DE COMPARTILHAMENTO -->
-  <meta name="description" content="Cardápio digital e delivery da Pizza Todo Dia (antiga Tri Pizzas). Pizzas artesanais assadas no forno de pedra, combos família e entrega rápida em Porto Alegre e Viamão!">
-  <meta property="og:title" content="Pizza Todo Dia — Cardápio & Delivery">
-  <meta property="og:description" content="Peça sua pizza favorita online! Entrega rápida no seu bairro.">
-  <meta property="og:image" content="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80">
+  <meta name="description" content="Cardápio digital e delivery direto via WhatsApp. Faça seu pedido online!">
+  <meta property="og:title" content="Cardápio Digital">
+  <meta property="og:description" content="Faça seu pedido online com praticidade!">
   <meta property="og:type" content="website">
 
-  <link rel="icon" id="pageFavicon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E91C24'><path d='M12 2L2 7l10 15 10-15-10-5z'/></svg>">
+  <link rel="icon" id="pageFavicon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232D6A4F'><path d='M12 2L2 7l10 15 10-15-10-5z'/></svg>">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,15 +26,15 @@
   <section class="ph-hero-section">
     <div class="ph-hero-card">
       <div class="ph-hero-text-side">
-        <div class="ph-hero-badge">OFERTA DO DIA</div>
-        <h1 class="ph-hero-title">COMBO FAMÍLIA <span>TODO DIA</span></h1>
-        <p class="ph-hero-subtitle">2 Pizzas Grandes quentinhas + 1 Borda Recheada Grátis + 1 Guaraná Antarctica 2L trincando de gelado!</p>
+        <div class="ph-hero-badge">BEM-VINDO</div>
+        <h1 class="ph-hero-title">NOSSO <span>CARDÁPIO</span></h1>
+        <p class="ph-hero-subtitle">Escolha seus produtos favoritos e faça seu pedido direto pelo WhatsApp com praticidade e rapidez!</p>
         <button class="ph-btn-red-lg" onclick="scrollToCatalogSection()">
-          <span>MONTE SEU COMBO</span>
+          <span>VER PRODUTOS</span>
         </button>
       </div>
       <div class="ph-hero-img-side">
-        <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80" alt="Combo Família Pizza Todo Dia">
+        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80" alt="Cardápio Digital">
       </div>
     </div>
   </section>
@@ -53,27 +52,22 @@
     </div>
   </main>
 
-  <!-- MODAL: ÁREA DE COBERTURA (PORTO ALEGRE E VIAMÃO) -->
+  <!-- MODAL: ÁREA DE COBERTURA -->
   <div class="modal-overlay" id="coverageModal">
     <div class="modal-card" style="max-width: 440px;">
       <button class="modal-close-btn" onclick="closeCoverageModal()">✕</button>
       <div class="modal-content-body">
-        <h2 class="checkout-main-title">ÁREA DE COBERTURA</h2>
-        <p style="font-size: 0.86rem; color: #555;">Entregamos quentinho e direto do forno nas seguintes cidades:</p>
+        <h2 class="checkout-main-title">ÁREA DE ATENDIMENTO</h2>
+        <p style="font-size: 0.86rem; color: #555;">Entregamos nas seguintes regiões e cidades:</p>
         
         <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 12px;">
           <div style="background: var(--ph-gray-light); padding: 14px; border-radius: var(--radius-md); border-left: 4px solid var(--ph-red);">
-            <div style="font-family: var(--font-display); font-weight: 900; font-style: italic; font-size: 1.1rem; color: var(--ph-black);">PORTO ALEGRE</div>
-            <div style="font-size: 0.8rem; color: #666; margin-top: 4px;">Atendimento em todos os bairros da Zona Norte, Leste, Sul e Centro Histórico. Tempo médio de entrega: 30 a 45 min.</div>
-          </div>
-
-          <div style="background: var(--ph-gray-light); padding: 14px; border-radius: var(--radius-md); border-left: 4px solid var(--ph-red);">
-            <div style="font-family: var(--font-display); font-weight: 900; font-style: italic; font-size: 1.1rem; color: var(--ph-black);">VIAMÃO</div>
-            <div style="font-size: 0.8rem; color: #666; margin-top: 4px;">Atendimento na região Central, Santa Isabel, Viamópolis e bairros vizinhos. Tempo médio de entrega: 35 a 50 min.</div>
+            <div style="font-family: var(--font-display); font-weight: 900; font-style: italic; font-size: 1.1rem; color: var(--ph-black);" id="covCity1">REGIÃO DE ATENDIMENTO</div>
+            <div style="font-size: 0.8rem; color: #666; margin-top: 4px;">Consulte no momento do checkout as taxas de entrega para o seu bairro.</div>
           </div>
         </div>
 
-        <button class="ph-btn-red-lg" style="width: 100%; margin-top: 10px;" onclick="closeCoverageModal()">
+        <button class="ph-btn-red-lg" style="width: 100%; margin-top: 14px;" onclick="closeCoverageModal()">
           ENTENDI, VER CARDÁPIO
         </button>
       </div>
