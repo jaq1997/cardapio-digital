@@ -5,171 +5,76 @@ const DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzB3UaS
 const DEFAULT_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTnWp67Ggx_hVGo4gLXJZtGJZa9ZrmO91sLF3cmzPqLOpgRhY-VdkWk3UyX5-eILluZJNxRIL4RdcRk/pub?output=csv';
 const BASE_URL_FOTOS = 'https://pub-67111bf9eee943e3aeaf4b493b4dd034.r2.dev/';
 
-const STORAGE_KEY_BRANDING    = 'ptd_store_branding';
-const STORAGE_KEY_PRODUCTS    = 'ptd_store_products';
-const STORAGE_KEY_CATEGORIES  = 'ptd_store_categories';
+const STORAGE_KEY_BRANDING       = 'ptd_store_branding';
+const STORAGE_KEY_PRODUCTS       = 'ptd_store_products';
+const STORAGE_KEY_CATEGORIES     = 'ptd_store_categories';
 const STORAGE_KEY_DELIVERY_ZONES = 'ptd_delivery_zones';
 const STORAGE_KEY_SHEETS_CONFIG  = 'ptd_sheets_config';
+const STORAGE_KEY_COUPONS        = 'ptd_store_coupons';
 
 const defaultBranding = {
-  storeName: "Pizza Todo Dia",
-  storeSub: "Antiga Tri Pizzas • Tradição e Sabor no Seu Bairro",
-  wppNumber: "5531992082542",
+  storeName: "Minha Loja",
+  storeSub: "",
+  wppNumber: "",
   frete: 5.00,
-  primaryColor: "#E91C24",
-  darkColor: "#C50303",
+  primaryColor: "#2D6A4F",
+  darkColor: "#1B4332",
   logoUrl: "",
   bannerDeskUrl: "",
   bannerMobUrl: "",
-  coverageCities: "Porto Alegre, Viamão"
+  coverageCities: "",
+  storeAddress: "",
+  storeHours: ""
 };
 
 const defaultDeliveryZones = [
   { id: "z-balcao", name: "Retirada no Balcão (Grátis)", price: 0.00 },
-  { id: "z-centro", name: "Centro / Bairros Próximos", price: 5.00 },
-  { id: "z-zonasul", name: "Zona Sul / Bairros Médios", price: 8.00 },
-  { id: "z-zonanorte", name: "Zona Norte / Bairros Distantes", price: 12.00 }
+  { id: "z-bairro", name: "Bairros Próximos", price: 5.00 },
+  { id: "z-distante", name: "Bairros Mais Distantes", price: 10.00 }
 ];
 
 const defaultCategories = [
-  { id: "combos", name: "Promos do Dia" },
-  { id: "pizzas-salgadas", name: "Pizzas Salgadas" },
-  { id: "pizzas-doces", name: "Pizzas Doces" },
+  { id: "destaques", name: "Destaques" },
+  { id: "pratos", name: "Pratos" },
   { id: "bebidas", name: "Bebidas" }
 ];
 
 const defaultProducts = [
   {
-    id: "combo-familia",
-    nome: "Combo Família Todo Dia",
-    categoria: "combos",
-    descricao: "2 Pizzas Grandes (até 4 sabores) + 1 Borda Recheada à escolha + 1 Guaraná Antarctica 2 Litros trincando de gelado.",
-    preco: 109.90,
-    preco_grande: 109.90,
-    preco_media: 89.90,
-    preco_broto: 0,
-    badge: "Combo Destaque",
-    img_url: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "combo-individual",
-    nome: "Combo Individual",
-    categoria: "combos",
-    descricao: "1 Pizza Broto (4 fatias) + 1 Porção de Pão de Alho (4un) + 1 Refrigerante Lata 350ml.",
-    preco: 34.90,
-    preco_grande: 0,
+    id: "demo-prato-1",
+    nome: "Prato Exemplo 1",
+    categoria: "destaques",
+    descricao: "Descrição do produto. Acesse o painel admin para cadastrar seus próprios itens.",
+    preco: 0,
+    preco_grande: 29.90,
     preco_media: 0,
-    preco_broto: 34.90,
-    badge: "Promoção",
-    img_url: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80"
+    preco_broto: 0,
+    badge: "Destaque",
+    img_url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"
   },
   {
-    id: "pizza-pepperoni",
-    nome: "Pepperoni Especial",
-    categoria: "pizzas-salgadas",
-    descricao: "Molho de tomate artesanal da casa, generosa camada de mussarela derretida e fatias crocantes de pepperoni.",
-    preco: 64.90,
-    preco_grande: 64.90,
-    preco_media: 49.90,
-    preco_broto: 36.90,
-    badge: "Mais Pedida",
-    img_url: "https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "pizza-pepperoni-requeijao",
-    nome: "Pepperoni com Requeijão Cremoso",
-    categoria: "pizzas-salgadas",
-    descricao: "Fatias crocantes de pepperoni combinadas com fios generosos de requeijão cremoso e mussarela derretida.",
-    preco: 68.90,
-    preco_grande: 68.90,
-    preco_media: 53.90,
-    preco_broto: 39.90,
+    id: "demo-prato-2",
+    nome: "Prato Exemplo 2",
+    categoria: "pratos",
+    descricao: "Descrição do produto. Acesse o painel admin para cadastrar seus próprios itens.",
+    preco: 0,
+    preco_grande: 24.90,
+    preco_media: 0,
+    preco_broto: 0,
     badge: "",
-    img_url: "https://images.unsplash.com/photo-1541745537411-b8046dc6d66c?auto=format&fit=crop&w=800&q=80"
+    img_url: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=800&q=80"
   },
   {
-    id: "pizza-calabresa",
-    nome: "Calabresa com Cebola Roxa",
-    categoria: "pizzas-salgadas",
-    descricao: "Calabresa defumada selecionada fatiada fininha, cebola roxa fresca, azeitonas pretas e orégano sobre mussarela.",
-    preco: 59.90,
-    preco_grande: 59.90,
-    preco_media: 46.90,
-    preco_broto: 34.90,
-    badge: "",
-    img_url: "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "pizza-supreme",
-    nome: "Pizza Suprema Todo Dia",
-    categoria: "pizzas-salgadas",
-    descricao: "A receita da casa! Pepperoni, carne moída temperada, pimentão verde crocante, cebola fresca e cogumelos.",
-    preco: 72.90,
-    preco_grande: 72.90,
-    preco_media: 56.90,
-    preco_broto: 42.90,
-    badge: "Especialidade",
-    img_url: "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "pizza-frango-requeijao",
-    nome: "Frango com Catupiry Original",
-    categoria: "pizzas-salgadas",
-    descricao: "Peito de frango desfiaudinho bem temperado, milho verde e camada generosa do autêntico Catupiry cremoso.",
-    preco: 64.90,
-    preco_grande: 64.90,
-    preco_media: 49.90,
-    preco_broto: 37.90,
-    badge: "",
-    img_url: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "pizza-4queijos",
-    nome: "Quatro Queijos Premium",
-    categoria: "pizzas-salgadas",
-    descricao: "Harmonia perfeita de Mussarela, Provolone defumado, Gorgonzola aveludado e Requeijão cremoso.",
-    preco: 66.90,
-    preco_grande: 66.90,
-    preco_media: 51.90,
-    preco_broto: 38.90,
-    badge: "",
-    img_url: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "pizza-doce-nutella",
-    nome: "Nutella com Morango",
-    categoria: "pizzas-doces",
-    descricao: "Massa crocante assada no forno coberta com uma generosa camada de Nutella® cremosa e morangos frescos fatiados.",
-    preco: 58.90,
-    preco_grande: 58.90,
-    preco_media: 46.90,
-    preco_broto: 36.90,
-    badge: "Doce Mais Pedida",
-    img_url: "https://images.unsplash.com/photo-1588315029754-2dd089d39a1a?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "bebida-coca-2l",
-    nome: "Coca-Cola Garrafa 2L",
+    id: "demo-bebida-1",
+    nome: "Bebida Exemplo",
     categoria: "bebidas",
-    descricao: "Garrafa 2 Litros trincando de gelada.",
-    preco: 14.90,
-    preco_grande: 14.90,
+    descricao: "Descrição da bebida. Acesse o painel admin para cadastrar seus próprios itens.",
+    preco: 0,
+    preco_grande: 8.90,
     preco_media: 0,
     preco_broto: 0,
     badge: "",
-    img_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: "bebida-guarana-2l",
-    nome: "Guaraná Antarctica Garrafa 2L",
-    categoria: "bebidas",
-    descricao: "Garrafa 2 Litros super gelada.",
-    preco: 12.90,
-    preco_grande: 12.90,
-    preco_media: 0,
-    preco_broto: 0,
-    badge: "",
-    img_url: "https://images.unsplash.com/photo-1581006852262-e4307cf6283a?auto=format&fit=crop&w=800&q=80"
+    img_url: "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=800&q=80"
   }
 ];
 

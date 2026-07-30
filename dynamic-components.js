@@ -97,20 +97,20 @@ const SHARED_COMPONENTS = {
         <footer class="ph-footer">
             <div class="ph-footer-inner">
                 <div class="ph-footer-col">
-                    <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; margin-bottom: 6px; font-style: italic;" id="footerStoreTitle">PIZZA TODO DIA</div>
-                    <p style="font-size: 0.82rem; color: #888888; margin-bottom: 10px;" id="footerStoreSub">Cardápio Digital & Delivery Direto do Forno.</p>
-                    <div class="footer-info-item" id="footerAddressBox" style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #CCCCCC; margin-top: 6px;">
+                    <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; margin-bottom: 6px; font-style: italic;" id="footerStoreTitle"></div>
+                    <p style="font-size: 0.82rem; color: #888888; margin-bottom: 10px;" id="footerStoreSub"></p>
+                    <div class="footer-info-item" id="footerAddressBox" style="display: none; align-items: center; gap: 8px; font-size: 0.82rem; color: #CCCCCC; margin-top: 6px;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                        <span id="footerAddressText">Endereço sob consulta</span>
+                        <span id="footerAddressText"></span>
                     </div>
-                    <div class="footer-info-item" id="footerHoursBox" style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #CCCCCC; margin-top: 4px;">
+                    <div class="footer-info-item" id="footerHoursBox" style="display: none; align-items: center; gap: 8px; font-size: 0.82rem; color: #CCCCCC; margin-top: 4px;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        <span id="footerHoursText">Consulte o horário de funcionamento</span>
+                        <span id="footerHoursText"></span>
                     </div>
                 </div>
                 <div class="ph-footer-col" style="text-align: right;">
-                    <div style="font-size: 0.78rem; color: #666666;">© 2026 Todos os direitos reservados.</div>
-                    <div style="font-size: 0.78rem; color: #888; margin-top: 4px;">Powered by Cardápio Digital Engine</div>
+                    <div style="font-size: 0.78rem; color: #666666;">&copy; 2026 Todos os direitos reservados.</div>
+                    <div style="font-size: 0.78rem; color: #888; margin-top: 4px;">Criado e Desenvolvido por <a href="https://evolux360.com.br" target="_blank" rel="noopener" style="color: #aaa; text-decoration: underline;">Evolux360</a></div>
                 </div>
             </div>
         </footer>
