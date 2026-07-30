@@ -1,7 +1,7 @@
 
 /* Constantes de Storage e URLs fornecidas por defaults.js */
 
-let WPP_NUMERO = '5531992082542';
+let WPP_NUMERO = '5551989912555';
 
 // Delivery zones default moved to `defaults.js`
 
@@ -24,7 +24,46 @@ async function initLojaEngine() {
   await loadCatalogData();
   await loadDeliveryZonesData();
   renderCatalog();
+  await loadAndRenderDrawerCategories();
   populateFlavorRadioLists();
+}
+
+async function loadAndRenderDrawerCategories() {
+  const container = document.getElementById('drawerCategoriesList');
+  if (!container) return;
+
+  let categories = [];
+
+  if (window.DbService) {
+    try {
+      const remote = await DbService.getCategories();
+      if (remote && remote.length > 0) categories = remote;
+    } catch(e) {}
+  }
+
+  if (categories.length === 0) {
+    const saved = localStorage.getItem(STORAGE_KEY_CATEGORIES);
+    if (saved) {
+      try { categories = JSON.parse(saved); } catch(e) {}
+    }
+  }
+
+  if (categories.length === 0 && typeof defaultCategories !== 'undefined') {
+    categories = defaultCategories;
+  }
+
+  let html = `<button class="drawer-cat-item ${activeCategory === 'todos' ? 'active' : ''}" onclick="selectDrawerCategory('todos')" style="width: 100%; text-align: left; padding: 10px 14px; background: transparent; border: none; font-weight: 600; font-size: 0.88rem; color: #0F172A; cursor: pointer; border-radius: 6px;">TODOS OS PRODUTOS</button>`;
+
+  categories.forEach(cat => {
+    const isAct = (activeCategory === cat.name || activeCategory === cat.id);
+    html += `
+      <button class="drawer-cat-item ${isAct ? 'active' : ''}" onclick="selectDrawerCategory('${cat.name}')" style="width: 100%; text-align: left; padding: 10px 14px; background: transparent; border: none; font-weight: 600; font-size: 0.88rem; color: #0F172A; cursor: pointer; border-radius: 6px;">
+        ${cat.name.toUpperCase()}
+      </button>
+    `;
+  });
+
+  container.innerHTML = html;
 }
 
 if (document.readyState === 'loading') {
@@ -58,27 +97,61 @@ async function applyDynamicBranding() {
 
   try {
 
-    if (cfg.wppNumber) WPP_NUMERO = cfg.wppNumber;
+    if (cfg.wppNumber) {
+      WPP_NUMERO = cfg.wppNumber;
+    } else {
+      WPP_NUMERO = '';
+    }
+
+    const floatBtn = document.getElementById('wppFloatBtn') || document.querySelector('.ph-wpp-float');
+    if (floatBtn) {
+      if (!WPP_NUMERO || WPP_NUMERO.trim() === '') {
+        floatBtn.style.display = 'none';
+      } else {
+        floatBtn.style.display = 'flex';
+      }
+    }
     if (cfg.frete) currentDeliveryFee = parseFloat(cfg.frete);
 
-    if (cfg.primaryColor) {
+    if (cfg.primaryColor && cfg.primaryColor !== '#18181B') {
       document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
     }
-    if (cfg.darkColor) {
-      document.documentElement.style.setProperty('--ph-red-dark', cfg.darkColor);
+    if (cfg.btnTextColor) {
+      document.documentElement.style.setProperty('--ph-btn-text', cfg.btnTextColor);
+    }
+    if (cfg.accentColor) {
+      document.documentElement.style.setProperty('--ph-accent', cfg.accentColor);
+    }
+    if (cfg.badgeBgColor) {
+      document.documentElement.style.setProperty('--ph-badge-bg', cfg.badgeBgColor);
     }
 
     if (cfg.storeName) {
       const logoText = document.querySelector('.ph-logo-text');
-      if (logoText) logoText.innerHTML = `${cfg.storeName.toUpperCase()}`;
+      if (logoText) logoText.innerHTML = `${cfg.storeName}`;
+      const footerStoreName = document.getElementById('footerStoreName');
+      if (footerStoreName) footerStoreName.innerText = cfg.storeName;
     }
     if (cfg.storeSub) {
       const logoSub = document.querySelector('.ph-logo-sub');
-      if (logoSub) logoSub.innerText = cfg.storeSub.toUpperCase();
+      if (logoSub) logoSub.innerText = cfg.storeSub;
     }
+    if (cfg.storeAddress) {
+      const footerAddr = document.getElementById('footerStoreAddress');
+      if (footerAddr) footerAddr.innerText = cfg.storeAddress;
+    }
+    if (cfg.storeHours) {
+      const footerHours = document.getElementById('footerStoreHours');
+      if (footerHours) footerHours.innerText = cfg.storeHours;
+    }
+    if (cfg.wppNumber) {
+      const footerWpp = document.getElementById('footerStorePhone');
+      if (footerWpp) footerWpp.innerText = cfg.wppNumber;
+    }
+
     if (cfg.logoUrl) {
       const logoBadge = document.querySelector('.ph-logo-badge');
-      if (logoBadge) logoBadge.innerHTML = `<img src="${cfg.logoUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+      if (logoBadge) logoBadge.innerHTML = `<img src="${cfg.logoUrl}" style="width:100%; height:100%; object-fit:contain; border-radius: 50%;">`;
     }
 
     const heroCard = document.querySelector('.ph-hero-card');
@@ -91,9 +164,27 @@ async function applyDynamicBranding() {
         heroCard.classList.add('has-custom-banner');
         heroCard.style.cursor = 'pointer';
         heroCard.onclick = () => handleBannerClick();
+        heroCard.innerHTML = '';
       } else {
+        heroCard.style.backgroundImage = 'none';
+        heroCard.style.backgroundColor = 'transparent';
         heroCard.classList.remove('has-custom-banner');
         heroCard.onclick = null;
+        heroCard.innerHTML = `
+          <div style="width: 100%; min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; border: 1px dashed #E0E0E6; border-radius: 12px; background: #F8F8FA; box-shadow: inset 0 0 20px rgba(0,0,0,0.01);">
+            <div style="width: 64px; height: 64px; border-radius: 12px; background: #EFEFEF; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#A0A0AB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+            </div>
+            <div style="font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: #3F3F46; margin-bottom: 4px;">Banner Principal da Loja</div>
+            <div style="font-size: 0.82rem; color: #71717A; max-width: 440px; line-height: 1.4;">
+              Envie as imagens de destaque para o seu cardápio através da aba <strong>"Identidade, Banners & WhatsApp"</strong> no Painel Admin.
+            </div>
+          </div>
+        `;
       }
     }
 
@@ -123,13 +214,15 @@ async function loadCatalogData() {
           nome: p.nome || 'Produto',
           categoria: p.categoria || 'outros',
           descricao: p.descricao || '',
+          preco: p.preco || p.preco_grande || 0,
           preco_broto:   p.preco_broto   || 0,
           preco_media:   p.preco_media   || 0,
           preco_grande:  p.preco_grande  || p.preco || 0,
           preco_gigante: p.preco_gigante || 0,
           badge:   p.badge   || '',
           img_url: p.img_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
-          ingredientes: p.descricao || ''
+          ingredientes: p.descricao || '',
+          adicionais: p.adicionais || []
         }));
         return;
       }
@@ -148,13 +241,15 @@ async function loadCatalogData() {
           nome: p.nome || 'Produto',
           categoria: p.categoria || 'outros',
           descricao: p.descricao || '',
+          preco: p.preco || p.preco_grande || 0,
           preco_broto:   p.preco_broto   || 0,
           preco_media:   p.preco_media   || 0,
           preco_grande:  p.preco_grande  || p.preco || 0,
           preco_gigante: p.preco_gigante || 0,
           badge:   p.badge   || '',
           img_url: p.img_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
-          ingredientes: p.descricao || ''
+          ingredientes: p.descricao || '',
+          adicionais: p.adicionais || []
         }));
         return;
       }
@@ -192,7 +287,12 @@ function renderCatalog() {
   let filtered = catalogData;
 
   if (activeCategory !== 'todos') {
-    filtered = filtered.filter(p => p.categoria === activeCategory);
+    filtered = filtered.filter(p => {
+      if (!p.categoria) return false;
+      const catVal = String(p.categoria).toLowerCase().trim();
+      const targetVal = String(activeCategory).toLowerCase().trim();
+      return catVal === targetVal;
+    });
   }
 
   if (currentSearchQuery) {
@@ -210,13 +310,9 @@ function renderCatalog() {
 
   if (filtered.length === 0) {
     container.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: #FFFFFF; border: 2px dashed #DDD; border-radius: 8px; margin: 20px 0;">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--ph-red)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px;">
-          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-          <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-        <h3 style="font-size: 1.2rem; font-weight: 900; color: #333; margin-bottom: 6px; font-family: var(--font-display);">CARDÁPIO EM ATUALIZAÇÃO</h3>
-        <p style="font-size: 0.88rem; color: #777;">Este estabelecimento está cadastrando seus produtos. Volte em instantes!</p>
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; margin: 20px 0;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: #0F172A; margin-bottom: 6px;">Nenhum produto nesta categoria</h3>
+        <p style="font-size: 0.85rem; color: #64748B;">Cadastre produtos no painel admin ou selecione "Todos os Produtos".</p>
       </div>
     `;
     return;
@@ -325,33 +421,127 @@ function populateFlavorRadioLists() {
   if (container2) container2.innerHTML = html2;
 }
 
+let modalQty = 1;
+
 function openPizzaCustomizerModal(productId) {
   const product = catalogData.find(p => String(p.id) === String(productId));
   if (!product) return;
 
   currentSelectedProduct = product;
+  modalQty = 1;
 
   const titleEl = document.getElementById('modalPizzaTitle');
-  if (titleEl) titleEl.innerText = product.nome.toUpperCase();
+  if (titleEl) titleEl.innerText = product.nome;
 
   const descEl = document.getElementById('modalPizzaDesc');
   if (descEl) descEl.innerText = product.descricao || product.ingredientes || '';
 
-  const imgEl = document.getElementById('modalHeroBg') || document.getElementById('modalPizzaImg');
+  const imgEl = document.getElementById('modalHeroBg');
   if (imgEl) imgEl.src = product.img_url;
 
-  flavorMode = 'single';
-  selectedSize = 'grande';
-  const btn1 = document.getElementById('btnSingleFlavor') || document.getElementById('btnFlavor1');
-  const btn2 = document.getElementById('btnHalfFlavor') || document.getElementById('btnFlavor2');
-  if (btn1) btn1.classList.add('active');
-  if (btn2) btn2.classList.remove('active');
+  const obsInput = document.getElementById('modalObsInput');
+  if (obsInput) obsInput.value = '';
 
-  populateFlavorRadioLists();
+  const qtyEl = document.getElementById('modalQtyDisplay');
+  if (qtyEl) qtyEl.innerText = '1';
+
+  const adicContainer = document.getElementById('modalAdicionaisContainer');
+  const adicList = document.getElementById('modalAdicionaisList');
+  if (adicContainer && adicList) {
+    let adicionaisList = product.adicionais || [];
+    if (typeof adicionaisList === 'string') {
+      try { adicionaisList = JSON.parse(adicionaisList); } catch(e) { adicionaisList = []; }
+    }
+
+    if (Array.isArray(adicionaisList) && adicionaisList.length > 0) {
+      adicContainer.style.display = 'block';
+      adicList.innerHTML = adicionaisList.map((item, idx) => `
+        <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.84rem; padding: 6px 0; border-bottom: 1px solid #F1F5F9;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" class="modal-adic-checkbox" value="${item.nome}" data-price="${item.preco}" onchange="recalculateModalTotal()" style="accent-color: #6344F5; width: 16px; height: 16px;">
+            <span style="font-weight: 500; color: #0F172A;">${item.nome}</span>
+          </div>
+          <span style="font-weight: 700; color: #6344F5;">+ R$ ${(parseFloat(item.preco)||0).toFixed(2).replace('.', ',')}</span>
+        </label>
+      `).join('');
+    } else {
+      adicContainer.style.display = 'none';
+      adicList.innerHTML = '';
+    }
+  }
+
   recalculateModalTotal();
 
-  const modal = document.getElementById('pizzaModal') || document.getElementById('pizzaCustomizerModal');
-  if (modal) modal.classList.add('active');
+  const modal = document.getElementById('pizzaModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+  }
+}
+
+function changeModalQty(delta) {
+  modalQty = Math.max(1, modalQty + delta);
+  const qtyEl = document.getElementById('modalQtyDisplay');
+  if (qtyEl) qtyEl.innerText = modalQty;
+  recalculateModalTotal();
+}
+
+function recalculateModalTotal() {
+  if (!currentSelectedProduct) return;
+  const p1 = parseFloat(currentSelectedProduct.preco);
+  const p2 = parseFloat(currentSelectedProduct.preco_grande);
+  const basePrice = (!isNaN(p1) && p1 > 0) ? p1 : ((!isNaN(p2) && p2 > 0) ? p2 : 0);
+  
+  let adicTotal = 0;
+  document.querySelectorAll('.modal-adic-checkbox:checked').forEach(cb => {
+    adicTotal += parseFloat(cb.dataset.price) || 0;
+  });
+
+  const unitTotal = basePrice + adicTotal;
+  const grandTotal = unitTotal * modalQty;
+
+  const displayEl = document.getElementById('modalDynamicTotalPrice');
+  if (displayEl) displayEl.innerText = `R$ ${grandTotal.toFixed(2).replace('.', ',')}`;
+}
+
+function addModalProductToCart() {
+  if (!currentSelectedProduct) return;
+  const p1 = parseFloat(currentSelectedProduct.preco);
+  const p2 = parseFloat(currentSelectedProduct.preco_grande);
+  const basePrice = (!isNaN(p1) && p1 > 0) ? p1 : ((!isNaN(p2) && p2 > 0) ? p2 : 0);
+  const obs = document.getElementById('modalObsInput') ? document.getElementById('modalObsInput').value.trim() : '';
+
+  const selectedAdicionais = [];
+  let adicTotal = 0;
+  document.querySelectorAll('.modal-adic-checkbox:checked').forEach(cb => {
+    const p = parseFloat(cb.dataset.price) || 0;
+    adicTotal += p;
+    selectedAdicionais.push(`${cb.value} (+R$ ${p.toFixed(2).replace('.', ',')})`);
+  });
+
+  const finalUnitPrice = basePrice + adicTotal;
+
+  let fullObs = obs;
+  if (selectedAdicionais.length > 0) {
+    const adicStr = 'Adicionais: ' + selectedAdicionais.join(', ');
+    fullObs = fullObs ? `${fullObs} | ${adicStr}` : adicStr;
+  }
+
+  const cartItem = {
+    cartId: 'item-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+    id: currentSelectedProduct.id,
+    title: currentSelectedProduct.nome,
+    price: finalUnitPrice,
+    qty: modalQty,
+    details: fullObs,
+    img_url: currentSelectedProduct.img_url
+  };
+
+  cart.push(cartItem);
+  closePizzaModal();
+  updateCartBadge();
+  if (typeof showToast === 'function') showToast(`"${currentSelectedProduct.nome}" adicionado ao carrinho!`, 'success');
+  openCartModal();
 }
 
 function closePizzaModal() {
@@ -498,12 +688,18 @@ function openCartModal() {
     console.error('Erro ao preparar carrinho:', e);
   }
   const modal = document.getElementById('cartModal');
-  if (modal) modal.classList.add('active');
+  if (modal) {
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+  }
 }
 
 function closeCartModal() {
   const modal = document.getElementById('cartModal');
-  if (modal) modal.classList.remove('active');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+  }
 }
 
 function renderCartItems() {
@@ -520,26 +716,28 @@ function renderCartItems() {
   }
 
   container.innerHTML = cart.map((item, index) => {
-    const itemPrice = (parseFloat(item.price) || 0);
-    const itemQty = (parseInt(item.qty) || 1);
+    const itemTitle = item.title || item.nome || 'Produto';
+    const itemPrice = parseFloat(item.price || item.preco || 0);
+    const itemQty = parseInt(item.qty || item.quantidade || 1);
+    const itemDetails = item.details || item.obs || '';
     const totalItemPrice = (itemPrice * itemQty).toFixed(2).replace('.', ',');
 
     return `
-      <div style="background: var(--ph-gray-light); padding: 12px; border-radius: var(--radius-md); margin-bottom: 10px; border: 1px solid var(--ph-border);">
+      <div style="background: #FAFAFC; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #E2E8F0;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
           <div>
-            <strong style="font-size: 0.92rem; color: var(--ph-black);">${item.title}</strong>
-            <div style="font-size: 0.76rem; color: #666; margin-top: 2px;">${item.details || ''}</div>
+            <strong style="font-size: 0.92rem; color: #0F172A;">${itemTitle}</strong>
+            <div style="font-size: 0.76rem; color: #64748B; margin-top: 2px;">${itemDetails}</div>
           </div>
-          <button onclick="removeCartItem(${index})" style="background: none; border: none; color: var(--ph-red); font-weight: 900; cursor: pointer;">✕</button>
+          <button onclick="removeCartItem(${index})" style="background: none; border: none; color: #EF4444; font-weight: 900; cursor: pointer;">✕</button>
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-          <div style="display: flex; align-items: center; gap: 8px; background: #FFF; padding: 2px 8px; border-radius: 4px; border: 1px solid #DDD;">
-            <button onclick="updateItemQty(${index}, -1)" style="border: none; background: none; font-weight: 900; cursor: pointer;">-</button>
-            <span style="font-weight: 800; font-size: 0.85rem;">${itemQty}</span>
-            <button onclick="updateItemQty(${index}, 1)" style="border: none; background: none; font-weight: 900; cursor: pointer;">+</button>
+          <div style="display: flex; align-items: center; gap: 8px; background: #FFF; padding: 2px 8px; border-radius: 6px; border: 1px solid #E2E8F0;">
+            <button onclick="updateItemQty(${index}, -1)" style="border: none; background: none; font-weight: 900; cursor: pointer; color: #0F172A;">-</button>
+            <span style="font-weight: 800; font-size: 0.85rem; color: #0F172A;">${itemQty}</span>
+            <button onclick="updateItemQty(${index}, 1)" style="border: none; background: none; font-weight: 900; cursor: pointer; color: #0F172A;">+</button>
           </div>
-          <strong style="color: var(--ph-red); font-size: 0.95rem;">R$ ${totalItemPrice}</strong>
+          <strong style="color: #0F172A; font-size: 0.95rem;">R$ ${totalItemPrice}</strong>
         </div>
       </div>
     `;
@@ -564,7 +762,6 @@ function removeCartItem(index) {
   recalculateCartTotal();
 }
 
-const STORAGE_KEY_COUPONS = 'ptd_store_coupons';
 let currentAppliedCoupon = null;
 
 function aplicarCupomDesconto() {
@@ -612,7 +809,11 @@ function aplicarCupomDesconto() {
 }
 
 function recalculateCartTotal() {
-  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const subtotal = cart.reduce((sum, item) => {
+    const p = parseFloat(item.price || item.preco || 0);
+    const q = parseInt(item.qty || item.quantidade || 1);
+    return sum + (p * q);
+  }, 0);
   let discount = 0;
 
   if (currentAppliedCoupon) {
@@ -623,29 +824,49 @@ function recalculateCartTotal() {
     }
   }
 
+  const deliveryTypeRadio = document.querySelector('input[name="deliveryType"]:checked');
+  const isBalcao = deliveryTypeRadio ? (deliveryTypeRadio.value === 'balcao') : false;
+
+  if (isBalcao) {
+    currentDeliveryFee = 0.00;
+  }
+
   const total = Math.max(0, subtotal + currentDeliveryFee - discount);
 
   const subEl = document.getElementById('txtSubtotalFrete');
   const totEl = document.getElementById('txtTotalCartFinal');
+  const btnFinalizar = document.getElementById('btnFinalizarPedidoCart') || document.querySelector('.checkout-submit-btn');
 
-  let detailsText = `Subtotal: R$ ${subtotal.toFixed(2).replace('.', ',')} | Frete (${currentSelectedZoneName}): R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}`;
-  if (discount > 0) {
+  let freteTxt = isBalcao ? 'Retirada no Balcão (Grátis)' : `Frete: R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}`;
+  let detailsText = `Subtotal: R$ ${subtotal.toFixed(2).replace('.', ',')} | ${freteTxt}`;
+  
+  if (discount > 0 && currentAppliedCoupon) {
     detailsText += ` | Cupom (${currentAppliedCoupon.code}): -R$ ${discount.toFixed(2).replace('.', ',')}`;
   }
 
   if (subEl) subEl.innerText = detailsText;
   if (totEl) totEl.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+
+  if (btnFinalizar) {
+    if (cart.length === 0) {
+      btnFinalizar.disabled = true;
+      btnFinalizar.style.opacity = '0.5';
+      btnFinalizar.style.cursor = 'not-allowed';
+    } else {
+      btnFinalizar.disabled = false;
+      btnFinalizar.style.opacity = '1';
+      btnFinalizar.style.cursor = 'pointer';
+    }
+  }
 }
 
 function toggleDeliveryTypeUI(type) {
   const addressBox = document.getElementById('deliveryAddressBox');
   if (type === 'balcao') {
     currentDeliveryFee = 0.00;
-    currentSelectedZoneName = 'Retirada no Balcão';
     if (addressBox) addressBox.style.display = 'none';
   } else {
     currentDeliveryFee = 5.00;
-    currentSelectedZoneName = 'Entrega em Domicílio';
     if (addressBox) addressBox.style.display = 'block';
   }
   recalculateCartTotal();
@@ -807,7 +1028,7 @@ function enviarPedidoWhatsAppFinal() {
   }
 
   if (!targetWpp || targetWpp === 'Não cadastrado' || targetWpp.trim() === '') {
-    showOrderConfirmationOnScreen('Pedido no Balcão / Sem WhatsApp');
+    showToast('O WhatsApp do estabelecimento não está configurado. Configure no painel admin para receber pedidos.', 'error');
     return;
   }
 
@@ -864,3 +1085,20 @@ function enviarPedidoWhatsAppFinal() {
 
   showOrderConfirmationOnScreen('Enviado via WhatsApp');
 }
+
+// Bind de funções globais para os botões do HTML
+window.openCartModal = openCartModal;
+window.closeCartModal = closeCartModal;
+window.openPizzaCustomizerModal = openPizzaCustomizerModal;
+
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.ph-cart-btn, .ph-cart-btn *, [data-action="cart"]');
+  if (btn) {
+    if (typeof openCartModal === 'function') {
+      openCartModal();
+    }
+  }
+});
+window.closePizzaModal = closePizzaModal;
+window.changeModalQty = changeModalQty;
+window.addModalProductToCart = addModalProductToCart;

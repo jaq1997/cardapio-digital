@@ -43,24 +43,12 @@ const SHARED_COMPONENTS = {
                 </button>
             </div>
         </nav>
-
-        <!-- CATEGORIAS DINÂMICAS DO CARDÁPIO -->
-        <div class="ph-categories-section">
-            <div class="ph-categories-wrapper">
-                <div class="ph-categories-inner" id="categoriesTabContainer">
-                    <button class="ph-cat-pill active" data-cat="todos" onclick="filterCategory('todos', this)">TODOS OS PRODUTOS</button>
-                    <button class="ph-cat-pill" data-cat="destaques" onclick="filterCategory('destaques', this)">DESTAQUES</button>
-                    <button class="ph-cat-pill" data-cat="pratos" onclick="filterCategory('pratos', this)">PRATOS</button>
-                    <button class="ph-cat-pill" data-cat="bebidas" onclick="filterCategory('bebidas', this)">BEBIDAS</button>
-                </div>
-            </div>
-        </div>
     `,
     drawer: `
         <div class="mobile-drawer-overlay" id="drawerOverlay" onclick="toggleMobileDrawer(false)"></div>
         <div class="mobile-drawer-card" id="drawerCard">
             <div class="drawer-header">
-                <div class="drawer-title" id="drawerStoreTitle">PIZZA TODO DIA</div>
+                <div class="drawer-title" id="drawerStoreTitle">MINHA LOJA</div>
                 <button class="drawer-close-btn" onclick="toggleMobileDrawer(false)">✕</button>
             </div>
             
@@ -69,22 +57,24 @@ const SHARED_COMPONENTS = {
             </div>
 
             <div class="drawer-cat-list" id="drawerCategoryListContainer">
-                <div style="font-size: 0.7rem; font-weight: 900; color: #888; margin-bottom: 4px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div>
-                <button class="drawer-cat-item active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>
-                <button class="drawer-cat-item" onclick="selectDrawerCategory('combos')">PROMOS DO DIA</button>
-                <button class="drawer-cat-item" onclick="selectDrawerCategory('pizzas-salgadas')">PIZZAS SALGADAS</button>
-                <button class="drawer-cat-item" onclick="selectDrawerCategory('pizzas-doces')">PIZZAS DOCES</button>
-                <button class="drawer-cat-item" onclick="selectDrawerCategory('bebidas')">BEBIDAS</button>
+                <div style="font-size: 0.75rem; font-weight: 700; color: #64748B; margin-bottom: 8px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div>
+                <div id="drawerCategoriesList">
+                    <button class="drawer-cat-item active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>
+                </div>
             </div>
         </div>
     `,
-    wppFloat: `
-        <a href="https://wa.me/5531992082542" target="_blank" class="ph-wpp-float" id="floatWppBtn" aria-label="Fazer pedido no WhatsApp">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.485 1.332 5.001l-1.415 5.166 5.289-1.385c1.464.798 3.116 1.218 4.783 1.219h.004c5.505 0 9.988-4.478 9.989-9.984 0-2.667-1.038-5.174-2.926-7.062a9.923 9.923 0 0 0-7.066-2.939zm5.952 14.502c-.251.706-1.458 1.348-2.022 1.433-.518.078-1.196.111-3.447-.818-2.879-1.189-4.735-4.116-4.879-4.307-.143-.191-1.168-1.554-1.168-2.964 0-1.41.741-2.104 1.004-2.387.263-.283.573-.354.765-.354.192 0 .383.003.548.01.175.008.411-.067.643.489.239.574.814 1.986.886 2.13.072.144.119.311.024.499-.096.188-.144.306-.287.474-.143.167-.301.373-.43.501-.143.143-.293.299-.126.586.167.287.74 1.22 1.587 1.975 1.09.972 2.008 1.274 2.295 1.417.287.143.454.119.622-.072.167-.191.718-.838.91-1.125.191-.287.383-.239.646-.143.263.096 1.674.79 1.961.933.287.143.479.215.55.335.072.12.072.694-.179 1.401z"/>
-            </svg>
-        </a>
-    `,
+    get wppFloat() {
+        const num = (typeof WPP_NUMERO !== 'undefined' && WPP_NUMERO) ? WPP_NUMERO : '5551989912555';
+        const cleanNum = String(num).replace(/\D/g, '');
+        return `
+            <a href="https://wa.me/${cleanNum}" target="_blank" class="ph-wpp-float" id="floatWppBtn" aria-label="Fazer pedido no WhatsApp">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.764.459 3.485 1.332 5.001l-1.415 5.166 5.289-1.385c1.464.798 3.116 1.218 4.783 1.219h.004c5.505 0 9.988-4.478 9.989-9.984 0-2.667-1.038-5.174-2.926-7.062a9.923 9.923 0 0 0-7.066-2.939zm5.952 14.502c-.251.706-1.458 1.348-2.022 1.433-.518.078-1.196.111-3.447-.818-2.879-1.189-4.735-4.116-4.879-4.307-.143-.191-1.168-1.554-1.168-2.964 0-1.41.741-2.104 1.004-2.387.263-.283.573-.354.765-.354.192 0 .383.003.548.01.175.008.411-.067.643.489.239.574.814 1.986.886 2.13.072.144.119.311.024.499-.096.188-.144.306-.287.474-.143.167-.301.373-.43.501-.143.143-.293.299-.126.586.167.287.74 1.22 1.587 1.975 1.09.972 2.008 1.274 2.295 1.417.287.143.454.119.622-.072.167-.191.718-.838.91-1.125.191-.287.383-.239.646-.143.263.096 1.674.79 1.961.933.287.143.479.215.55.335.072.12.072.694-.179 1.401z"/>
+                </svg>
+            </a>
+        `;
+    },
     mobileBar: `
         <div class="mobile-sticky-bar">
             <button class="ph-btn-red-lg" style="width: 100%; font-size: 0.9rem;" onclick="openCartModal()">
@@ -93,23 +83,26 @@ const SHARED_COMPONENTS = {
         </div>
     `,
     footer: `
-        <footer class="ph-footer">
-            <div class="ph-footer-inner">
-                <div class="ph-footer-col">
-                    <div style="font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; margin-bottom: 6px; font-style: italic;" id="footerStoreTitle"></div>
-                    <p style="font-size: 0.82rem; color: #888888; margin-bottom: 10px;" id="footerStoreSub"></p>
-                    <div class="footer-info-item" id="footerAddressBox" style="display: none; align-items: center; gap: 8px; font-size: 0.82rem; color: #CCCCCC; margin-top: 6px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                        <span id="footerAddressText"></span>
-                    </div>
-                    <div class="footer-info-item" id="footerHoursBox" style="display: none; align-items: center; gap: 8px; font-size: 0.82rem; color: #CCCCCC; margin-top: 4px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        <span id="footerHoursText"></span>
+        <footer class="ph-footer" style="background: #18181B; color: #FFF; padding: 40px 24px 28px; margin-top: 60px; border-top: 1px solid #27272A;">
+            <div class="ph-footer-inner" style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; width: 100%;">
+                    <div>
+                        <div style="font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; margin-bottom: 6px;" id="footerStoreTitle">MINHA LOJA</div>
+                        <p style="font-size: 0.84rem; color: #A1A1AA; margin-bottom: 10px;" id="footerStoreSub">Cardápio Digital & Delivery Direto via WhatsApp</p>
+                        <div class="footer-info-item" id="footerAddressBox" style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #D4D4D8; margin-top: 6px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <span id="footerAddressText">Atendimento online com entrega no seu endereço</span>
+                        </div>
+                        <div class="footer-info-item" id="footerHoursBox" style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #D4D4D8; margin-top: 4px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            <span id="footerHoursText">Segunda a Domingo — Faça seu pedido online</span>
+                        </div>
                     </div>
                 </div>
-                <div class="ph-footer-col" style="text-align: right;">
-                    <div style="font-size: 0.78rem; color: #666666;">&copy; 2026 Todos os direitos reservados.</div>
-                    <div style="font-size: 0.78rem; color: #888; margin-top: 4px;">Criado e Desenvolvido por <a href="https://evolux360.com.br" target="_blank" rel="noopener" style="color: #aaa; text-decoration: underline;">Evolux360</a></div>
+
+                <!-- CRÉDITOS CENTRALIZADOS NA PARTE INFERIOR DO FOOTER -->
+                <div style="border-top: 1px solid #27272A; padding-top: 20px; text-align: center; font-size: 0.8rem; color: #71717A; width: 100%;">
+                    &copy; 2026 Todos os direitos reservados • Criado e Desenvolvido por <a href="https://evolux360.vercel.app/" target="_blank" rel="noopener" style="color: #A1A1AA; text-decoration: underline; font-weight: 600;">Evolux360</a>
                 </div>
             </div>
         </footer>

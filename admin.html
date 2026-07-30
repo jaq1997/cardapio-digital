@@ -30,131 +30,158 @@
   <!-- CONTEÚDO DO ADMIN (oculto até auth confirmar) -->
   <div id="adminContent" style="display:none;">
 
-  <!-- HEADER ADMIN -->
-  <header class="admin-header">
-    <div class="admin-header-inner">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <div class="admin-logo-badge" id="adminHeaderBadge">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  <div id="adminLayout" style="display: flex; min-height: 100vh; background: #F6F6F9;">
+    
+    <!-- SIDEBAR DE NAVEGAÇÃO LATERAL (ESTILO NUVEMSHOP) -->
+    <aside class="admin-sidebar" style="width: 260px; background: #FFFFFF; border-right: 1px solid #E4E4E7; display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 0; height: 100vh;">
+      <div style="padding: 20px 24px; border-bottom: 1px solid #E4E4E7; display: flex; align-items: center; gap: 12px;">
+        <div style="width: 38px; height: 38px; background: #F4F3FF; color: #6C5CE7; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem;">
+          E
         </div>
         <div>
-          <h1 class="admin-title">Painel de Gestão — <span id="adminStoreTitleDisplay">Sua Loja</span></h1>
-          <p style="font-size: 0.78rem; color: #AAA; margin: 2px 0 0 0;">Central de Comando e Operação do Cardápio Digital.</p>
+          <div style="font-weight: 800; font-size: 0.95rem; color: #18181B;" id="adminStoreTitleDisplay">Minha Loja</div>
+          <div style="font-size: 0.75rem; color: #71717A;">Painel do Cardápio</div>
         </div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <a href="index.html" target="_blank" class="btn-admin btn-admin-primary" style="text-decoration: none;">
+
+      <nav style="padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1;">
+        <button class="nav-tab active" onclick="switchAdminTab('dashboard')">
+          <span>Visão Geral</span>
+        </button>
+        <button class="nav-tab" onclick="switchAdminTab('items')">
+          <span>Produtos & Estoque</span>
+        </button>
+        <button class="nav-tab" onclick="switchAdminTab('categories')">
+          <span>Categorias</span>
+        </button>
+        <button class="nav-tab" onclick="switchAdminTab('delivery')">
+          <span>Formas de Entrega</span>
+        </button>
+        <button class="nav-tab" onclick="switchAdminTab('coupons')">
+          <span>Cupons de Desconto</span>
+        </button>
+        <button class="nav-tab" onclick="switchAdminTab('branding')">
+          <span>Identidade Visual & Banners</span>
+        </button>
+      </nav>
+
+      <div style="padding: 16px; border-top: 1px solid #E4E4E7; display: flex; flex-direction: column; gap: 8px;">
+        <a href="index.html" target="_blank" class="btn-admin btn-admin-primary" style="text-decoration: none; justify-content: center; width: 100%;">
           <span>Ver Cardápio Ao Vivo</span>
         </a>
-        <button class="btn-admin" onclick="AUTH.logout()" style="background:#2A2A2A;color:#AAA;border:1px solid #333;" title="Sair do painel">
-          <span>Sair</span>
+        <button class="btn-admin" onclick="AUTH.logout()" style="width: 100%; justify-content: center; background: #F4F4F7; color: #71717A; border: 1px solid #E4E4E7;">
+          <span>Sair da Conta</span>
         </button>
       </div>
-    </div>
-  </header>
+    </aside>
 
-  <!-- ABAS SUPERIORES DA CENTRAL DE COMANDO (ORDEM SIMPLIFICADA PARA O CLIENTE) -->
-  <nav class="admin-nav-tabs">
-    <button class="nav-tab active" onclick="switchAdminTab('items')">Produtos & Estoque</button>
-    <button class="nav-tab" onclick="switchAdminTab('categories')">Categorias do Cardápio</button>
-    <button class="nav-tab" onclick="switchAdminTab('delivery')">Taxas de Entrega por Bairro</button>
-    <button class="nav-tab" onclick="switchAdminTab('coupons')">Cupons de Desconto</button>
-    <button class="nav-tab" onclick="switchAdminTab('branding')">Identidade, Banners & WhatsApp</button>
-    <button class="nav-tab" onclick="switchAdminTab('sheets')" style="opacity: 0.75;">Configurações do Servidor</button>
-  </nav>
-
-  <main class="admin-container">
+    <!-- ÁREA DE CONTEÚDO PRINCIPAL DA PÁGINA -->
+    <main style="flex: 1; min-width: 0; width: 100%; padding: 32px; box-sizing: border-box; overflow-y: auto;">
     
-    <!-- STATS CARDS DE IMPACTO -->
-    <div class="stats-grid">
-      <div class="stat-card active-orders">
-        <div class="stat-label">Produtos Ativos</div>
-        <div class="stat-value" id="totalProductsCount">0</div>
+    <!-- TAB 0: DASHBOARD / VISÃO GERAL -->
+    <div id="tabContentDashboard">
+      <div style="margin-bottom: 24px;">
+        <h2 style="font-size: 1.3rem; font-weight: 800; color: #18181B; margin-bottom: 4px;">Visão Geral do Cardápio</h2>
+        <p style="font-size: 0.85rem; color: #71717A;">Resumo operacional e atalhos rápidos da sua loja.</p>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Categorias Cadastradas</div>
-        <div class="stat-value" id="totalCatCount">0</div>
+
+      <!-- STATS CARDS DE IMPACTO -->
+      <div class="stats-grid" style="margin-bottom: 32px;">
+        <div class="stat-card active-orders" style="background: #FFFFFF; border: 1px solid #E4E4E7; border-radius: 12px; padding: 20px;">
+          <div class="stat-label" style="color: #71717A; font-size: 0.8rem; font-weight: 600;">Produtos Ativos</div>
+          <div class="stat-value" id="totalProductsCount" style="font-size: 1.8rem; font-weight: 800; color: #18181B; margin-top: 4px;">0</div>
+        </div>
+        <div class="stat-card" style="background: #FFFFFF; border: 1px solid #E4E4E7; border-radius: 12px; padding: 20px;">
+          <div class="stat-label" style="color: #71717A; font-size: 0.8rem; font-weight: 600;">Categorias Cadastradas</div>
+          <div class="stat-value" id="totalCatCount" style="font-size: 1.8rem; font-weight: 800; color: #18181B; margin-top: 4px;">0</div>
+        </div>
+        <div class="stat-card" style="background: #FFFFFF; border: 1px solid #E4E4E7; border-radius: 12px; padding: 20px;">
+          <div class="stat-label" style="color: #71717A; font-size: 0.8rem; font-weight: 600;">Formas & Taxas de Entrega</div>
+          <div class="stat-value" id="totalDeliveryZonesCount" style="font-size: 1.8rem; font-weight: 800; color: #18181B; margin-top: 4px;">0</div>
+        </div>
+        <div class="stat-card" style="background: #FFFFFF; border: 1px solid #E4E4E7; border-radius: 12px; padding: 20px;">
+          <div class="stat-label" style="color: #71717A; font-size: 0.8rem; font-weight: 600;">Status do Banco Supabase</div>
+          <div class="stat-value" id="sheetsStatusDisplay" style="font-size: 0.95rem; font-family: var(--font-mono); margin-top: 6px; color: #16A34A; font-weight: 700;">Conectado</div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Regiões de Entrega</div>
-        <div class="stat-value" id="totalDeliveryZonesCount">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Status do Banco de Dados</div>
-        <div class="stat-value" id="sheetsStatusDisplay" style="font-size: 0.95rem; font-family: var(--font-mono); margin-top: 6px; color: #2E7D32;">Conectado</div>
+
+      <!-- ATALHOS RÁPIDOS -->
+      <div style="background: #FFFFFF; border: 1px solid #E4E4E7; border-radius: 12px; padding: 24px;">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: #18181B; margin-bottom: 16px;">Ações rápidas</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+          <button class="btn-admin btn-admin-primary" onclick="switchAdminTab('items'); openAddProductModal();" style="padding: 16px; justify-content: center;">
+            <span>Cadastrar produto</span>
+          </button>
+          <button class="btn-admin" onclick="switchAdminTab('branding');" style="padding: 16px; justify-content: center; background: #F4F4F7;">
+            <span>Configurar banners e WhatsApp</span>
+          </button>
+          <button class="btn-admin" onclick="switchAdminTab('delivery');" style="padding: 16px; justify-content: center; background: #F4F4F7;">
+            <span>Ajustar formas de entrega</span>
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- TAB 1: PRODUTOS E ESTOQUE (INICIAL DO CLIENTE) -->
-    <div id="tabContentItems">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-        <h2 style="font-size: 1.2rem; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display);">Produtos do Cardápio</h2>
+    <!-- TAB 1: PRODUTOS E ESTOQUE -->
+    <div id="tabContentItems" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <h2 style="font-size: 1.3rem; font-weight: 800; color: #0F172A; margin: 0;">Produtos do cardápio</h2>
+          <p style="font-size: 0.85rem; color: #64748B; margin-top: 4px;">Gerencie seus produtos, imagens, adicionais e valores.</p>
+        </div>
         
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <input type="text" class="admin-input" placeholder="Buscar produto..." onkeyup="filterAdminTable(this.value)" style="width: 200px;">
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <input type="text" class="admin-input" placeholder="Buscar por nome..." onkeyup="filterAdminCards(this.value)" style="width: 240px;">
           <button class="btn-admin btn-admin-primary" onclick="openAddProductModal()">
-            <span>+ Cadastrar Novo Produto</span>
+            <span>Cadastrar produto</span>
           </button>
         </div>
       </div>
 
-      <div class="admin-table-wrapper">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Foto</th>
-              <th>Nome do Produto</th>
-              <th>Categoria</th>
-              <th>Selo / Destaque</th>
-              <th>Preço (R$)</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="adminTableBody">
-            <!-- Renderizado via admin.js -->
-          </tbody>
-        </table>
+      <!-- GRID DE CARDS DE PRODUTOS CLEAN -->
+      <div id="adminProductGridContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+        <!-- Renderizado dinamicamente via admin.js -->
       </div>
     </div>
 
     <!-- TAB 2: CATEGORIAS -->
     <div id="tabContentCategories" style="display: none;">
-      <div class="config-card">
-        <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display);">Gerenciar Categorias</h3>
-        
-        <form onsubmit="addNewCategory(event)" style="display: flex; gap: 10px; margin-bottom: 20px;">
-          <input type="text" id="newCategoryInput" class="admin-input" placeholder="Ex: Pizzas Especiais, Sobremesas, Bebidas..." required style="flex: 1;">
-          <button type="submit" class="btn-admin btn-admin-primary">
-            <span>+ Adicionar Categoria</span>
+      <div class="config-card" style="background: #FFFFFF; border: 1px solid #E4E4E7; border-radius: 12px; padding: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #18181B; margin: 0;">Categorias do cardápio</h3>
+            <p style="font-size: 0.82rem; color: #71717A; margin-top: 2px;">Crie categorias e associe múltiplos produtos a elas.</p>
+          </div>
+          <button class="btn-admin btn-admin-primary" onclick="openAddCategoryModal()">
+            <span>Nova categoria</span>
           </button>
-        </form>
+        </div>
 
-        <label class="admin-label">Categorias Ativas no Cardápio:</label>
-        <div id="categoriesListContainer" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;">
+        <label class="admin-label">Categorias Ativas:</label>
+        <div id="categoriesListContainer" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px;">
           <!-- Categorias renderizadas via admin.js -->
         </div>
       </div>
     </div>
 
-    <!-- TAB 3: TAXAS DE ENTREGA -->
+    <!-- TAB 3: FORMAS DE ENTREGA -->
     <div id="tabContentDelivery" style="display: none;">
-      <div class="config-card">
-        <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display);">Taxas de Entrega por Bairro / Região</h3>
-        
-        <form onsubmit="addNewDeliveryZone(event)" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-          <input type="text" id="newZoneNameInput" class="admin-input" placeholder="Nome do Bairro / Região (Ex: Centro, Zona Sul...)" required style="flex: 2; min-width: 200px;">
-          <input type="number" id="newZonePriceInput" class="admin-input" step="0.50" placeholder="Valor da Taxa (Ex: 8.00)" required style="flex: 1; min-width: 120px;">
-          <button type="submit" class="btn-admin btn-admin-primary">
-            <span>+ Adicionar Região</span>
+      <div class="config-card" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #0F172A; margin: 0;">Formas & Opções de Entrega</h3>
+            <p style="font-size: 0.82rem; color: #64748B; margin-top: 2px;">Gerencie bairros, taxas de entrega e a opção de retirada no balcão.</p>
+          </div>
+          <button class="btn-admin btn-admin-primary" onclick="openAddDeliveryZoneModal()">
+            <span>+ Nova Forma / Região de Entrega</span>
           </button>
-        </form>
+        </div>
 
         <div class="admin-table-wrapper">
           <table class="admin-table">
             <thead>
               <tr>
-                <th>Bairro / Região</th>
+                <th>Forma / Bairro ou Região</th>
                 <th>Taxa de Entrega (R$)</th>
                 <th>Ações</th>
               </tr>
@@ -169,20 +196,16 @@
 
     <!-- TAB 4: CUPONS DE DESCONTO -->
     <div id="tabContentCoupons" style="display: none;">
-      <div class="config-card">
-        <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display);">Gerenciar Cupons de Desconto</h3>
-        
-        <form onsubmit="addNewCoupon(event)" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-          <input type="text" id="newCouponCodeInput" class="admin-input" placeholder="Código (Ex: PRIMEIRACOMPRA, SEXTOU10)" required style="flex: 2; min-width: 180px; text-transform: uppercase;">
-          <select id="newCouponTypeInput" class="admin-input" style="flex: 1.2; min-width: 140px;">
-            <option value="percent">Porcentagem (%)</option>
-            <option value="fixed">Valor Fixo (R$)</option>
-          </select>
-          <input type="number" id="newCouponValueInput" class="admin-input" step="0.01" placeholder="Valor (Ex: 10 para 10% ou 5.00)" required style="flex: 1; min-width: 120px;">
-          <button type="submit" class="btn-admin btn-admin-primary">
-            <span>+ Criar Cupom</span>
+      <div class="config-card" style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #0F172A; margin: 0;">Cupons de Desconto</h3>
+            <p style="font-size: 0.82rem; color: #64748B; margin-top: 2px;">Crie e gerencie códigos promocionais para seus clientes.</p>
+          </div>
+          <button class="btn-admin btn-admin-primary" onclick="openAddCouponModal()">
+            <span>+ Novo Cupom de Desconto</span>
           </button>
-        </form>
+        </div>
 
         <div class="admin-table-wrapper">
           <table class="admin-table">
@@ -202,167 +225,154 @@
       </div>
     </div>
 
-    <!-- TAB 4: IDENTIDADE VISUAL, BANNERS E WHATSAPP -->
+    <!-- TAB 4: IDENTIDADE VISUAL & BANNERS -->
     <div id="tabContentBranding" style="display: none;">
-      <div class="config-card">
-        <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display); color: var(--ph-black);">Identidade Visual, Banners & WhatsApp</h3>
-        
-        <form id="brandingForm" onsubmit="saveBrandingConfig(event)" style="display: flex; flex-direction: column; gap: 16px;">
-          
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <div>
-              <label class="admin-label">Nome do Estabelecimento / Marca:</label>
-              <input type="text" id="cfgStoreName" class="admin-input" placeholder="Ex: Pizza Todo Dia, Marmitas da Ana..." required>
-            </div>
-            <div>
-              <label class="admin-label">Subtítulo / Slogan:</label>
-              <input type="text" id="cfgStoreSub" class="admin-input" placeholder="Ex: Pizzas Artesanais & Forno a Lenha">
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <div>
-              <label class="admin-label">Endereço do Estabelecimento:</label>
-              <input type="text" id="cfgStoreAddress" class="admin-input" placeholder="Ex: Av. Paulista, 1000 - São Paulo/SP">
-            </div>
-            <div>
-              <label class="admin-label">Horário de Funcionamento:</label>
-              <input type="text" id="cfgStoreHours" class="admin-input" placeholder="Ex: Terça a Domingo das 18h às 23h30">
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <div>
-              <label class="admin-label">Número do WhatsApp para Receber Pedidos (com DDD):</label>
-              <input type="text" id="cfgWppNumber" class="admin-input" placeholder="Ex: 51999999999" required>
-            </div>
-            <div>
-              <label class="admin-label">Taxa Padrão de Entrega (R$):</label>
-              <input type="number" id="cfgFrete" class="admin-input" step="0.50" placeholder="5.00">
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <div>
-              <label class="admin-label">Cor Principal da Marca (Destaques e Botões):</label>
-              <div style="display: flex; gap: 10px; align-items: center;">
-                <input type="color" id="cfgPrimaryColorPicker" class="color-picker-input" value="#E91C24" onchange="document.getElementById('cfgPrimaryColor').value = this.value">
-                <input type="text" id="cfgPrimaryColor" class="admin-input" value="#E91C24" style="flex: 1;">
-              </div>
-            </div>
-            <div>
-              <label class="admin-label">Cor de Hover dos Botões:</label>
-              <div style="display: flex; gap: 10px; align-items: center;">
-                <input type="color" id="cfgDarkColorPicker" class="color-picker-input" value="#C50303" onchange="document.getElementById('cfgDarkColor').value = this.value">
-                <input type="text" id="cfgDarkColor" class="admin-input" value="#C50303" style="flex: 1;">
-              </div>
-            </div>
-          </div>
-
-          <!-- UPLOAD DIRETO DA LOGO DA MARCA -->
-          <div>
-            <label class="admin-label">Logo da Marca (.PNG ou .JPG) — <span style="color: #666; font-weight: normal;">Tamanho recomendado: 300x300 px</span>:</label>
-            <div class="file-drop-zone" id="logoDropZone" onclick="document.getElementById('cfgLogoFile').click()">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.89 8.82 10a2 2 0 0 1 2.83 0l6.47 6.47"/><circle cx="8.5" cy="8.5" r="1.5"/><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
-              <div>
-                <strong>Clique para selecionar a imagem da logo</strong> no computador
-                <div style="font-size: 0.74rem; color: #777; margin-top: 2px;">Ou arraste a imagem diretamente para esta área</div>
-              </div>
-            </div>
-            <input type="file" id="cfgLogoFile" style="display: none;" accept="image/*" onchange="previewLogoFileUpload(this)">
-            <div style="margin-top: 8px; display: flex; align-items: center; gap: 10px;">
-              <img id="logoFilePreview" style="max-height: 70px; border-radius: 4px; display: none; border: 2px solid var(--ph-black);" alt="Pré-visualização da Logo">
-              <button type="button" id="btnRemoveLogo" class="btn-admin btn-admin-danger" style="display: none;" onclick="removeLogo()">Remover Logo</button>
-            </div>
-          </div>
-
-          <!-- BANNER DESKTOP PLACEHOLDER / UPLOAD -->
-          <div style="border-top: 2px dashed #DDD; padding-top: 14px; margin-top: 6px;">
-            <label class="admin-label">Banner Promocional Desktop (.PNG ou .JPG) — <span style="color: var(--ph-red); font-weight: 800;">Tamanho Recomendado: 1200 x 400 px</span>:</label>
-            <div class="file-drop-zone" id="bannerDeskDropZone" onclick="document.getElementById('cfgBannerDeskFile').click()">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-              <div>
-                <strong>Clique para selecionar o Banner Desktop (1200x400 px)</strong>
-                <div style="font-size: 0.74rem; color: #777; margin-top: 2px;">Arraste o arquivo de imagem diretamente para esta área</div>
-              </div>
-            </div>
-            <input type="file" id="cfgBannerDeskFile" style="display: none;" accept="image/*" onchange="previewBannerDeskUpload(this)">
-            <div style="margin-top: 8px; display: flex; align-items: center; gap: 10px;">
-              <img id="bannerDeskPreview" style="max-height: 100px; border-radius: 4px; display: none; border: 2px solid var(--ph-black);" alt="Pré-visualização Banner Desktop">
-              <button type="button" id="btnRemoveBannerDesk" class="btn-admin btn-admin-danger" style="display: none;" onclick="removeBannerDesk()">Remover Banner Desktop</button>
-            </div>
-          </div>
-
-          <!-- BANNER MOBILE PLACEHOLDER / UPLOAD -->
-          <div>
-            <label class="admin-label">Banner Promocional Mobile / Celular (.PNG ou .JPG) — <span style="color: var(--ph-red); font-weight: 800;">Tamanho Recomendado: 600 x 600 px (ou 800x400 px)</span>:</label>
-            <div class="file-drop-zone" id="bannerMobDropZone" onclick="document.getElementById('cfgBannerMobFile').click()">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-              <div>
-                <strong>Clique para selecionar o Banner Mobile (600x600 px)</strong>
-                <div style="font-size: 0.74rem; color: #777; margin-top: 2px;">Ideal para exibição em telas de celular em alta qualidade</div>
-              </div>
-            </div>
-            <input type="file" id="cfgBannerMobFile" style="display: none;" accept="image/*" onchange="previewBannerMobUpload(this)">
-            <div style="margin-top: 8px; display: flex; align-items: center; gap: 10px;">
-              <img id="bannerMobPreview" style="max-height: 100px; border-radius: 4px; display: none; border: 2px solid var(--ph-black);" alt="Pré-visualização Banner Mobile">
-              <button type="button" id="btnRemoveBannerMob" class="btn-admin btn-admin-danger" style="display: none;" onclick="removeBannerMob()">Remover Banner Mobile</button>
-            </div>
-          </div>
-
-          <div>
-            <label class="admin-label">Cidades / Região de Atendimento (Separado por vírgula):</label>
-            <input type="text" id="cfgCoverageCities" class="admin-input" placeholder="Ex: Porto Alegre, Viamão">
-          </div>
-
-          <div style="display: flex; gap: 10px; margin-top: 10px;">
-            <button type="submit" class="btn-admin btn-admin-primary" style="padding: 12px; flex: 1;">
-              <span>Salvar Identidade & Banners</span>
-            </button>
-            <button type="button" class="btn-admin" style="padding: 12px;" onclick="resetBrandingToDefault()">
-              <span>Restaurar Padrão Pizza Todo Dia</span>
-            </button>
-          </div>
-        </form>
-
-      </div>
-    </div>
-
-    <!-- TAB 5: CONFIGURAÇÕES AVANÇADAS (ÁREA TÉCNICA RESTRITA) -->
-    <div id="tabContentSheets" style="display: none;">
-      <div class="config-card">
-        <div style="background: #FFF8E1; border-left: 4px solid #FFA000; padding: 12px 16px; margin-bottom: 20px; border-radius: 4px; font-size: 0.85rem; color: #5D4037;">
-          <strong>Área Técnica — Banco de Dados e Servidor Remoto:</strong> Não é necessário alterar estes campos durante a operação normal do estabelecimento.
+      <div style="display: flex; flex-direction: column; gap: 24px;">
+        <div style="margin-bottom: 4px;">
+          <h2 style="font-size: 1.3rem; font-weight: 800; color: #0F172A; margin: 0;">Identidade Visual & Banners</h2>
+          <p style="font-size: 0.85rem; color: #64748B; margin-top: 4px;">Personalize as informações, contatos e imagens promocionais do seu cardápio.</p>
         </div>
 
-        <h3 style="font-size: 1.1rem; margin-bottom: 16px; font-weight: 900; text-transform: uppercase; font-style: italic; font-family: var(--font-display); color: var(--ph-black);">Configurações de Conexão do Servidor</h3>
-        
-        <form onsubmit="saveSheetsConfig(event)" style="display: flex; flex-direction: column; gap: 14px;">
-          <div>
-            <label class="admin-label">URL do Google Apps Script (Web App):</label>
-            <input type="url" id="cfgAppsScriptUrl" class="admin-input" placeholder="Ex: https://script.google.com/macros/s/AKfycb.../exec">
-            <div style="font-size: 0.74rem; color: #777; margin-top: 4px;">Servidor proxy para leitura e salvamento remoto de dados.</div>
+        <form onsubmit="saveBrandingConfig(event)" style="display: flex; flex-direction: column; gap: 24px;">
+          
+          <!-- BLOCO 1: DADOS DO ESTABELECIMENTO -->
+          <div class="config-card">
+            <h3 style="font-size: 1rem; font-weight: 800; color: #0F172A; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">1. Informações Básicas, Logotipo & Contato</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                  <label class="admin-label">Nome da Loja / Estabelecimento:</label>
+                  <input type="text" id="cfgStoreName" class="admin-input" placeholder="Ex: Marmitaria Gourmet" required>
+                </div>
+                <div>
+                  <label class="admin-label">Subtítulo / Slogan:</label>
+                  <input type="text" id="cfgStoreSub" class="admin-input" placeholder="Ex: Comida Caseira & Saudável">
+                </div>
+              </div>
+
+              <!-- LOGOTIPO DA LOJA -->
+              <div>
+                <label class="admin-label">Logotipo do Estabelecimento (.PNG ou .JPG):</label>
+                <div class="file-drop-zone" id="logoDropZone" onclick="document.getElementById('cfgLogoFile').click()">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  <div>
+                    <strong>Clique para escolher a Logomarca da sua Loja</strong>
+                    <div style="font-size: 0.74rem; color: #64748B; margin-top: 2px;">Formatos aceitos: PNG, JPG ou SVG</div>
+                  </div>
+                </div>
+                <input type="file" id="cfgLogoFile" style="display: none;" accept="image/*" onchange="previewLogoFileUpload(this)">
+                <div style="margin-top: 10px; display: flex; align-items: center; gap: 12px;">
+                  <img id="logoFilePreview" style="max-height: 70px; border-radius: 8px; display: none; border: 1px solid #E2E8F0; object-fit: contain; padding: 4px; background: #FFF;" alt="Pré-visualização Logo">
+                  <button type="button" id="btnRemoveLogo" class="btn-admin" style="display: none; background: #FEE2E2; color: #DC2626; border-color: #FCA5A5;" onclick="removeLogo()">Remover Logo</button>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                  <label class="admin-label">WhatsApp para Receber Pedidos (com DDD):</label>
+                  <input type="text" id="cfgWppNumber" class="admin-input" placeholder="Ex: 11999999999 (Apenas números)">
+                </div>
+                <div>
+                  <label class="admin-label">Endereço Completo:</label>
+                  <input type="text" id="cfgStoreAddress" class="admin-input" placeholder="Ex: Av. Principal, 100 - Centro">
+                </div>
+              </div>
+
+              <div>
+                <label class="admin-label">Horários de Funcionamento:</label>
+                <input type="text" id="cfgStoreHours" class="admin-input" placeholder="Ex: Segunda a Sábado das 11h às 22h">
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label class="admin-label">URL da Planilha Publicada em CSV (Backup PapaParse):</label>
-            <input type="url" id="cfgSheetCsvUrl" class="admin-input" placeholder="Ex: https://docs.google.com/spreadsheets/d/.../pub?output=csv">
-            <div style="font-size: 0.74rem; color: #777; margin-top: 4px;">Utilizado como leitura estática de alta velocidade.</div>
+          <!-- BLOCO 2: BANNERS PROMOCIONAIS -->
+          <div class="config-card">
+            <h3 style="font-size: 1rem; font-weight: 800; color: #0F172A; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">2. Banners Promocionais da Loja</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              <!-- BANNER DESKTOP -->
+              <div>
+                <label class="admin-label">Banner Desktop (Recomendado: 1200x400 px):</label>
+                <div class="file-drop-zone" id="bannerDeskDropZone" onclick="document.getElementById('cfgBannerDeskFile').click()">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                  <div>
+                    <strong>Clique para escolher a imagem do Banner Desktop</strong>
+                    <div style="font-size: 0.74rem; color: #64748B; margin-top: 2px;">Formatos aceitos: JPG, PNG ou WEBP</div>
+                  </div>
+                </div>
+                <input type="file" id="cfgBannerDeskFile" style="display: none;" accept="image/*" onchange="previewBannerDeskUpload(this)">
+                <div style="margin-top: 10px; display: flex; align-items: center; gap: 12px;">
+                  <img id="bannerDeskPreview" style="max-height: 90px; border-radius: 8px; display: none; border: 1px solid #E2E8F0; object-fit: cover;" alt="Pré-visualização Banner Desktop">
+                  <button type="button" id="btnRemoveBannerDesk" class="btn-admin" style="display: none; background: #FEE2E2; color: #DC2626; border-color: #FCA5A5;" onclick="removeBannerDesk()">Remover Banner</button>
+                </div>
+              </div>
+
+              <!-- BANNER MOBILE -->
+              <div>
+                <label class="admin-label">Banner Mobile / Celular (Recomendado: 600x600 px):</label>
+                <div class="file-drop-zone" id="bannerMobDropZone" onclick="document.getElementById('cfgBannerMobFile').click()">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                  <div>
+                    <strong>Clique para escolher a imagem do Banner Mobile</strong>
+                    <div style="font-size: 0.74rem; color: #64748B; margin-top: 2px;">Otimizado para telas de celular</div>
+                  </div>
+                </div>
+                <input type="file" id="cfgBannerMobFile" style="display: none;" accept="image/*" onchange="previewBannerMobUpload(this)">
+                <div style="margin-top: 10px; display: flex; align-items: center; gap: 12px;">
+                  <img id="bannerMobPreview" style="max-height: 90px; border-radius: 8px; display: none; border: 1px solid #E2E8F0; object-fit: cover;" alt="Pré-visualização Banner Mobile">
+                  <button type="button" id="btnRemoveBannerMob" class="btn-admin" style="display: none; background: #FEE2E2; color: #DC2626; border-color: #FCA5A5;" onclick="removeBannerMob()">Remover Banner</button>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div style="display: flex; gap: 10px; margin-top: 8px;">
-            <button type="submit" class="btn-admin btn-admin-primary" style="padding: 10px 18px;">
-              <span>Salvar Configurações Avançadas</span>
-            </button>
-            <button type="button" class="btn-admin" style="padding: 10px 18px;" onclick="syncWithSheetsNow()">
-              <span>Sincronizar Agora</span>
-            </button>
-            <button type="button" class="btn-admin" style="padding: 10px 18px;" onclick="pushCurrentToSheetsNow()">
-              <span>Enviar Dados para a Planilha</span>
+          <!-- BLOCO 3: CORES DA MARCA (NUVEMSHOP STYLE) -->
+          <div class="config-card">
+            <h3 style="font-size: 1rem; font-weight: 800; color: #0F172A; margin-bottom: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 8px;">3. Cores da Marca no Cardápio (Estilo Nuvemshop)</h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+              <div>
+                <label class="admin-label">Cor do Botão Principal:</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="color" id="cfgPrimaryColorPicker" style="width: 44px; height: 38px; border: 1px solid #E2E8F0; border-radius: 6px; cursor: pointer; padding: 2px; background: #FFF;" onchange="document.getElementById('cfgPrimaryColor').value = this.value">
+                  <input type="text" id="cfgPrimaryColor" class="admin-input" placeholder="#18181B" value="#18181B" onchange="document.getElementById('cfgPrimaryColorPicker').value = this.value">
+                </div>
+              </div>
+
+              <div>
+                <label class="admin-label">Texto do Botão Principal:</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="color" id="cfgBtnTextColorPicker" style="width: 44px; height: 38px; border: 1px solid #E2E8F0; border-radius: 6px; cursor: pointer; padding: 2px; background: #FFF;" value="#FFFFFF" onchange="document.getElementById('cfgBtnTextColor').value = this.value">
+                  <input type="text" id="cfgBtnTextColor" class="admin-input" placeholder="#FFFFFF" value="#FFFFFF" onchange="document.getElementById('cfgBtnTextColorPicker').value = this.value">
+                </div>
+              </div>
+
+              <div>
+                <label class="admin-label">Cor de Destaque / Links (Accent):</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="color" id="cfgAccentColorPicker" style="width: 44px; height: 38px; border: 1px solid #E2E8F0; border-radius: 6px; cursor: pointer; padding: 2px; background: #FFF;" value="#6344F5" onchange="document.getElementById('cfgAccentColor').value = this.value">
+                  <input type="text" id="cfgAccentColor" class="admin-input" placeholder="#6344F5" value="#6344F5" onchange="document.getElementById('cfgAccentColorPicker').value = this.value">
+                </div>
+              </div>
+
+              <div>
+                <label class="admin-label">Cor dos Selos / Badges:</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="color" id="cfgBadgeBgColorPicker" style="width: 44px; height: 38px; border: 1px solid #E2E8F0; border-radius: 6px; cursor: pointer; padding: 2px; background: #FFF;" value="#F1EEFE" onchange="document.getElementById('cfgBadgeBgColor').value = this.value">
+                  <input type="text" id="cfgBadgeBgColor" class="admin-input" placeholder="#F1EEFE" value="#F1EEFE" onchange="document.getElementById('cfgBadgeBgColorPicker').value = this.value">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px;">
+            <button type="submit" class="btn-admin btn-admin-primary" style="padding: 14px; flex: 1; font-size: 0.95rem;">
+              <span>Salvar Alterações</span>
             </button>
           </div>
+
         </form>
-
       </div>
     </div>
 
@@ -386,8 +396,8 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
           <div>
-            <label class="admin-label">Categoria:</label>
-            <select id="prodCategory" class="admin-input" required>
+            <label class="admin-label">Categoria (Opcional):</label>
+            <select id="prodCategory" class="admin-input">
               <!-- Renderizado via admin.js -->
             </select>
           </div>
@@ -412,20 +422,36 @@
               </div>
             </div>
             <input type="file" id="prodFile" style="display: none;" accept="image/*" onchange="previewProductFileUpload(this)">
-            <div style="margin-top: 6px;">
-              <img id="prodFilePreview" style="max-height: 70px; border-radius: 4px; display: none; border: 2px solid var(--ph-black);" alt="Pré-visualização Foto Produto">
+            <div style="margin-top: 8px; position: relative; display: inline-block;">
+              <img id="prodFilePreview" style="max-height: 80px; border-radius: 8px; display: none; border: 1px solid #E4E4E7; object-fit: cover;" alt="Pré-visualização Foto Produto">
+              <button type="button" id="btnRemoveProdImg" onclick="removeProductPhoto()" title="Remover Imagem" style="display: none; position: absolute; top: -6px; right: -6px; background: #EF4444; color: #FFFFFF; border: none; width: 24px; height: 24px; border-radius: 50%; font-size: 0.75rem; font-weight: bold; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); align-items: center; justify-content: center;">
+                ✕
+              </button>
             </div>
           </div>
         </div>
 
         <div>
           <label class="admin-label">Descrição dos Ingredientes / Detalhes:</label>
-          <textarea id="prodDesc" class="admin-input" rows="3" placeholder="Descreva os ingredientes ou detalhes do produto..."></textarea>
+          <textarea id="prodDesc" class="admin-input" rows="2" placeholder="Descreva os ingredientes ou detalhes do produto..."></textarea>
+        </div>
+
+        <!-- SEÇÃO DE ADICIONAIS DO PRODUTO (NOME + PREÇO) -->
+        <div style="border: 1px solid #E4E4E7; border-radius: 8px; padding: 14px; background: #FAFAFC;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <label class="admin-label" style="margin: 0; font-weight: 700; color: #18181B;">Adicionais e opcionais do produto:</label>
+            <button type="button" onclick="addAdicionalInputRow()" style="background: #F1EEFE; color: #6344F5; border: 1px solid #DDD6FE; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+              Adicionar opcional
+            </button>
+          </div>
+          <div id="adicionaisContainer" style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- Linhas de adicionais geradas dinamicamente -->
+          </div>
         </div>
 
         <div style="display: flex; gap: 12px; margin-top: 10px;">
           <button type="submit" class="btn-admin btn-admin-primary" style="flex: 1; padding: 14px;">
-            <span>Salvar Produto</span>
+            <span>Salvar produto</span>
           </button>
           <button type="button" class="btn-admin" onclick="closeProductFormModal()" style="padding: 14px;">
             <span>Cancelar</span>
@@ -438,13 +464,117 @@
   </div><!-- /adminContent -->
 
   <script src="defaults.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ajv@8/dist/ajv.min.js"></script>
-  <script src="auth.js"></script>
   <script src="db-service.js"></script>
   <script src="admin.js"></script>
+  <script src="auth.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => AUTH.guardAdmin());
   </script>
+  <!-- MODAL FORMULÁRIO CATEGORIA COM SELEÇÃO DE PRODUTOS -->
+  <div class="modal-overlay" id="categoryFormModal">
+    <div class="modal-card" style="max-width: 520px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: #0F172A;" id="catModalTitle">Nova categoria</h3>
+        <button onclick="closeCategoryModal()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #71717A;">✕</button>
+      </div>
+
+      <form onsubmit="saveCategoryWithProducts(event)" style="display: flex; flex-direction: column; gap: 16px;">
+        <input type="hidden" id="catModalEditName" value="">
+        <div>
+          <label class="admin-label">Nome da Categoria:</label>
+          <input type="text" id="catModalNameInput" class="admin-input" placeholder="Ex: Marmitas Fit, Sobremesas, Promos..." required>
+        </div>
+
+        <div>
+          <label class="admin-label">Selecione os Produtos que pertencem a esta Categoria:</label>
+          <div id="catModalProductsChecklist" style="max-height: 220px; overflow-y: auto; border: 1px solid #E4E4E7; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: #FAFAFC;">
+            <!-- Renderizado dinamicamente via JS -->
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 8px;">
+          <button type="submit" class="btn-admin btn-admin-primary" style="flex: 1; padding: 12px;">
+            <span>Salvar Categoria</span>
+          </button>
+          <button type="button" class="btn-admin" onclick="closeCategoryModal()" style="padding: 12px;">
+            <span>Cancelar</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL FORMULÁRIO FORMAS DE ENTREGA -->
+  <div class="modal-overlay" id="deliveryZoneModalForm">
+    <div class="modal-card" style="max-width: 480px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: #0F172A;">NOVA FORMA DE ENTREGA</h3>
+        <button onclick="closeDeliveryZoneModal()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #64748B;">✕</button>
+      </div>
+
+      <form onsubmit="addNewDeliveryZone(event)" style="display: flex; flex-direction: column; gap: 16px;">
+        <div>
+          <label class="admin-label">Forma / Bairro ou Região:</label>
+          <input type="text" id="newZoneNameInput" class="admin-input" placeholder="Ex: Centro, Retirada no Balcão, Zona Sul..." required>
+        </div>
+
+        <div>
+          <label class="admin-label">Taxa de Entrega (R$):</label>
+          <input type="number" id="newZonePriceInput" class="admin-input" step="0.50" placeholder="Ex: 8.00 (ou 0 para grátis)" required>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 8px;">
+          <button type="submit" class="btn-admin btn-admin-primary" style="flex: 1; padding: 12px;">
+            <span>Salvar forma de entrega</span>
+          </button>
+          <button type="button" class="btn-admin" onclick="closeDeliveryZoneModal()" style="padding: 12px;">
+            <span>Cancelar</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL FORMULÁRIO CUPOM DE DESCONTO -->
+  <div class="modal-overlay" id="couponModalForm">
+    <div class="modal-card" style="max-width: 480px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: #0F172A;">Novo cupom de desconto</h3>
+        <button onclick="closeCouponModal()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #64748B;">✕</button>
+      </div>
+
+      <form onsubmit="addNewCoupon(event)" style="display: flex; flex-direction: column; gap: 16px;">
+        <div>
+          <label class="admin-label">Código do cupom:</label>
+          <input type="text" id="newCouponCodeInput" class="admin-input" placeholder="Ex: PRIMEIRACOMPRA, OFF10" required style="text-transform: uppercase;">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label class="admin-label">Tipo de desconto:</label>
+            <select id="newCouponTypeInput" class="admin-input">
+              <option value="percent">Porcentagem (%)</option>
+              <option value="fixed">Valor fixo (R$)</option>
+            </select>
+          </div>
+          <div>
+            <label class="admin-label">Valor do desconto:</label>
+            <input type="number" id="newCouponValueInput" class="admin-input" step="0.01" placeholder="Ex: 10" required>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 8px;">
+          <button type="submit" class="btn-admin btn-admin-primary" style="flex: 1; padding: 12px;">
+            <span>Criar cupom</span>
+          </button>
+          <button type="button" class="btn-admin" onclick="closeCouponModal()" style="padding: 12px;">
+            <span>Cancelar</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </body>
 
 </html>

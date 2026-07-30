@@ -1,33 +1,36 @@
 /* 
    ==========================================================================
-   PIZZA TODO DIA — ADMIN COMMAND CENTER (PREMIUM PDV STYLE)
-   Visual de alta densidade, focado em operação de franquia.
+   EVOLUX360 & NUVEMSHOP STYLE — ADMIN DASHBOARD DESIGN SYSTEM
+   Visual Clean, Moderno, Minimalista em tons de cinza suave + Roxo Evolux360
    ========================================================================== 
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;0,900;1,900&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-    --ph-red: #E91C24;
-    --ph-red-dark: #C50303;
-    --ph-black: #1E1E1E;
-    --ph-black-pure: #000000;
+    --ph-purple: #6344F5;
+    --ph-purple-dark: #5233E3;
+    --ph-purple-light: #F1EEFE;
+    --ph-red: #6344F5;
+    --ph-red-dark: #5233E3;
+    --ph-black: #0F172A;
+    --ph-black-pure: #020617;
     --ph-white: #FFFFFF;
-    --ph-gray-bg: #F0F0F2;
+    --ph-gray-bg: #F8FAFC;
     --ph-gray-surface: #FFFFFF;
-    --ph-border: #D8D8DF;
+    --ph-border: #E2E8F0;
     
-    --font-display: 'Montserrat', sans-serif;
+    --font-display: 'Inter', sans-serif;
     --font-body: 'Inter', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace; /* Para IDs e Preços de Alta Precisão */
+    --font-mono: 'Inter', sans-serif;
 }
 
 body {
-    background-color: var(--ph-gray-bg);
+    background-color: #F8FAFC;
     font-family: var(--font-body);
     margin: 0;
     padding: 0;
-    color: var(--ph-black);
+    color: #0F172A;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -36,97 +39,68 @@ body {
 }
 
 /* ==========================================================================
-   HEADER (ESTILO TORRE DE CONTROLE)
+   SIDEBAR NAV TABS (ALINHADOS À ESQUERDA)
    ========================================================================== */
-.admin-header {
-    background: var(--ph-black-pure);
-    color: var(--ph-white);
-    padding: 12px 24px;
-    border-bottom: 4px solid var(--ph-red);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.admin-header-inner {
-    max-width: 1400px;
-    width: 100%;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.admin-title {
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-style: italic;
-    text-transform: uppercase;
-    letter-spacing: -1px;
-    font-size: 1.4rem;
-    margin: 0;
-}
-
-.admin-title span { color: var(--ph-red); }
-
-.admin-logo-badge {
-    width: 40px;
-    height: 40px;
-    background: var(--ph-red);
-    color: var(--ph-white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    border-radius: 4px;
-}
-
-.admin-container {
-    max-width: 1400px;
-    margin: 20px auto;
-    padding: 0 20px;
-}
-
-/* ==========================================================================
-   SIDEBAR / NAV (SISTEMA DE ABAS ROBUSTO)
-   ========================================================================== */
-.admin-nav-tabs {
-    display: flex;
-    gap: 4px;
-    background: #DDD;
-    padding: 6px 8px 0 8px;
-    border-bottom: 2px solid var(--ph-border);
-    margin-bottom: 20px;
-}
-
-.nav-tab {
-    padding: 12px 24px;
-    background: #E5E5E5;
+.admin-sidebar .nav-tab {
+    background: transparent;
+    color: #64748B;
     border: none;
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-style: italic;
-    text-transform: uppercase;
-    font-size: 0.78rem;
+    padding: 12px 16px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    border-radius: 8px;
     cursor: pointer;
-    color: #666;
-    border-radius: 4px 4px 0 0;
     transition: all 0.2s ease;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 }
 
-.nav-tab.active {
-    background: var(--ph-white);
-    color: var(--ph-red);
-    box-shadow: 0 -4px 0 var(--ph-red);
+.admin-sidebar .nav-tab:hover {
+    background: #F1F5F9;
+    color: #0F172A;
 }
 
-/* ==========================================================================
-   CARDS DE STATUS (DASHBOARD)
-   ========================================================================== */
+.admin-sidebar .nav-tab.active {
+    background: #F1EEFE;
+    color: #6344F5;
+    font-weight: 700;
+    border-left: 3px solid #6344F5;
+    border-radius: 4px 8px 8px 4px;
+}
+
+.btn-admin {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: 1px solid #E2E8F0;
+    background: #FFFFFF;
+    color: #0F172A;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-admin:hover {
+    background: #F8FAFC;
+}
+
+.btn-admin-primary {
+    background: #6344F5;
+    color: #FFFFFF;
+    border-color: #6344F5;
+    box-shadow: 0 2px 6px rgba(99, 68, 245, 0.25);
+}
+
+.btn-admin-primary:hover {
+    background: #5233E3;
+    border-color: #5233E3;
+}
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -177,15 +151,16 @@ table {
 }
 
 th {
-    background: var(--ph-black);
-    color: var(--ph-white);
+    background: #F8FAFC;
+    color: #0F172A;
     text-align: left;
     padding: 12px 14px;
     font-family: var(--font-display);
-    text-transform: uppercase;
-    font-size: 0.7rem;
-    letter-spacing: 1px;
-    font-style: italic;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-style: normal;
+    letter-spacing: 0;
+    border-bottom: 2px solid #E2E8F0;
 }
 
 td {
@@ -207,139 +182,183 @@ tr:hover { background-color: #F9F9FB; }
     object-fit: cover;
 }
 
-/* ==========================================================================
-   BOTÕES DE AÇÃO (PDV STYLE)
-   ========================================================================== */
-.btn-admin {
-    padding: 8px 16px;
-    font-family: var(--font-display);
-    font-weight: 900;
-    font-style: italic;
-    text-transform: uppercase;
-    font-size: 0.72rem;
-    border: 2px solid var(--ph-black);
-    background: var(--ph-white);
-    color: var(--ph-black);
-    cursor: pointer;
-    transition: all 0.15s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    text-decoration: none;
-}
 
 .btn-admin:hover {
-    background: #E5E5E5;
-    transform: translate(-2px, -2px);
-    box-shadow: 2px 2px 0 var(--ph-black);
+    background: #F1F5F9;
+    transform: none;
+    box-shadow: none;
 }
 
 .btn-admin-primary {
-    background: var(--ph-red);
-    color: var(--ph-white);
-    border-color: var(--ph-red);
+    background: #6344F5 !important;
+    color: #FFFFFF !important;
+    border-color: #6344F5 !important;
 }
 
 .btn-admin-primary:hover {
-    background: var(--ph-red-dark);
-    border-color: var(--ph-red-dark);
-    transform: translate(-2px, -2px);
-    box-shadow: 2px 2px 0 var(--ph-black);
+    background: #5233E3 !important;
+    border-color: #5233E3 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 68, 245, 0.25);
 }
 
 .btn-admin:active {
-    transform: translate(0, 0);
+    transform: translateY(0);
     box-shadow: none;
 }
 
 .btn-admin-danger {
-    background: #D9534F;
-    color: #FFFFFF;
-    border-color: #D9534F;
+    background: #FEE2E2 !important;
+    color: #DC2626 !important;
+    border: 1px solid #FCA5A5 !important;
 }
 
 .btn-admin-danger:hover {
-    background: #C9302C;
-    border-color: #C9302C;
-    box-shadow: 2px 2px 0 var(--ph-black);
+    background: #FEF2F2 !important;
+    border-color: #EF4444 !important;
 }
 
 /* ==========================================================================
-   FORMULÁRIOS & CONFIG CARDS (LIMPOS E RÍGIDOS)
+   FORMULÁRIOS & CONFIG CARDS (EVOLUX360 CLEAN DESIGN SYSTEM)
    ========================================================================== */
 .config-card {
-    background: var(--ph-white);
+    background: #FFFFFF;
     padding: 24px;
-    border: 2px solid var(--ph-black);
-    box-shadow: 6px 6px 0 rgba(0,0,0,0.1);
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
 
-.admin-form-group { margin-bottom: 15px; }
+.admin-form-group { margin-bottom: 16px; }
 
 .admin-label { 
     display: block; 
-    font-weight: 800; 
-    font-size: 0.75rem; 
+    font-weight: 700; 
+    font-size: 0.78rem; 
     text-transform: uppercase; 
-    margin-bottom: 5px;
-    color: var(--ph-black);
+    letter-spacing: 0.3px;
+    margin-bottom: 6px;
+    color: #475569;
 }
 
 .admin-input {
     width: 100%;
-    padding: 10px 12px;
-    border: 2px solid var(--ph-border);
+    padding: 10px 14px;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
     font-family: var(--font-body);
     font-size: 0.88rem;
-    font-weight: 600;
+    font-weight: 500;
     outline: none;
     background: #FAFAFC;
-    transition: border-color 0.15s ease;
+    color: #0F172A;
+    transition: all 0.15s ease;
 }
 
-.admin-input:focus { border-color: var(--ph-black); background: #FFF; }
+select.admin-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 36px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    cursor: pointer;
+}
+
+.admin-input:focus { 
+    border-color: #6344F5; 
+    background: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(99, 68, 245, 0.1);
+}
+    box-shadow: 0 0 0 3px rgba(99, 68, 245, 0.15); 
+}
 
 .file-drop-zone {
     background: #FAFAFC;
-    border: 2px dashed var(--ph-border);
-    padding: 14px 20px;
+    border: 2px dashed #CBD5E1;
+    border-radius: 10px;
+    padding: 16px 20px;
     text-align: center;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    font-size: 0.8rem;
-    color: var(--ph-black);
+    font-size: 0.82rem;
+    color: #475569;
     transition: all 0.15s ease;
 }
 
 .file-drop-zone:hover, .file-drop-zone.dragover {
-    border-color: var(--ph-black);
-    background: #FFF;
+    border-color: #6344F5;
+    background: #F1EEFE;
+    color: #6344F5;
 }
 
 .color-picker-input {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border: 2px solid var(--ph-black);
+    width: 44px;
+    height: 44px;
+    padding: 2px;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
     cursor: pointer;
-    background: none;
+    background: #FFFFFF;
 }
 
-/* MODAL DE PRODUTO */
+/* ==========================================================================
+   TABELAS RESPONSIVAS CLEAN
+   ========================================================================== */
+.admin-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    background: #FFFFFF;
+    margin-top: 12px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+    text-align: left;
+}
+
+.admin-table th {
+    background: #F8FAFC;
+    color: #64748B;
+    padding: 12px 16px;
+    font-weight: 700;
+    border-bottom: 1px solid #E2E8F0;
+    white-space: nowrap;
+}
+
+.admin-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #F1F5F9;
+    color: #0F172A;
+    vertical-align: middle;
+}
+
+.admin-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* ==========================================================================
+   MODAIS CLEAN (SEM CONTORNOS PESADOS OU AZULADOS)
+   ========================================================================== */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(3px);
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
     z-index: 4000;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 14px;
+    padding: 16px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
@@ -351,18 +370,18 @@ tr:hover { background-color: #F9F9FB; }
 }
 
 .modal-card {
-    background: var(--ph-white);
-    border: 2px solid var(--ph-black);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
     width: 100%;
-    max-width: 780px;
-    max-height: 88vh;
+    max-width: 720px;
+    max-height: 90vh;
     overflow-y: auto;
     position: relative;
-    color: var(--ph-black);
-    padding: 32px;
+    color: #0F172A;
+    padding: 28px;
     box-sizing: border-box;
-    border-radius: 12px;
+    border-radius: 16px;
 }
 
 .modal-close-btn {

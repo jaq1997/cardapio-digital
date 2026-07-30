@@ -22,20 +22,10 @@
 
 <body data-page="index">
 
-  <!-- HERO SECTION COMERCIAL DE ALTO IMPACTO -->
+  <!-- HERO SECTION COMERCIAL -->
   <section class="ph-hero-section">
     <div class="ph-hero-card">
-      <div class="ph-hero-text-side">
-        <div class="ph-hero-badge">BEM-VINDO</div>
-        <h1 class="ph-hero-title">NOSSO <span>CARDÁPIO</span></h1>
-        <p class="ph-hero-subtitle">Escolha seus produtos favoritos e faça seu pedido direto pelo WhatsApp com praticidade e rapidez!</p>
-        <button class="ph-btn-red-lg" onclick="scrollToCatalogSection()">
-          <span>VER PRODUTOS</span>
-        </button>
-      </div>
-      <div class="ph-hero-img-side">
-        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80" alt="Cardápio Digital">
-      </div>
+      <!-- Injetado dinamicamente via loja.js (Banner da loja ou Placeholder estilo NuvemShop) -->
     </div>
   </section>
 
@@ -74,200 +64,45 @@
     </div>
   </div>
 
-  <!-- MODAL 1: CUSTOMIZADOR DE PRODUTO / PIZZA -->
+  <!-- MODAL 1: CUSTOMIZADOR DE PRODUTO UNIVERSAL -->
   <div class="modal-overlay" id="pizzaModal">
-    <div class="modal-card" style="max-width: 860px; padding: 28px;">
+    <div class="modal-card" style="max-width: 540px; padding: 24px;">
       <button class="modal-close-btn" onclick="closePizzaModal()">✕</button>
       
-      <div class="modal-customizer-grid">
-        <!-- COLUNA ESQUERDA: FOTO, TÍTULO, DESCRIÇÃO E TAMANHO (RADIO CARDS) -->
-        <div style="display: flex; flex-direction: column; gap: 16px;">
-          <div style="height: 200px; border-radius: 8px; overflow: hidden; position: relative;">
-            <img id="modalHeroBg" src="https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=800&q=80" alt="Produto" style="width: 100%; height: 100%; object-fit: cover;">
-          </div>
-          
-          <div>
-            <h3 style="font-size: 1.4rem; font-weight: 900; color: var(--ph-black); text-transform: uppercase; font-style: italic; font-family: var(--font-display);" id="modalPizzaTitle">Pepperoni Especial</h3>
-            <p style="font-size: 0.84rem; color: #666666; margin-top: 4px;" id="modalPizzaDesc">Massa crocante com molho de tomate artesanal da casa e mussarela derretida.</p>
-          </div>
-
-          <!-- 1. SELEÇÃO DE TAMANHO COM RADIO BUTTONS VISÍVEIS -->
-          <div>
-            <div class="option-group-title">1. Escolha o Tamanho</div>
-            <div class="grid-sizes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-              <label class="size-option-card" data-size="broto" onclick="selectPizzaSize('broto', this)" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="radio" name="sizeRadio" value="broto" style="accent-color: var(--ph-red);">
-                <div>
-                  <div class="size-name" style="font-family: var(--font-display); font-weight: 900;">Broto</div>
-                  <div class="size-slices" style="font-size: 0.68rem; color: #777;">4 Fatias (15cm)</div>
-                  <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem;" id="priceBrotoVal">R$ 36,90</div>
-                </div>
-              </label>
-              
-              <label class="size-option-card" data-size="media" onclick="selectPizzaSize('media', this)" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="radio" name="sizeRadio" value="media" style="accent-color: var(--ph-red);">
-                <div>
-                  <div class="size-name" style="font-family: var(--font-display); font-weight: 900;">Média</div>
-                  <div class="size-slices" style="font-size: 0.68rem; color: #777;">6 Fatias (25cm)</div>
-                  <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem;" id="priceMediaVal">R$ 49,90</div>
-                </div>
-              </label>
-
-              <label class="size-option-card selected" data-size="grande" onclick="selectPizzaSize('grande', this)" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="radio" name="sizeRadio" value="grande" checked style="accent-color: var(--ph-red);">
-                <div>
-                  <div class="size-name" style="font-family: var(--font-display); font-weight: 900;">Grande</div>
-                  <div class="size-slices" style="font-size: 0.68rem; color: #777;">8 Fatias (35cm)</div>
-                  <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem;" id="priceGrandeVal">R$ 64,90</div>
-                </div>
-              </label>
-
-              <label class="size-option-card" data-size="gigante" onclick="selectPizzaSize('gigante', this)" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="radio" name="sizeRadio" value="gigante" style="accent-color: var(--ph-red);">
-                <div>
-                  <div class="size-name" style="font-family: var(--font-display); font-weight: 900;">Gigante</div>
-                  <div class="size-slices" style="font-size: 0.68rem; color: #777;">12 Fatias (40cm)</div>
-                  <div class="size-price" style="font-weight: 900; color: var(--ph-red); font-size: 0.8rem;" id="priceGiganteVal">R$ 79,90</div>
-                </div>
-              </label>
-            </div>
-          </div>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="height: 180px; border-radius: 12px; overflow: hidden; background: #FAFAFC; display: flex; align-items: center; justify-content: center; border: 1px solid #E2E8F0; padding: 8px;">
+          <img id="modalHeroBg" src="" alt="Produto" style="max-height: 100%; max-width: 100%; object-fit: contain; border-radius: 8px;">
+        </div>
+        
+        <div>
+          <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--ph-black); font-family: var(--font-display);" id="modalPizzaTitle">Produto</h3>
+          <p style="font-size: 0.86rem; color: #666666; margin-top: 6px; line-height: 1.4;" id="modalPizzaDesc">Descrição do produto...</p>
+          <div style="font-size: 1.4rem; font-weight: 900; color: var(--ph-black); margin-top: 10px;" id="modalDynamicTotalPrice">R$ 0,00</div>
         </div>
 
-        <!-- COLUNA DIREITA: DIVISÃO DE SABORES (ESTILO IFOOD SEM DROPDOWN), BORDA, EXTRAS, OBS E BOTAO -->
-        <div style="display: flex; flex-direction: column; gap: 16px;">
-          <!-- 2. DIVISÃO DE SABORES -->
-          <div>
-            <div class="option-group-title">2. Escolha de Sabores</div>
-            <div class="flavor-toggle-bar" style="display: flex; background: var(--ph-gray-light); padding: 4px; border-radius: var(--radius-pill); border: 1px solid var(--ph-border); gap: 4px; margin-bottom: 12px;">
-              <button class="flavor-toggle-btn active" id="btnSingleFlavor" onclick="setFlavorMode('single')">1 Sabor (Inteira)</button>
-              <button class="flavor-toggle-btn" id="btnHalfFlavor" onclick="setFlavorMode('half')">2 Sabores (Meio a Meio)</button>
-            </div>
+        <!-- CAMPO DE OBSERVAÇÕES -->
+        <div>
+          <label style="font-size: 0.8rem; font-weight: 700; color: #444; margin-bottom: 6px; display: block;">Observações do Item:</label>
+          <textarea id="modalObsInput" class="modal-obs-textarea" placeholder="Ex: Tirar molho, bem passado, embalagem separada..." rows="2" style="width: 100%; border: 1px solid var(--ph-border); border-radius: 8px; padding: 10px; font-size: 0.86rem;"></textarea>
+        </div>
 
-            <!-- LISTA DE RADIO CARDS IFOOD DE SABORES -->
-            <div id="flavorRadioList1Container">
-              <label style="font-size: 0.72rem; font-weight: 800; color: #777; text-transform: uppercase;">1º Sabor (Principal):</label>
-              <div id="flavorRadioList1" style="max-height: 180px; overflow-y: auto; margin-top: 6px;"></div>
-            </div>
+        <!-- ADICIONAIS DO PRODUTO (OPCIONAL) -->
+        <div id="modalAdicionaisContainer" style="display: none; border: 1px solid var(--ph-border); border-radius: 8px; padding: 12px; background: #FAFAFC;">
+          <label style="font-size: 0.8rem; font-weight: 700; color: #18181B; margin-bottom: 8px; display: block;">Opcionais / Adicionais:</label>
+          <div id="modalAdicionaisList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
 
-            <div id="containerFlavor2" style="display: none; margin-top: 10px;">
-              <label style="font-size: 0.72rem; font-weight: 800; color: #777; text-transform: uppercase;">2º Sabor (Meio a Meio):</label>
-              <div id="flavorRadioList2" style="max-height: 180px; overflow-y: auto; margin-top: 6px;"></div>
-            </div>
+        <!-- CONTROLES DE QUANTIDADE E ADICIONAR -->
+        <div style="display: flex; gap: 12px; align-items: center; margin-top: 8px;">
+          <div style="display: flex; align-items: center; border: 1px solid var(--ph-border); border-radius: 8px; padding: 2px;">
+            <button type="button" onclick="changeModalQty(-1)" style="width: 36px; height: 36px; border: none; background: #F4F4F6; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">-</button>
+            <span id="modalQtyDisplay" style="width: 36px; text-align: center; font-weight: 700; font-size: 1rem;">1</span>
+            <button type="button" onclick="changeModalQty(1)" style="width: 36px; height: 36px; border: none; background: #F4F4F6; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">+</button>
           </div>
 
-          <!-- 3. ESCOLHA DA BORDA RECHEADA -->
-          <div>
-            <div class="option-group-title">3. Borda Recheada (Opcional)</div>
-            <div class="flavor-radio-list" id="bordaRadioList">
-              <label class="flavor-radio-card">
-                <input type="radio" name="bordaRadio" value="sem" data-price="0" checked onchange="recalculateModalTotal()">
-                <div class="flavor-radio-img-wrap" style="background: #F5F5F5; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 6px;">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-                </div>
-                <div class="flavor-radio-content">
-                  <div class="flavor-radio-title">Sem Borda Recheada</div>
-                  <div class="flavor-radio-desc">Massa tradicional assada com borda simples crocante.</div>
-                </div>
-                <div style="font-weight: 800; font-size: 0.82rem; color: #2E7D32;">Grátis</div>
-              </label>
-
-              <label class="flavor-radio-card">
-                <input type="radio" name="bordaRadio" value="catupiry" data-price="8.00" onchange="recalculateModalTotal()">
-                <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=200&q=80" class="flavor-radio-img" alt="Catupiry Cremoso">
-                <div class="flavor-radio-content">
-                  <div class="flavor-radio-title">Catupiry Cremoso Original</div>
-                  <div class="flavor-radio-desc">Borda recheada com legítimo Catupiry cremoso e gratinado.</div>
-                </div>
-                <div style="font-weight: 800; font-size: 0.82rem; color: var(--ph-red);">+ R$ 8,00</div>
-              </label>
-
-              <label class="flavor-radio-card">
-                <input type="radio" name="bordaRadio" value="cheddar" data-price="8.00" onchange="recalculateModalTotal()">
-                <img src="https://images.unsplash.com/photo-1541745537411-b8046dc6d66c?auto=format&fit=crop&w=200&q=80" class="flavor-radio-img" alt="Requeijão Cheddar">
-                <div class="flavor-radio-content">
-                  <div class="flavor-radio-title">Requeijão Cheddar Cremoso</div>
-                  <div class="flavor-radio-desc">Borda recheada com cheddar cremoso derretido e intenso.</div>
-                </div>
-                <div style="font-weight: 800; font-size: 0.82rem; color: var(--ph-red);">+ R$ 8,00</div>
-              </label>
-
-              <label class="flavor-radio-card">
-                <input type="radio" name="bordaRadio" value="chocolate" data-price="10.00" onchange="recalculateModalTotal()">
-                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=200&q=80" class="flavor-radio-img" alt="Chocolate ao Leite">
-                <div class="flavor-radio-content">
-                  <div class="flavor-radio-title">Chocolate ao Leite Nobre</div>
-                  <div class="flavor-radio-desc">Borda recheada com ganache de chocolate ao leite artesanal.</div>
-                </div>
-                <div style="font-weight: 800; font-size: 0.82rem; color: var(--ph-red);">+ R$ 10,00</div>
-              </label>
-            </div>
-          </div>
-
-          <!-- 4. ADICIONAIS EXTRA -->
-          <div>
-            <div class="option-group-title">4. Adicionais Extra (Opcional)</div>
-            <div class="flavor-radio-list" id="extraRadioList">
-              <label class="flavor-radio-card">
-                <input type="radio" name="extraRadio" value="nenhum" data-price="0" checked onchange="recalculateModalTotal()">
-                <div class="flavor-radio-img-wrap" style="background: #F5F5F5; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 6px;">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-                </div>
-                <div class="flavor-radio-content">
-                  <div class="flavor-radio-title">Nenhum Adicional Extra</div>
-                  <div class="flavor-radio-desc">Sem acréscimo de ingredientes extras.</div>
-                </div>
-                <div style="font-weight: 800; font-size: 0.82rem; color: #2E7D32;">Grátis</div>
-              </label>
-
-              <label class="flavor-radio-card">
-                <input type="radio" name="extraRadio" value="bacon" data-price="6.90" onchange="recalculateModalTotal()">
-                <img src="https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=200&q=80" class="flavor-radio-img" alt="Bacon Crocante">
-                <div class="flavor-radio-content">
-                  <div class="flavor-radio-title">Bacon Crispy Extra</div>
-                  <div class="flavor-radio-desc">Porção extra de fatias crocantes de bacon defumado.</div>
-                </div>
-                <div style="font-weight: 800; font-size: 0.82rem; color: var(--ph-red);">+ R$ 6,90</div>
-              </label>
-
-              <label class="flavor-radio-card">
-                <input type="radio" name="extraRadio" value="alho" data-price="4.90" onchange="recalculateModalTotal()">
-                <img src="https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=200&q=80" class="flavor-radio-img" alt="Alho Frito">
-                <div class="flavor-radio-content">
-                  <div class="flavor-radio-title">Alho Frito Dourado Extra</div>
-                  <div class="flavor-radio-desc">Porção extra de alho lâminado frito e salpicado.</div>
-                </div>
-                <div style="font-weight: 800; font-size: 0.82rem; color: var(--ph-red);">+ R$ 4,90</div>
-              </label>
-
-              <label class="flavor-radio-card">
-                <input type="radio" name="extraRadio" value="catupiry-extra" data-price="7.90" onchange="recalculateModalTotal()">
-                <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=200&q=80" class="flavor-radio-img" alt="Mussarela em Dobro">
-                <div class="flavor-radio-content">
-                  <div class="flavor-radio-title">Mussarela em Dobro Extra</div>
-                  <div class="flavor-radio-desc">Camada extra de mussarela especial de cura derretida.</div>
-                </div>
-                <div style="font-weight: 800; font-size: 0.82rem; color: var(--ph-red);">+ R$ 7,90</div>
-              </label>
-            </div>
-          </div>
-
-          <!-- 5. OBSERVAÇÕES DO PEDIDO -->
-          <div>
-            <div class="option-group-title">5. Observações do Pedido</div>
-            <textarea id="modalObs" rows="2" class="cep-input" style="width: 100%; border-radius: 6px;" placeholder="Ex: Tirar a cebola, massa bem assada..."></textarea>
-          </div>
-
-          <!-- FOOTER DO MODAL -->
-          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 2px solid var(--ph-black); margin-top: auto;">
-            <div>
-              <span style="font-size: 0.7rem; color: #777777; text-transform: uppercase; font-weight: 800;">TOTAL ITEM:</span>
-              <div style="font-size: 1.8rem; font-weight: 900; color: var(--ph-red);" id="modalCalculatedTotal">R$ 64,90</div>
-            </div>
-            <button class="ph-btn-red-lg" style="width: auto; padding: 12px 24px;" onclick="addCustomPizzaToCart()">
-              <span>ADICIONAR AO PEDIDO</span>
-            </button>
-          </div>
+          <button class="ph-btn-red-lg" style="flex: 1; margin-top: 0; padding: 14px;" onclick="addModalProductToCart()">
+            <span>ADICIONAR AO CARRINHO</span>
+          </button>
         </div>
       </div>
     </div>
