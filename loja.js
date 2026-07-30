@@ -95,7 +95,31 @@ function applyDynamicBranding() {
   }
 }
 
-function loadCatalogData() {
+async function loadCatalogData() {
+  if (window.DbService) {
+    try {
+      const products = await DbService.getProducts();
+      if (products && products.length > 0) {
+        catalogData = products.map(p => ({
+          id: p.id,
+          nome: p.nome || 'Produto',
+          categoria: p.categoria || 'outros',
+          descricao: p.descricao || '',
+          preco_broto:   p.preco_broto   || 0,
+          preco_media:   p.preco_media   || 0,
+          preco_grande:  p.preco_grande  || p.preco || 0,
+          preco_gigante: p.preco_gigante || 0,
+          badge:   p.badge   || '',
+          img_url: p.img_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+          ingredientes: p.descricao || ''
+        }));
+        return;
+      }
+    } catch(e) {
+      console.warn('[Loja] Erro ao carregar produtos do Supabase:', e);
+    }
+  }
+  // Fallback: localStorage ou defaultProducts
   const savedProducts = localStorage.getItem(STORAGE_KEY_PRODUCTS);
   if (savedProducts) {
     try {
@@ -104,24 +128,30 @@ function loadCatalogData() {
         catalogData = parsed.map(p => ({
           id: p.id,
           nome: p.nome || 'Produto',
-          categoria: p.categoria || 'pizzas-salgadas',
+          categoria: p.categoria || 'outros',
           descricao: p.descricao || '',
-          preco_broto: p.preco_broto || 0,
-          preco_media: p.preco_media || 0,
-          preco_grande: p.preco_grande || p.preco || 0,
+          preco_broto:   p.preco_broto   || 0,
+          preco_media:   p.preco_media   || 0,
+          preco_grande:  p.preco_grande  || p.preco || 0,
           preco_gigante: p.preco_gigante || 0,
-          badge: p.badge || '',
+          badge:   p.badge   || '',
           img_url: p.img_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
           ingredientes: p.descricao || ''
         }));
         return;
       }
-    } catch(e) {}
+    } catch(e) { console.warn('Erro ao ler produtos do localStorage:', e); }
   }
   catalogData = (typeof defaultProducts !== 'undefined' && Array.isArray(defaultProducts)) ? defaultProducts : [];
 }
 
-function loadDeliveryZonesData() {
+async function loadDeliveryZonesData() {
+  if (window.DbService) {
+    try {
+      const zones = await DbService.getDeliveryZones();
+      if (zones && zones.length > 0) { deliveryZones = zones; return; }
+    } catch(e) {}
+  }
   const savedZones = localStorage.getItem(STORAGE_KEY_DELIVERY_ZONES);
   if (savedZones) {
     try {

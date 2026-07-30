@@ -16,14 +16,13 @@ let pendingBannerDeskBase64 = '';
 let pendingBannerMobBase64 = '';
 let pendingProductImgBase64 = '';
 
-document.addEventListener('DOMContentLoaded', () => {
-  loadAdminSettings();
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadAdminSettings();
   renderAdminTable();
   renderCategoriesUI();
   renderDeliveryZonesUI();
   updateStats();
   initDragAndDropHandlers();
-  fetchFromSheets();
 });
 
 // apiRequest helper e fornecido centralidamente pelo defaults.js
@@ -37,18 +36,11 @@ function applyUnifiedBrandingVariables(primaryColor, darkColor) {
   }
 }
 
-function loadAdminSettings() {
-  const savedBranding = localStorage.getItem(STORAGE_KEY_BRANDING);
-  currentBranding = savedBranding ? JSON.parse(savedBranding) : { ...defaultBranding };
-
-  const savedCategories = localStorage.getItem(STORAGE_KEY_CATEGORIES);
-  currentCategories = savedCategories ? JSON.parse(savedCategories) : [ ...defaultCategories ];
-
-  const savedProducts = localStorage.getItem(STORAGE_KEY_PRODUCTS);
-  currentProducts = savedProducts ? JSON.parse(savedProducts) : [ ...defaultProducts ];
-
-  const savedZones = localStorage.getItem(STORAGE_KEY_DELIVERY_ZONES);
-  currentDeliveryZones = savedZones ? JSON.parse(savedZones) : [ ...defaultDeliveryZones ];
+async function loadAdminSettings() {
+  currentBranding    = await DbService.getBranding();
+  currentCategories  = await DbService.getCategories();
+  currentProducts    = await DbService.getProducts();
+  currentDeliveryZones = await DbService.getDeliveryZones();
 
   const savedSheetsCfg = localStorage.getItem(STORAGE_KEY_SHEETS_CONFIG);
   sheetsConfig = savedSheetsCfg ? JSON.parse(savedSheetsCfg) : { appsScriptUrl: DEFAULT_APPS_SCRIPT_URL, sheetCsvUrl: DEFAULT_CSV_URL };
@@ -382,12 +374,13 @@ function pushCurrentToSheetsNow() {
 async function resetBrandingToDefault() {
   const ok = await showConfirm('Deseja restaurar as configurações originais da marca Pizza Todo Dia?');
   if (!ok) return;
+  // Limpa localStorage
   localStorage.removeItem(STORAGE_KEY_BRANDING);
   localStorage.removeItem(STORAGE_KEY_CATEGORIES);
   localStorage.removeItem(STORAGE_KEY_PRODUCTS);
   localStorage.removeItem(STORAGE_KEY_DELIVERY_ZONES);
   localStorage.removeItem(STORAGE_KEY_SHEETS_CONFIG);
-  loadAdminSettings();
+  await loadAdminSettings();
   renderAdminTable();
   renderCategoriesUI();
   renderDeliveryZonesUI();
@@ -433,9 +426,9 @@ function addNewDeliveryZone(event) {
   if (!name) return;
 
   const newZoneId = 'z-' + Date.now();
-  currentDeliveryZones.push({ id: newZoneId, name: name, price: price });
-
-  localStorage.setItem(STORAGE_KEY_DELIVERY_ZONES, JSON.stringify(currentDeliveryZones));
+  const newZone = { id: newZoneId, name: name, price: price };
+  currentDeliveryZones.push(newZone);
+  await DbService.upsertDeliveryZone(newZone);
 
   nameInput.value = '';
   priceInput.value = '';
@@ -447,7 +440,7 @@ async function deleteDeliveryZone(zoneId) {
   const ok = await showConfirm('Deseja excluir esta taxa de entrega?');
   if (!ok) return;
   currentDeliveryZones = currentDeliveryZones.filter(z => z.id !== zoneId);
-  localStorage.setItem(STORAGE_KEY_DELIVERY_ZONES, JSON.stringify(currentDeliveryZones));
+  await DbService.deleteDeliveryZone(zoneId);
   renderDeliveryZonesUI();
   showToast('Região excluída com sucesso!', 'success');
 }
@@ -484,9 +477,9 @@ async function addNewCategory(event) {
   }
 
   const catId = 'cat-' + Date.now();
-
-  currentCategories.push({ id: catId, name: catName });
-  localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(currentCategories));
+  const newCat = { id: catId, name: catName, position: currentCategories.length };
+  currentCategories.push(newCat);
+  await DbService.upsertCategory(newCat);
 
   input.value = '';
   renderCategoriesUI();
@@ -497,7 +490,7 @@ async function deleteCategory(catId) {
   const ok = await showConfirm('Deseja excluir esta categoria? Os produtos vinculados a ela permanecerão salvos.');
   if (!ok) return;
   currentCategories = currentCategories.filter(c => c.id !== catId);
-  localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(currentCategories));
+  await DbService.deleteCategory(catId);
   renderCategoriesUI();
   showToast('Categoria excluída com sucesso!', 'success');
 }
@@ -596,10 +589,10 @@ function previewLogoFileUpload(input) {
   }
 }
 
-function removeLogo() {
+async function removeLogo() {
   currentBranding.logoUrl = '';
   pendingLogoBase64 = '';
-  localStorage.setItem(STORAGE_KEY_BRANDING, JSON.stringify(currentBranding));
+  await DbService.saveBranding(currentBranding);
   const preview = document.getElementById('logoFilePreview');
   const btn = document.getElementById('btnRemoveLogo');
   if (preview) preview.style.display = 'none';
@@ -619,10 +612,10 @@ function previewBannerDeskUpload(input) {
   }
 }
 
-function removeBannerDesk() {
+async function removeBannerDesk() {
   currentBranding.bannerDeskUrl = '';
   pendingBannerDeskBase64 = '';
-  localStorage.setItem(STORAGE_KEY_BRANDING, JSON.stringify(currentBranding));
+  await DbService.saveBranding(currentBranding);
   const preview = document.getElementById('bannerDeskPreview');
   const btn = document.getElementById('btnRemoveBannerDesk');
   if (preview) preview.style.display = 'none';
@@ -642,10 +635,10 @@ function previewBannerMobUpload(input) {
   }
 }
 
-function removeBannerMob() {
+async function removeBannerMob() {
   currentBranding.bannerMobUrl = '';
   pendingBannerMobBase64 = '';
-  localStorage.setItem(STORAGE_KEY_BRANDING, JSON.stringify(currentBranding));
+  await DbService.saveBranding(currentBranding);
   const preview = document.getElementById('bannerMobPreview');
   const btn = document.getElementById('btnRemoveBannerMob');
   if (preview) preview.style.display = 'none';
@@ -666,7 +659,7 @@ function previewProductFileUpload(input) {
   }
 }
 
-function saveBrandingConfig(event) {
+async function saveBrandingConfig(event) {
   event.preventDefault();
 
   currentBranding.storeName = document.getElementById('cfgStoreName').value.trim();
@@ -679,21 +672,12 @@ function saveBrandingConfig(event) {
   currentBranding.darkColor = document.getElementById('cfgDarkColor').value.trim();
   currentBranding.coverageCities = document.getElementById('cfgCoverageCities').value.trim();
 
-  if (pendingLogoBase64) {
-    currentBranding.logoUrl = pendingLogoBase64;
-  }
-
-  if (pendingBannerDeskBase64) {
-    currentBranding.bannerDeskUrl = pendingBannerDeskBase64;
-  }
-
-  if (pendingBannerMobBase64) {
-    currentBranding.bannerMobUrl = pendingBannerMobBase64;
-  }
+  if (pendingLogoBase64) currentBranding.logoUrl = pendingLogoBase64;
+  if (pendingBannerDeskBase64) currentBranding.bannerDeskUrl = pendingBannerDeskBase64;
+  if (pendingBannerMobBase64) currentBranding.bannerMobUrl = pendingBannerMobBase64;
 
   applyUnifiedBrandingVariables(currentBranding.primaryColor, currentBranding.darkColor);
-
-  localStorage.setItem(STORAGE_KEY_BRANDING, JSON.stringify(currentBranding));
+  await DbService.saveBranding(currentBranding);
 
   document.getElementById('adminStoreTitleDisplay').innerText = currentBranding.storeName;
   document.getElementById('currentWppDisplay').innerText = currentBranding.wppNumber;
@@ -832,7 +816,7 @@ function addNewCoupon(event) {
   };
 
   currentCoupons.push(newCoupon);
-  localStorage.setItem(STORAGE_KEY_COUPONS, JSON.stringify(currentCoupons));
+  await DbService.upsertCoupon(newCoupon);
 
   codeInput.value = '';
   valueInput.value = '';
@@ -843,7 +827,7 @@ async function deleteCoupon(id) {
   const ok = await showConfirm('Tem certeza que deseja excluir este cupom de desconto?');
   if (!ok) return;
   currentCoupons = currentCoupons.filter(c => c.id !== id);
-  localStorage.setItem(STORAGE_KEY_COUPONS, JSON.stringify(currentCoupons));
+  await DbService.deleteCoupon(id);
   renderCouponsUI();
   showToast('Cupom excluído com sucesso!', 'success');
 }
@@ -940,8 +924,14 @@ function saveProductItem(event) {
     currentProducts.push({ ...candidate, preco_media: price, preco_broto: price });
   }
 
-  localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(currentProducts));
-  saveToSheets(currentProducts);
+  await DbService.upsertProduct(candidate);
+  // Sync local array
+  if (editId) {
+    const idx2 = currentProducts.findIndex(p => p.id === candidate.id);
+    if (idx2 !== -1) currentProducts[idx2] = { ...currentProducts[idx2], ...candidate };
+  } else {
+    currentProducts.push({ ...candidate });
+  }
 
   closeProductFormModal();
   renderAdminTable();
@@ -951,8 +941,7 @@ async function deleteProductItem(id) {
   const ok = await showConfirm('Tem certeza que deseja excluir este produto do cardápio?');
   if (!ok) return;
   currentProducts = currentProducts.filter(p => p.id !== id);
-  localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(currentProducts));
-  saveToSheets(currentProducts);
+  await DbService.deleteProduct(id);
   renderAdminTable();
   showToast('Produto excluído do cardápio.', 'success');
 }

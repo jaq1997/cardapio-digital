@@ -337,54 +337,7 @@
 
         <!-- COLUNA DIREITA: CUPOM DE DESCONTO, FORMA DE PAGAMENTO E TOTAL -->
         <div style="display: flex; flex-direction: column; gap: 16px;">
-          <!-- CUPOM DE DESCONTO -->
-          <div class="checkout-section-box">
-            <div class="option-group-title">Cupom de Desconto (Opcional)</div>
-            <div style="display: flex; gap: 8px;">
-              <input type="text" class="cep-input" id="inputCouponCode" placeholder="Digite seu cupom" style="text-transform: uppercase; flex: 1;">
-              <button class="btn-cep-search" onclick="aplicarCupomDesconto()">APLICAR</button>
-            </div>
-            <div id="couponFeedbackBox" style="font-size: 0.8rem; font-weight: 800; margin-top: 6px; display: none;"></div>
-          </div>
-
-          <!-- FORMAS DE PAGAMENTO -->
-          <div class="checkout-section-box">
-            <div class="option-group-title">Forma de Pagamento</div>
-            <div class="mp-checkout-tabs">
-              <button class="mp-tab-btn active" id="tabMpPix" onclick="switchCheckoutTab('pix')">PIX</button>
-              <button class="mp-tab-btn" id="tabMpCard" onclick="switchCheckoutTab('card')">CARTÃO DE CRÉDITO</button>
-              <button class="mp-tab-btn" id="tabWpp" onclick="switchCheckoutTab('wpp')">WHATSAPP</button>
-            </div>
-
-            <!-- TAB 1: PIX -->
-            <div id="contentCheckoutPix" class="tab-content-box">
-              <div class="pix-title">Pagamento Instantâneo via PIX</div>
-              <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=00020126580014BR.GOV.BCB.PIX013612345678-PIZZA-TODO-DIA520400005303986540578.905802BR5920PIZZA%20TODO%20DIA6009SAO%20PAULO62070503***6304ABCD" class="pix-qr-img" alt="QR Code PIX">
-              <div class="pix-code-str" id="pixCodeText">00020126580014BR.GOV.BCB.PIX013612345678-PIZZA-TODO-DIA520400005303986540578.905802BR5920PIZZA%20TODO%20DIA6009SAO%20PAULO62070503***6304ABCD</div>
-              <button class="ph-btn-add" style="width: 100%; justify-content: center;" onclick="copiarPixChave()">COPIAR CHAVE PIX</button>
-            </div>
-
-            <!-- TAB 2: CARTÃO -->
-            <div id="contentCheckoutCard" class="tab-content-box" style="display: none;">
-              <input type="text" class="cep-input" placeholder="Número do Cartão" style="margin-bottom: 8px;">
-              <div class="row-inputs">
-                <input type="text" class="cep-input" placeholder="MM/AA">
-                <input type="text" class="cep-input" placeholder="CVV">
-              </div>
-              <input type="text" class="cep-input" placeholder="Nome do Titular" style="margin-top: 8px;">
-              <button class="ph-btn-red-lg" style="margin-top: 10px; width: 100%;" onclick="simularPagamentoMercadoPagoCard()">PAGAR COM CARTÃO</button>
-            </div>
-
-            <!-- TAB 3: WHATSAPP DIRETO -->
-            <div id="contentCheckoutWpp" class="tab-content-box" style="display: none; text-align: center;">
-              <p class="wpp-notice" style="font-size: 0.82rem; color: #555; margin-bottom: 10px;">Seu pedido será enviado formatado direto para o WhatsApp do atendimento com mensagem de confirmação!</p>
-              <button class="ph-btn-red-lg" style="width: 100%; background: #25D366; color: #FFF;" onclick="enviarPedidoWhatsAppFinal()">
-                <span>FINALIZAR PELO WHATSAPP</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- TOTAL GIGANTE EM NEGRITO -->
+          <!-- TOTAL E BOTÃO FINALIZAR -->
           <div style="background: var(--ph-gray-light); padding: 14px; border-radius: 8px; margin-top: auto;">
             <div id="txtSubtotalFrete" style="font-size: 0.8rem; color: #666; font-weight: 700;">Subtotal: R$ 0,00 | Frete: R$ 0,00</div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
@@ -393,7 +346,7 @@
             </div>
           </div>
 
-          <button class="ph-btn-red-lg" style="width: 100%; margin-top: 4px;" onclick="enviarPedidoWhatsAppFinal()">
+          <button class="ph-btn-red-lg" style="width: 100%; margin-top: 4px; background: #25D366;" onclick="enviarPedidoWhatsAppFinal()">
             <span>FINALIZAR PEDIDO</span>
           </button>
         </div>
@@ -401,9 +354,12 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="db-service.js"></script>
   <script src="dynamic-components.js"></script>
   <script src="defaults.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script src="loja.js"></script>
 </body>
 
