@@ -65,7 +65,7 @@ const SHARED_COMPONENTS = {
         </div>
     `,
     get wppFloat() {
-        const num = (typeof WPP_NUMERO !== 'undefined' && WPP_NUMERO) ? WPP_NUMERO : '5551989912555';
+        const num = (typeof WPP_NUMERO !== 'undefined' && WPP_NUMERO) ? WPP_NUMERO : '';
         const cleanNum = String(num).replace(/\D/g, '');
         return `
             <a href="https://wa.me/${cleanNum}" target="_blank" class="ph-wpp-float" id="floatWppBtn" aria-label="Fazer pedido no WhatsApp">

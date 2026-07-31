@@ -41,56 +41,7 @@ const defaultCategories = [
 
 const PLACEHOLDER_PRODUCT_IMG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 24 24' fill='%23F4F4F6' stroke='%23CCCCCC' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='3' ry='3'/><circle cx='8.5' cy='8.5' r='1.5'/><polyline points='21 15 16 10 5 21'/></svg>";
 
-const defaultProducts = [
-  {
-    id: "demo-produto-1",
-    nome: "Produto de exemplo",
-    categoria: "destaques",
-    descricao: "Este é um produto de demonstração. Acesse o painel admin para editar ou cadastrar seus próprios produtos.",
-    preco: 96.00,
-    preco_grande: 96.00,
-    preco_media: 0,
-    preco_broto: 0,
-    badge: "-20% OFF",
-    img_url: PLACEHOLDER_PRODUCT_IMG
-  },
-  {
-    id: "demo-produto-2",
-    nome: "Produto de exemplo",
-    categoria: "destaques",
-    descricao: "Este é um produto de demonstração. Acesse o painel admin para editar ou cadastrar seus próprios produtos.",
-    preco: 122.00,
-    preco_grande: 122.00,
-    preco_media: 0,
-    preco_broto: 0,
-    badge: "",
-    img_url: PLACEHOLDER_PRODUCT_IMG
-  },
-  {
-    id: "demo-produto-3",
-    nome: "Produto de exemplo",
-    categoria: "pratos",
-    descricao: "Este é um produto de demonstração. Acesse o painel admin para editar ou cadastrar seus próprios produtos.",
-    preco: 320.00,
-    preco_grande: 320.00,
-    preco_media: 0,
-    preco_broto: 0,
-    badge: "",
-    img_url: PLACEHOLDER_PRODUCT_IMG
-  },
-  {
-    id: "demo-produto-4",
-    nome: "Produto de exemplo",
-    categoria: "bebidas",
-    descricao: "Este é um produto de demonstração. Acesse o painel admin para editar ou cadastrar seus próprios produtos.",
-    preco: 420.00,
-    preco_grande: 420.00,
-    preco_media: 0,
-    preco_broto: 0,
-    badge: "",
-    img_url: PLACEHOLDER_PRODUCT_IMG
-  }
-];
+const defaultProducts = [];
 
 // Alias usado pelo `loja.js` original
 const defaultCatalogData = defaultProducts;
