@@ -201,24 +201,17 @@ window.DbService = (function () {
   async function upsertCategory(cat) {
     if (isReady()) {
       const payload = {
-        id:       cat.id,
-        store_id: getStoreId(),
-        name:     cat.name || '',
+        id:   cat.id,
+        name: cat.name || '',
       };
       if (cat.active !== undefined) payload.active = (cat.active !== false);
-      if (cat.position !== undefined) payload.position = cat.position || 0;
 
-      // 1. Tenta atualizar o registro filtrando pelo ID da categoria
-      let { data, error } = await window.db.from('store_categories').update(payload).eq('id', cat.id).select();
-
-      // 2. Se o registro não existia ainda (ou se a coluna store_id for opcional), faz o insert limpo
-      if (error || !data || data.length === 0) {
-        let ins = await window.db.from('store_categories').insert(payload);
-        if (ins.error) {
-          delete payload.active;
-          delete payload.position;
-          delete payload.store_id;
-          await window.db.from('store_categories').insert(payload);
+      let { error } = await window.db.from('store_categories').upsert(payload);
+      if (error) {
+        delete payload.active;
+        let retry = await window.db.from('store_categories').upsert(payload);
+        if (retry.error) {
+          console.warn('[DbService] upsertCategory erro:', retry.error);
         }
       }
     }
