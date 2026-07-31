@@ -81,7 +81,7 @@ window.DbService = (function () {
           .select('*')
           .order('position', { ascending: true });
 
-        if (!error && data) {
+        if (!error && Array.isArray(data)) {
           localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(data));
           return data;
         }

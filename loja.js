@@ -51,6 +51,24 @@ async function applyDynamicBranding() {
       }
       if (cfg.primaryColor) {
         document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
+        document.documentElement.style.setProperty('--theme-primary', cfg.primaryColor);
+      }
+      if (cfg.btnTextColor) {
+        document.documentElement.style.setProperty('--ph-btn-text', cfg.btnTextColor);
+      }
+      if (cfg.accentColor) {
+        document.documentElement.style.setProperty('--ph-accent', cfg.accentColor);
+        document.documentElement.style.setProperty('--ph-purple', cfg.accentColor);
+      }
+      if (cfg.badgeBgColor) {
+        document.documentElement.style.setProperty('--ph-badge-bg', cfg.badgeBgColor);
+      }
+
+      if (cfg.logoUrl) {
+        const logoBadge = document.querySelector('.ph-logo-badge');
+        if (logoBadge) {
+          logoBadge.innerHTML = `<img src="${cfg.logoUrl}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">`;
+        }
       }
 
       // Renderização do Banner Principal (Hero Card)

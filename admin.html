@@ -427,11 +427,8 @@
               </div>
             </div>
             <input type="file" id="prodFile" style="display: none;" accept="image/*" onchange="previewProductFileUpload(this)">
-            <div style="margin-top: 8px; position: relative; display: inline-block;">
-              <img id="prodFilePreview" style="max-height: 80px; border-radius: 8px; display: none; border: 1px solid #E4E4E7; object-fit: cover;" alt="Pré-visualização Foto Produto">
-              <button type="button" id="btnRemoveProdImg" onclick="removeProductPhoto()" title="Remover Imagem" style="display: none; position: absolute; top: -6px; right: -6px; background: #EF4444; color: #FFFFFF; border: none; width: 24px; height: 24px; border-radius: 50%; font-size: 0.75rem; font-weight: bold; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); align-items: center; justify-content: center;">
-                ✕
-              </button>
+            <div style="margin-top: 6px;">
+              <input type="url" id="prodImageUrlInput" class="admin-input" placeholder="OU Cole o link/URL da imagem (http...)" style="font-size: 0.78rem;" oninput="if(this.value.trim()){ tempProductImgBase64 = this.value.trim(); const img = document.getElementById('prodFilePreview'); if(img){ img.src=this.value.trim(); img.style.display='block'; } }">
             </div>
           </div>
         </div>

@@ -8,6 +8,7 @@ let currentProducts = [];
 let currentDeliveryZones = [];
 let currentCoupons = [];
 let tempProductImgBase64 = '';
+let tempLogoBase64 = '';
 let tempBannerDeskBase64 = '';
 let tempBannerMobBase64 = '';
 
@@ -60,6 +61,15 @@ async function loadAdminSettings() {
       } else {
         getEl('adminUserEmailDisplay').innerText = 'Administrador';
       }
+    }
+
+    // Carrega pré-visualização da Logo existente
+    if (currentBranding.logoUrl) {
+      tempLogoBase64 = currentBranding.logoUrl;
+      const imgL = getEl('logoFilePreview');
+      const btnL = getEl('btnRemoveLogo');
+      if (imgL) { imgL.src = tempLogoBase64; imgL.style.display = 'block'; }
+      if (btnL) btnL.style.display = 'inline-flex';
     }
 
     // Carrega pré-visualizações de banners existentes
@@ -199,6 +209,7 @@ function openAddProductModal() {
   document.getElementById('prodPrice').value = '';
   document.getElementById('prodDesc').value = '';
   document.getElementById('prodBadge').value = '';
+  if (document.getElementById('prodImageUrlInput')) document.getElementById('prodImageUrlInput').value = '';
   document.getElementById('adicionaisContainer').innerHTML = '';
   
   removeProductPhoto();
@@ -230,13 +241,40 @@ function previewProductFileUpload(input) {
 function removeProductPhoto() {
   tempProductImgBase64 = '';
   const fileInput = document.getElementById('prodFile');
+  const urlInput = document.getElementById('prodImageUrlInput');
   const img = document.getElementById('prodFilePreview');
   const btnRem = document.getElementById('btnRemoveProdImg');
   if (fileInput) fileInput.value = '';
+  if (urlInput) urlInput.value = '';
   if (img) {
     img.src = '';
     img.style.display = 'none';
   }
+  if (btnRem) btnRem.style.display = 'none';
+}
+
+/* UPLOAD E REMOÇÃO DE LOGO */
+function previewLogoFileUpload(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      tempLogoBase64 = e.target.result;
+      const img = document.getElementById('logoFilePreview');
+      const btnRem = document.getElementById('btnRemoveLogo');
+      if (img) { img.src = tempLogoBase64; img.style.display = 'block'; }
+      if (btnRem) btnRem.style.display = 'inline-flex';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function removeLogo() {
+  tempLogoBase64 = '';
+  const fileInput = document.getElementById('cfgLogoFile');
+  const img = document.getElementById('logoFilePreview');
+  const btnRem = document.getElementById('btnRemoveLogo');
+  if (fileInput) fileInput.value = '';
+  if (img) { img.src = ''; img.style.display = 'none'; }
   if (btnRem) btnRem.style.display = 'none';
 }
 
@@ -317,6 +355,9 @@ function editProductItem(id) {
   document.getElementById('prodBadge').value = item.badge || '';
 
   tempProductImgBase64 = item.img_url || '';
+  if (document.getElementById('prodImageUrlInput')) {
+    document.getElementById('prodImageUrlInput').value = (tempProductImgBase64.startsWith('http') ? tempProductImgBase64 : '');
+  }
   const img = document.getElementById('prodFilePreview');
   const btnRem = document.getElementById('btnRemoveProdImg');
   if (tempProductImgBase64 && img) {
@@ -765,6 +806,7 @@ async function saveBrandingConfig(event) {
     btnTextColor: document.getElementById('cfgBtnTextColor').value,
     accentColor: document.getElementById('cfgAccentColor').value,
     badgeBgColor: document.getElementById('cfgBadgeBgColor').value,
+    logoUrl: tempLogoBase64 || currentBranding.logoUrl || '',
     bannerDeskUrl: tempBannerDeskBase64 || currentBranding.bannerDeskUrl || '',
     bannerMobUrl: tempBannerMobBase64 || currentBranding.bannerMobUrl || ''
   };
@@ -792,6 +834,8 @@ window.openAddProductModal = openAddProductModal;
 window.closeProductFormModal = closeProductFormModal;
 window.previewProductFileUpload = previewProductFileUpload;
 window.removeProductPhoto = removeProductPhoto;
+window.previewLogoFileUpload = previewLogoFileUpload;
+window.removeLogo = removeLogo;
 window.previewBannerDeskUpload = previewBannerDeskUpload;
 window.removeBannerDesk = removeBannerDesk;
 window.previewBannerMobUpload = previewBannerMobUpload;
