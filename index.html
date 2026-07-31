@@ -18,6 +18,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;0,900;1,800;1,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script>
+    (function() {
+      try {
+        var storeId = (new URLSearchParams(window.location.search).get('loja')) || localStorage.getItem('active_store_id') || 'default';
+        var raw = localStorage.getItem('ptd_store_branding_' + storeId) || localStorage.getItem('ptd_store_branding');
+        if (raw) {
+          var cfg = JSON.parse(raw);
+          if (cfg.primaryColor) {
+            document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
+            document.documentElement.style.setProperty('--theme-primary', cfg.primaryColor);
+          }
+          if (cfg.btnTextColor) document.documentElement.style.setProperty('--ph-btn-text', cfg.btnTextColor);
+          if (cfg.accentColor) document.documentElement.style.setProperty('--ph-accent', cfg.accentColor);
+        }
+      } catch(e) {}
+    })();
+  </script>
 </head>
 
 <body data-page="index">

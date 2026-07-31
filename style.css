@@ -2,13 +2,14 @@
 
 :root {
   /* ===== Paleta Neutra Minimalista (Inspiração Referência Visual) ===== */
-  --theme-primary: #373844;            /* Grafite elegante para botões principais */
-  --theme-primary-dark: #1F2028;
+  --ph-red: #18181B;                   /* Cor Primária Neutra Padrão */
+  --theme-primary: #18181B;            /* Grafite elegante para botões principais */
+  --theme-primary-dark: #09090B;
   --theme-on-primary: #FFFFFF;       /* Texto do botão principal */
-  --ph-red-dark: #1F2028;
-  --ph-accent: #4B4C56;         /* Cor de acento secundária */
+  --ph-red-dark: #09090B;
+  --ph-accent: #6344F5;         /* Cor de acento secundária */
   --ph-badge-bg: #E5E7EB;       /* Fundo do badge cinza suave */
-  --ph-badge-text: #373844;     /* Texto do badge em grafite */
+  --ph-badge-text: #18181B;     /* Texto do badge em grafite */
   
   --ph-black: #111827;          /* Texto principal */
   --ph-black-pure: #030712;
