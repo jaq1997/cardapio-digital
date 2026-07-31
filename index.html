@@ -138,6 +138,25 @@
           <!-- ITENS DO CARRINHO -->
           <div id="cartItemsContainer" style="max-height: 260px; overflow-y: auto;"></div>
 
+          <!-- DADOS DO CLIENTE (NOME, WHATSAPP, OBSERVAÇÕES) -->
+          <div class="checkout-section-box">
+            <div class="option-group-title">Seus Dados</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 800; color: #666; text-transform: uppercase;">Seu Nome *:</label>
+                <input type="text" class="cep-input" id="inputCustomerName" placeholder="Ex: Maria Silva" style="width: 100%; font-size: 0.85rem;" required>
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 800; color: #666; text-transform: uppercase;">Seu WhatsApp *:</label>
+                <input type="tel" class="cep-input" id="inputCustomerPhone" placeholder="Ex: (51) 99999-9999" style="width: 100%; font-size: 0.85rem;" required>
+              </div>
+            </div>
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 800; color: #666; text-transform: uppercase;">Observações do Pedido (opcional):</label>
+              <input type="text" class="cep-input" id="inputOrderNotes" placeholder="Ex: Tirar a cebola, campainha com defeito..." style="width: 100%; font-size: 0.85rem;">
+            </div>
+          </div>
+
           <!-- FORMA DE ENTREGA E ENDEREÇO -->
           <div class="checkout-section-box">
             <div class="option-group-title">Forma de Entrega</div>

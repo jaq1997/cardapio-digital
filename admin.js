@@ -189,15 +189,30 @@ function filterAdminCards(query) {
   renderAdminTable(filtered);
 }
 
-function populateCategorySelect() {
-  const select = document.getElementById('prodCategory');
-  if (!select) return;
+function populateCategorySelect(selectedCatNames = []) {
+  const container = document.getElementById('prodCategoriesChecklist');
+  if (!container) return;
 
-  let html = '<option value="">Selecione uma categoria...</option>';
-  currentCategories.forEach(c => {
-    html += `<option value="${c.name}">${c.name}</option>`;
-  });
-  select.innerHTML = html;
+  if (!currentCategories || currentCategories.length === 0) {
+    container.innerHTML = '<div style="font-size: 0.78rem; color: #71717A;">Nenhuma categoria cadastrada.</div>';
+    return;
+  }
+
+  container.innerHTML = currentCategories.map(c => {
+    let isChecked = false;
+    if (Array.isArray(selectedCatNames)) {
+      isChecked = selectedCatNames.some(name => String(name).toLowerCase() === String(c.name).toLowerCase());
+    } else if (typeof selectedCatNames === 'string' && selectedCatNames) {
+      isChecked = selectedCatNames.toLowerCase().includes(c.name.toLowerCase());
+    }
+
+    return `
+      <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #18181B; cursor: pointer; font-weight: 500;">
+        <input type="checkbox" class="prod-cat-check" value="${c.name}" ${isChecked ? 'checked' : ''} style="accent-color: #6344F5;">
+        <span>${c.name}</span>
+      </label>
+    `;
+  }).join('');
 }
 
 function openAddProductModal() {
@@ -205,13 +220,13 @@ function openAddProductModal() {
   document.getElementById('productModalTitle').innerText = 'CADASTRAR PRODUTO';
   document.getElementById('prodEditId').value = '';
   document.getElementById('prodName').value = '';
-  document.getElementById('prodCategory').value = '';
   document.getElementById('prodPrice').value = '';
   document.getElementById('prodDesc').value = '';
   document.getElementById('prodBadge').value = '';
   if (document.getElementById('prodImageUrlInput')) document.getElementById('prodImageUrlInput').value = '';
   document.getElementById('adicionaisContainer').innerHTML = '';
   
+  populateCategorySelect([]);
   removeProductPhoto();
   document.getElementById('productFormModal').classList.add('active');
 }
@@ -349,10 +364,12 @@ function editProductItem(id) {
   document.getElementById('productModalTitle').innerText = 'EDITAR PRODUTO';
   document.getElementById('prodEditId').value = item.id;
   document.getElementById('prodName').value = item.nome || '';
-  document.getElementById('prodCategory').value = item.categoria || '';
   document.getElementById('prodPrice').value = parseFloat(item.preco || item.preco_grande || 0) || 0;
   document.getElementById('prodDesc').value = item.descricao || '';
   document.getElementById('prodBadge').value = item.badge || '';
+
+  const catVal = item.categorias || item.categoria || [];
+  populateCategorySelect(catVal);
 
   tempProductImgBase64 = item.img_url || '';
   if (document.getElementById('prodImageUrlInput')) {
@@ -382,7 +399,6 @@ async function saveProductItem(event) {
 
   const editId = document.getElementById('prodEditId').value;
   const name = document.getElementById('prodName').value.trim();
-  const category = document.getElementById('prodCategory').value;
   const price = parseFloat(document.getElementById('prodPrice').value) || 0;
   const desc = document.getElementById('prodDesc').value.trim();
   const badge = document.getElementById('prodBadge').value.trim();
@@ -391,6 +407,10 @@ async function saveProductItem(event) {
     showToast('Informe o nome do produto.', 'error');
     return;
   }
+
+  // Coleta Categorias Selecionadas (Multi-seleção)
+  const selectedCats = Array.from(document.querySelectorAll('.prod-cat-check:checked')).map(cb => cb.value);
+  const categoryStr = selectedCats.join(', ');
 
   // Coleta Adicionais
   const adicionaisList = [];
@@ -416,7 +436,8 @@ async function saveProductItem(event) {
   const candidate = {
     id: editId || ('prod-' + Date.now()),
     nome: name,
-    categoria: category,
+    categoria: categoryStr,
+    categorias: selectedCats,
     preco: price,
     preco_grande: price,
     descricao: desc,

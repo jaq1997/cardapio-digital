@@ -401,10 +401,10 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
           <div>
-            <label class="admin-label">Categoria (Opcional):</label>
-            <select id="prodCategory" class="admin-input">
-              <!-- Renderizado via admin.js -->
-            </select>
+            <label class="admin-label">Categorias do Produto (Marque uma ou mais):</label>
+            <div id="prodCategoriesChecklist" style="max-height: 110px; overflow-y: auto; border: 1px solid #E4E4E7; border-radius: 8px; padding: 8px 12px; background: #FAFAFC; display: flex; flex-direction: column; gap: 6px;">
+              <!-- Checkboxes das categorias gerados via admin.js -->
+            </div>
           </div>
           <div>
             <label class="admin-label">Preço (R$):</label>

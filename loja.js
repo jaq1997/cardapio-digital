@@ -239,9 +239,12 @@ function renderCatalog() {
   if (activeCategory !== 'todos') {
     const target = String(activeCategory).toLowerCase().trim();
     filtered = filtered.filter(p => {
+      if (Array.isArray(p.categorias) && p.categorias.length > 0) {
+        return p.categorias.some(c => String(c).toLowerCase().trim() === target);
+      }
       if (!p.categoria) return false;
       const catVal = String(p.categoria).toLowerCase().trim();
-      return catVal === target;
+      return catVal.includes(target);
     });
   }
 
@@ -744,10 +747,19 @@ function sendCartToWhatsApp() {
     enderecoTxt = parts.join(' ');
   }
 
+  const customerName = (document.getElementById('inputCustomerName')?.value || '').trim();
+  const customerPhone = (document.getElementById('inputCustomerPhone')?.value || '').trim();
+  const orderNotes = (document.getElementById('inputOrderNotes')?.value || '').trim();
+
   let msg = `*NOVO PEDIDO DE COMPRA*\n`;
+  if (customerName) msg += `*Cliente:* ${customerName}\n`;
+  if (customerPhone) msg += `*Telefone:* ${customerPhone}\n`;
   msg += `*Forma de Entrega:* ${currentSelectedZoneName}\n`;
   if (!isBalcao) {
     msg += `*Endereço de Entrega:* ${enderecoTxt}\n`;
+  }
+  if (orderNotes) {
+    msg += `*Observações do Pedido:* ${orderNotes}\n`;
   }
   msg += `------------------------------\n`;
   msg += `*ITENS DO PEDIDO:*\n\n`;
