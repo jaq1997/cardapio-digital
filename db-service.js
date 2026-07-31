@@ -177,9 +177,13 @@ window.DbService = (function () {
       };
 
       let { error } = await window.db.from('store_categories').upsert(payload, { onConflict: 'id' });
-      if (error && error.code === 'PGRST204') {
+      if (error) {
         delete payload.active;
-        await window.db.from('store_categories').upsert(payload, { onConflict: 'id' });
+        delete payload.position;
+        let retry = await window.db.from('store_categories').upsert(payload, { onConflict: 'id' });
+        if (retry.error) {
+          console.warn('[DbService] upsertCategory fallback:', retry.error);
+        }
       }
     }
     const cats = await getCategories();
