@@ -44,13 +44,20 @@ async function loadAdminSettings() {
     }
 
     // Exibe o e-mail do usuário logado na sidebar
-    if (window.AUTH && typeof AUTH.getUser === 'function') {
-      try {
-        const user = await AUTH.getUser();
-        if (user && user.email && getEl('adminUserEmailDisplay')) {
-          getEl('adminUserEmailDisplay').innerText = user.email;
-        }
-      } catch(e) {}
+    if (getEl('adminUserEmailDisplay')) {
+      if (window.db && window.db.auth) {
+        window.db.auth.getSession().then(({ data }) => {
+          if (data && data.session && data.session.user && data.session.user.email) {
+            getEl('adminUserEmailDisplay').innerText = data.session.user.email;
+          } else {
+            getEl('adminUserEmailDisplay').innerText = 'Administrador';
+          }
+        }).catch(() => {
+          getEl('adminUserEmailDisplay').innerText = 'Administrador';
+        });
+      } else {
+        getEl('adminUserEmailDisplay').innerText = 'Administrador';
+      }
     }
 
     // Preenche contadores na dashboard
