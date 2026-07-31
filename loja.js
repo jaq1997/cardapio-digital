@@ -14,6 +14,26 @@ let currentSelectedProduct = null;
 let currentDeliveryFee = 5.00;
 let currentSelectedZoneName = "Entrega em Domicílio";
 
+function normalizeCategoryNames(value) {
+  if (Array.isArray(value)) {
+    return value.map(v => String(v || '').trim()).filter(Boolean);
+  }
+  if (typeof value === 'string') {
+    return value.split(',').map(v => v.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+function getProductCategoryNames(product) {
+  return normalizeCategoryNames(product?.categorias || product?.categoria);
+}
+
+function productMatchesCategory(product, targetName) {
+  const names = getProductCategoryNames(product).map(name => String(name).toLowerCase().trim());
+  const target = String(targetName || '').toLowerCase().trim();
+  return names.includes(target);
+}
+
 async function initLojaEngine() {
   await applyDynamicBranding();
   await loadCatalogData();
@@ -229,9 +249,9 @@ function renderCatalog() {
     .map(c => String(c.name).toLowerCase().trim());
 
   let filtered = catalogData.filter(p => {
-    if (p.categoria) {
-      const prodCatName = String(p.categoria).toLowerCase().trim();
-      if (inactiveCatNames.includes(prodCatName)) return false;
+    const productCategories = getProductCategoryNames(p).map(cat => String(cat).toLowerCase().trim());
+    if (productCategories.length > 0 && productCategories.some(cat => inactiveCatNames.includes(cat))) {
+      return false;
     }
     return true;
   });
@@ -239,21 +259,22 @@ function renderCatalog() {
   if (activeCategory !== 'todos') {
     const target = String(activeCategory).toLowerCase().trim();
     filtered = filtered.filter(p => {
+      let cats = [];
       if (Array.isArray(p.categorias) && p.categorias.length > 0) {
-        return p.categorias.some(c => String(c).toLowerCase().trim() === target);
+        cats = p.categorias;
+      } else if (p.categoria) {
+        cats = String(p.categoria).split(',').map(s => s.trim());
       }
-      if (!p.categoria) return false;
-      const catVal = String(p.categoria).toLowerCase().trim();
-      return catVal.includes(target);
+      return cats.some(c => String(c).toLowerCase().trim() === target);
     });
   }
 
   if (currentSearchQuery) {
     const q = currentSearchQuery.toLowerCase();
-    filtered = filtered.filter(p =>
-      p.nome.toLowerCase().includes(q) ||
-      (p.categoria && p.categoria.toLowerCase().includes(q))
-    );
+    filtered = filtered.filter(p => {
+      const categoryText = getProductCategoryNames(p).join(' ');
+      return p.nome.toLowerCase().includes(q) || categoryText.toLowerCase().includes(q);
+    });
   }
 
   const countDisplay = document.getElementById('itemCountDisplay');

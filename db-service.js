@@ -81,6 +81,30 @@ window.DbService = (function () {
   /* -------------------------------------------------------------------------
      PRODUTOS
   ------------------------------------------------------------------------- */
+  function normalizeCategoryValues(value) {
+    if (Array.isArray(value)) {
+      return value.map(v => String(v || '').trim()).filter(Boolean);
+    }
+    if (typeof value === 'string') {
+      return value.split(',').map(v => v.trim()).filter(Boolean);
+    }
+    return [];
+  }
+
+  function serializeCategoryValue(value) {
+    return normalizeCategoryValues(value).join(', ');
+  }
+
+  function normalizeProductRecord(product) {
+    const categories = normalizeCategoryValues(product.categorias || product.categoria);
+    const categoryText = serializeCategoryValue(categories) || 'outros';
+    return {
+      ...product,
+      categoria: categoryText,
+      categorias: categories,
+    };
+  }
+
   async function getProducts() {
     if (isReady()) {
       try {
@@ -90,23 +114,27 @@ window.DbService = (function () {
           .order('position', { ascending: true });
 
         if (!error && Array.isArray(data)) {
-          _safeSetStorage(STORAGE_KEY_PRODUCTS, data);
-          return data;
+          const normalized = data.map(normalizeProductRecord);
+          _safeSetStorage(STORAGE_KEY_PRODUCTS, normalized);
+          return normalized;
         }
       } catch(e) {}
     }
     try {
       const raw = localStorage.getItem(STORAGE_KEY_PRODUCTS);
-      return raw ? JSON.parse(raw) : [];
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.map(normalizeProductRecord) : [];
     } catch { return []; }
   }
 
   async function upsertProduct(product) {
     if (isReady()) {
+      const selectedCategories = normalizeCategoryValues(product.categorias || product.categoria);
+      const categoryText = serializeCategoryValue(selectedCategories) || 'outros';
       const payload = {
         id:            product.id,
         nome:          product.nome           || '',
-        categoria:     product.categoria      || 'outros',
+        categoria:     categoryText,
         descricao:     product.descricao      || '',
         preco_broto:   product.preco_broto    || 0,
         preco_media:   product.preco_media    || 0,
@@ -139,7 +167,10 @@ window.DbService = (function () {
   function _syncProductsToLocalStorage() {
     if (isReady()) {
       window.db.from('store_products').select('*').order('position').then(({ data }) => {
-        if (data) _safeSetStorage(STORAGE_KEY_PRODUCTS, data);
+        if (data) {
+          const normalized = data.map(normalizeProductRecord);
+          _safeSetStorage(STORAGE_KEY_PRODUCTS, normalized);
+        }
       });
     }
   }
@@ -171,18 +202,23 @@ window.DbService = (function () {
     if (isReady()) {
       const payload = {
         id:       cat.id,
+        store_id: getStoreId(),
         name:     cat.name || '',
-        active:   cat.active !== false,
-        position: cat.position || 0,
       };
+      if (cat.active !== undefined) payload.active = (cat.active !== false);
+      if (cat.position !== undefined) payload.position = cat.position || 0;
 
-      let { error } = await window.db.from('store_categories').upsert(payload, { onConflict: 'id' });
-      if (error) {
-        delete payload.active;
-        delete payload.position;
-        let retry = await window.db.from('store_categories').upsert(payload, { onConflict: 'id' });
-        if (retry.error) {
-          console.warn('[DbService] upsertCategory fallback:', retry.error);
+      // 1. Tenta atualizar o registro filtrando pelo ID da categoria
+      let { data, error } = await window.db.from('store_categories').update(payload).eq('id', cat.id).select();
+
+      // 2. Se o registro não existia ainda (ou se a coluna store_id for opcional), faz o insert limpo
+      if (error || !data || data.length === 0) {
+        let ins = await window.db.from('store_categories').insert(payload);
+        if (ins.error) {
+          delete payload.active;
+          delete payload.position;
+          delete payload.store_id;
+          await window.db.from('store_categories').insert(payload);
         }
       }
     }

@@ -12,6 +12,26 @@ let tempLogoBase64 = '';
 let tempBannerDeskBase64 = '';
 let tempBannerMobBase64 = '';
 
+function normalizeCategoryNames(value) {
+  if (Array.isArray(value)) {
+    return value.map(v => String(v || '').trim()).filter(Boolean);
+  }
+  if (typeof value === 'string') {
+    return value.split(',').map(v => v.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+function getProductCategoryNames(product) {
+  return normalizeCategoryNames(product?.categorias || product?.categoria);
+}
+
+function productMatchesCategory(product, targetName) {
+  const names = getProductCategoryNames(product).map(name => String(name).toLowerCase().trim());
+  const target = String(targetName || '').toLowerCase().trim();
+  return names.includes(target);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   await loadAdminSettings();
   renderAdminTable();
@@ -149,7 +169,10 @@ function renderAdminTable(productsToRender) {
 
   container.innerHTML = list.map(p => {
     const priceVal = parseFloat(p.preco || p.preco_grande || 0);
-    const catName = p.categoria || 'Sem categoria';
+    const categoryNames = getProductCategoryNames(p);
+    const categoryBadges = categoryNames.length
+      ? categoryNames.map(cat => `<span style="display: inline-flex; align-items: center; background: #F4F4F7; color: #18181B; border: 1px solid #E4E4E7; padding: 2px 8px; border-radius: 999px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase;">${cat}</span>`).join('')
+      : '<span style="display: inline-flex; align-items: center; background: #F4F4F7; color: #71717A; border: 1px solid #E4E4E7; padding: 2px 8px; border-radius: 999px; font-size: 0.68rem; font-weight: 700;">Sem categoria</span>';
     const imgUrl = p.img_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
 
     return `
@@ -160,7 +183,7 @@ function renderAdminTable(productsToRender) {
         </div>
         <div style="padding: 16px; flex: 1; display: flex; flex-direction: column; justify-space-between;">
           <div>
-            <div style="font-size: 0.75rem; font-weight: 700; color: #6344F5; text-transform: uppercase;">${catName}</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">${categoryBadges}</div>
             <h4 style="font-size: 1rem; font-weight: 800; color: #18181B; margin: 4px 0 6px;">${p.nome}</h4>
             <p style="font-size: 0.82rem; color: #71717A; line-height: 1.3; margin: 0 0 12px;">${p.descricao || ''}</p>
           </div>
@@ -183,9 +206,10 @@ function filterAdminCards(query) {
     return;
   }
   const q = query.toLowerCase();
-  const filtered = currentProducts.filter(p =>
-    p.nome.toLowerCase().includes(q) || (p.categoria && p.categoria.toLowerCase().includes(q))
-  );
+  const filtered = currentProducts.filter(p => {
+    const categoryText = getProductCategoryNames(p).join(' ');
+    return p.nome.toLowerCase().includes(q) || categoryText.toLowerCase().includes(q);
+  });
   renderAdminTable(filtered);
 }
 
@@ -368,7 +392,7 @@ function editProductItem(id) {
   document.getElementById('prodDesc').value = item.descricao || '';
   document.getElementById('prodBadge').value = item.badge || '';
 
-  const catVal = item.categorias || item.categoria || [];
+  const catVal = getProductCategoryNames(item);
   populateCategorySelect(catVal);
 
   tempProductImgBase64 = item.img_url || '';
@@ -484,7 +508,7 @@ function renderCategoriesUI() {
   }
 
   container.innerHTML = currentCategories.map(c => {
-    const countProds = currentProducts.filter(p => p.categoria === c.name).length;
+    const countProds = currentProducts.filter(p => productMatchesCategory(p, c.name)).length;
     const isInactive = (c.active === false);
 
     return `
