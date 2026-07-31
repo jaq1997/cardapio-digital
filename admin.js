@@ -62,8 +62,11 @@ async function loadAdminSettings() {
     if (getEl('cfgAccentColor')) getEl('cfgAccentColor').value = currentBranding.accentColor || '#6344F5';
     if (getEl('cfgBadgeBgColor')) getEl('cfgBadgeBgColor').value = currentBranding.badgeBgColor || '#F1EEFE';
 
-    if (getEl('adminStoreTitleDisplay')) {
-      getEl('adminStoreTitleDisplay').innerText = currentBranding.storeName || 'Minha Loja';
+    // Atualiza o link do botão Ver Cardápio Ao Vivo com o ID da loja logada
+    const btnView = getEl('btnViewLiveStore');
+    if (btnView) {
+      const activeId = (typeof CURRENT_STORE_ID !== 'undefined' ? CURRENT_STORE_ID : (localStorage.getItem('active_store_id') || 'default'));
+      btnView.href = `index.html?loja=${activeId}`;
     }
 
     // Exibe o e-mail do usuário logado na sidebar
