@@ -8,7 +8,6 @@ const AUTH = {
   /* Verifica sessão ativa. Se não tiver, redireciona para o login. */
   async guardAdmin() {
     if (!window.SUPABASE_READY) {
-      // Supabase não configurado — acesso liberado em modo dev/local
       console.warn('[Auth] Supabase não configurado. Admin liberado sem autenticação.');
       AUTH._showAdminContent();
       return;
@@ -19,6 +18,10 @@ const AUTH = {
     if (!session) {
       window.location.replace('admin-login.html');
       return;
+    }
+
+    if (session.user) {
+      localStorage.setItem('active_store_id', session.user.id);
     }
 
     AUTH._showAdminContent();
@@ -32,13 +35,19 @@ const AUTH = {
     }
 
     const { data, error } = await window.db.auth.signInWithPassword({ email, password });
+    if (!error && data && data.user) {
+      // Associa o store_id ao ID do usuário autenticado no Supabase
+      localStorage.setItem('active_store_id', data.user.id);
+    }
     return { data, error };
   },
 
   /* Realiza logout */
   async logout() {
-    if (!window.SUPABASE_READY) return;
-    await window.db.auth.signOut();
+    if (window.SUPABASE_READY) {
+      await window.db.auth.signOut();
+    }
+    localStorage.removeItem('active_store_id');
     window.location.replace('admin-login.html');
   },
 

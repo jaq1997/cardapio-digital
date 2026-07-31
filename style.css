@@ -1246,10 +1246,10 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 
 @media (max-width: 768px) {
   body {
-    padding-bottom: 75px;
+    padding-bottom: 0;
   }
-  footer {
-    padding-bottom: 75px;
+  footer, .ph-footer {
+    padding-bottom: 30px;
   }
   .mobile-hamburger-btn {
     display: block;
@@ -1304,10 +1304,39 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
   gap: 24px;
 }
 
+.modal-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  -webkit-overflow-scrolling: touch;
+}
+
 @media (max-width: 768px) {
+  html {
+    background-color: #18181B !important;
+  }
+  body {
+    background-color: #F8FAFC;
+    padding-bottom: 0 !important;
+  }
+  .modal-overlay {
+    padding: 8px !important;
+    align-items: flex-end !important;
+  }
+  .modal-card {
+    max-height: 88vh !important;
+    padding: 20px 14px !important;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
   .modal-customizer-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
   }
 }
 
