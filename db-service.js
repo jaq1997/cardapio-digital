@@ -167,7 +167,12 @@ window.DbService = (function () {
         active:   cat.active !== false,
         position: cat.position || 0,
       };
-      await window.db.from('store_categories').upsert(payload, { onConflict: 'id' });
+
+      let { error } = await window.db.from('store_categories').upsert(payload, { onConflict: 'id' });
+      if (error && error.code === 'PGRST204') {
+        delete payload.active;
+        await window.db.from('store_categories').upsert(payload, { onConflict: 'id' });
+      }
     }
     const cats = await getCategories();
     localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(cats));

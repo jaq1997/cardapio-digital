@@ -8,6 +8,8 @@ let currentProducts = [];
 let currentDeliveryZones = [];
 let currentCoupons = [];
 let tempProductImgBase64 = '';
+let tempBannerDeskBase64 = '';
+let tempBannerMobBase64 = '';
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadAdminSettings();
@@ -58,6 +60,23 @@ async function loadAdminSettings() {
       } else {
         getEl('adminUserEmailDisplay').innerText = 'Administrador';
       }
+    }
+
+    // Carrega pré-visualizações de banners existentes
+    if (currentBranding.bannerDeskUrl) {
+      tempBannerDeskBase64 = currentBranding.bannerDeskUrl;
+      const imgD = getEl('bannerDeskPreview');
+      const btnD = getEl('btnRemoveBannerDesk');
+      if (imgD) { imgD.src = tempBannerDeskBase64; imgD.style.display = 'block'; }
+      if (btnD) btnD.style.display = 'inline-flex';
+    }
+
+    if (currentBranding.bannerMobUrl) {
+      tempBannerMobBase64 = currentBranding.bannerMobUrl;
+      const imgM = getEl('bannerMobPreview');
+      const btnM = getEl('btnRemoveBannerMob');
+      if (imgM) { imgM.src = tempBannerMobBase64; imgM.style.display = 'block'; }
+      if (btnM) btnM.style.display = 'inline-flex';
     }
 
     // Preenche contadores na dashboard
@@ -124,12 +143,12 @@ function renderAdminTable(productsToRender) {
     const imgUrl = p.img_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
 
     return `
-      <div class="admin-prod-card" style="background: #FFFFFF; border: 1px solid #E4E4E7; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+      <div class="admin-prod-card" style="background: #FFFFFF; border: 1px solid #E4E4E7; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; justify-space-between;">
         <div style="height: 140px; overflow: hidden; background: #FAFAFC; position: relative;">
           <img src="${imgUrl}" alt="${p.nome}" style="width: 100%; height: 100%; object-fit: cover;">
           ${p.badge ? `<span style="position: absolute; top: 8px; left: 8px; background: #6344F5; color: #FFF; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 4px;">${p.badge}</span>` : ''}
         </div>
-        <div style="padding: 16px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="padding: 16px; flex: 1; display: flex; flex-direction: column; justify-space-between;">
           <div>
             <div style="font-size: 0.75rem; font-weight: 700; color: #6344F5; text-transform: uppercase;">${catName}</div>
             <h4 style="font-size: 1rem; font-weight: 800; color: #18181B; margin: 4px 0 6px;">${p.nome}</h4>
@@ -218,6 +237,55 @@ function removeProductPhoto() {
     img.src = '';
     img.style.display = 'none';
   }
+  if (btnRem) btnRem.style.display = 'none';
+}
+
+/* UPLOAD E REMOÇÃO DE BANNERS */
+function previewBannerDeskUpload(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      tempBannerDeskBase64 = e.target.result;
+      const img = document.getElementById('bannerDeskPreview');
+      const btnRem = document.getElementById('btnRemoveBannerDesk');
+      if (img) { img.src = tempBannerDeskBase64; img.style.display = 'block'; }
+      if (btnRem) btnRem.style.display = 'inline-flex';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function removeBannerDesk() {
+  tempBannerDeskBase64 = '';
+  const fileInput = document.getElementById('cfgBannerDeskFile');
+  const img = document.getElementById('bannerDeskPreview');
+  const btnRem = document.getElementById('btnRemoveBannerDesk');
+  if (fileInput) fileInput.value = '';
+  if (img) { img.src = ''; img.style.display = 'none'; }
+  if (btnRem) btnRem.style.display = 'none';
+}
+
+function previewBannerMobUpload(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      tempBannerMobBase64 = e.target.result;
+      const img = document.getElementById('bannerMobPreview');
+      const btnRem = document.getElementById('btnRemoveBannerMob');
+      if (img) { img.src = tempBannerMobBase64; img.style.display = 'block'; }
+      if (btnRem) btnRem.style.display = 'inline-flex';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function removeBannerMob() {
+  tempBannerMobBase64 = '';
+  const fileInput = document.getElementById('cfgBannerMobFile');
+  const img = document.getElementById('bannerMobPreview');
+  const btnRem = document.getElementById('btnRemoveBannerMob');
+  if (fileInput) fileInput.value = '';
+  if (img) { img.src = ''; img.style.display = 'none'; }
   if (btnRem) btnRem.style.display = 'none';
 }
 
@@ -696,7 +764,9 @@ async function saveBrandingConfig(event) {
     primaryColor: document.getElementById('cfgPrimaryColor').value,
     btnTextColor: document.getElementById('cfgBtnTextColor').value,
     accentColor: document.getElementById('cfgAccentColor').value,
-    badgeBgColor: document.getElementById('cfgBadgeBgColor').value
+    badgeBgColor: document.getElementById('cfgBadgeBgColor').value,
+    bannerDeskUrl: tempBannerDeskBase64 || currentBranding.bannerDeskUrl || '',
+    bannerMobUrl: tempBannerMobBase64 || currentBranding.bannerMobUrl || ''
   };
 
   await DbService.saveBranding(currentBranding);
@@ -722,6 +792,10 @@ window.openAddProductModal = openAddProductModal;
 window.closeProductFormModal = closeProductFormModal;
 window.previewProductFileUpload = previewProductFileUpload;
 window.removeProductPhoto = removeProductPhoto;
+window.previewBannerDeskUpload = previewBannerDeskUpload;
+window.removeBannerDesk = removeBannerDesk;
+window.previewBannerMobUpload = previewBannerMobUpload;
+window.removeBannerMob = removeBannerMob;
 window.saveProductItem = saveProductItem;
 window.deleteProductItem = deleteProductItem;
 window.editProductItem = editProductItem;
