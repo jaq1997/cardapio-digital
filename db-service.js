@@ -1,6 +1,6 @@
 /* ==========================================================================
-   DB SERVICE — Camada de abstração de dados (100% Estável & Limpa)
-   Garante zero erros 400 no F12 e resiliência total com Supabase.
+   DB SERVICE — Camada de abstração de dados (100% Estável & Resiliente)
+   Utiliza _safeSetStorage para evitar QuotaExceededError no localStorage.
    Disponível globalmente como `window.DbService`
    ========================================================================== */
 
@@ -8,6 +8,14 @@ window.DbService = (function () {
 
   const isReady = () => window.SUPABASE_READY && window.db;
   const getStoreId = () => (typeof CURRENT_STORE_ID !== 'undefined' ? CURRENT_STORE_ID : 'default');
+
+  function _safeSetStorage(key, value) {
+    try {
+      localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+    } catch (e) {
+      // Ignora estouro de cota do localStorage (5MB) para utilizar o Supabase em nuvem livremente
+    }
+  }
 
   /* -------------------------------------------------------------------------
      BRANDING / IDENTIDADE VISUAL
@@ -46,7 +54,7 @@ window.DbService = (function () {
   }
 
   async function saveBranding(branding) {
-    localStorage.setItem(STORAGE_KEY_BRANDING, JSON.stringify(branding));
+    _safeSetStorage(STORAGE_KEY_BRANDING, branding);
 
     if (!isReady()) return;
 
@@ -82,7 +90,7 @@ window.DbService = (function () {
           .order('position', { ascending: true });
 
         if (!error && Array.isArray(data)) {
-          localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(data));
+          _safeSetStorage(STORAGE_KEY_PRODUCTS, data);
           return data;
         }
       } catch(e) {}
@@ -131,7 +139,7 @@ window.DbService = (function () {
   function _syncProductsToLocalStorage() {
     if (isReady()) {
       window.db.from('store_products').select('*').order('position').then(({ data }) => {
-        if (data) localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(data));
+        if (data) _safeSetStorage(STORAGE_KEY_PRODUCTS, data);
       });
     }
   }
@@ -147,8 +155,8 @@ window.DbService = (function () {
           .select('*')
           .order('position', { ascending: true });
 
-        if (!error && data) {
-          localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(data));
+        if (!error && Array.isArray(data)) {
+          _safeSetStorage(STORAGE_KEY_CATEGORIES, data);
           return data;
         }
       } catch(e) {}
@@ -175,7 +183,7 @@ window.DbService = (function () {
       }
     }
     const cats = await getCategories();
-    localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(cats));
+    _safeSetStorage(STORAGE_KEY_CATEGORIES, cats);
   }
 
   async function deleteCategory(id) {
@@ -183,7 +191,7 @@ window.DbService = (function () {
       await window.db.from('store_categories').delete().eq('id', id);
     }
     const cats = await getCategories();
-    localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(cats));
+    _safeSetStorage(STORAGE_KEY_CATEGORIES, cats);
   }
 
   /* -------------------------------------------------------------------------
@@ -197,8 +205,8 @@ window.DbService = (function () {
           .select('*')
           .order('position', { ascending: true });
 
-        if (!error && data) {
-          localStorage.setItem(STORAGE_KEY_DELIVERY_ZONES, JSON.stringify(data));
+        if (!error && Array.isArray(data)) {
+          _safeSetStorage(STORAGE_KEY_DELIVERY_ZONES, data);
           return data;
         }
       } catch(e) {}
@@ -220,7 +228,7 @@ window.DbService = (function () {
       await window.db.from('store_delivery_zones').upsert(payload, { onConflict: 'id' });
     }
     const zones = await getDeliveryZones();
-    localStorage.setItem(STORAGE_KEY_DELIVERY_ZONES, JSON.stringify(zones));
+    _safeSetStorage(STORAGE_KEY_DELIVERY_ZONES, zones);
   }
 
   async function deleteDeliveryZone(id) {
@@ -228,7 +236,7 @@ window.DbService = (function () {
       await window.db.from('store_delivery_zones').delete().eq('id', id);
     }
     const zones = await getDeliveryZones();
-    localStorage.setItem(STORAGE_KEY_DELIVERY_ZONES, JSON.stringify(zones));
+    _safeSetStorage(STORAGE_KEY_DELIVERY_ZONES, zones);
   }
 
   /* -------------------------------------------------------------------------
@@ -242,8 +250,8 @@ window.DbService = (function () {
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (!error && data) {
-          localStorage.setItem(STORAGE_KEY_COUPONS, JSON.stringify(data));
+        if (!error && Array.isArray(data)) {
+          _safeSetStorage(STORAGE_KEY_COUPONS, data);
           return data;
         }
       } catch(e) {}
@@ -268,7 +276,7 @@ window.DbService = (function () {
       await window.db.from('store_coupons').upsert(payload, { onConflict: 'id' });
     }
     const coupons = await getCoupons();
-    localStorage.setItem(STORAGE_KEY_COUPONS, JSON.stringify(coupons));
+    _safeSetStorage(STORAGE_KEY_COUPONS, coupons);
   }
 
   async function deleteCoupon(id) {
@@ -276,7 +284,7 @@ window.DbService = (function () {
       await window.db.from('store_coupons').delete().eq('id', id);
     }
     const coupons = await getCoupons();
-    localStorage.setItem(STORAGE_KEY_COUPONS, JSON.stringify(coupons));
+    _safeSetStorage(STORAGE_KEY_COUPONS, coupons);
   }
 
   return {
