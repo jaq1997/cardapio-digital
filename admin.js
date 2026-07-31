@@ -400,6 +400,19 @@ async function saveProductItem(event) {
     if (n) adicionaisList.push({ nome: n, preco: p });
   });
 
+  // Captura direta da imagem (Upload, URL ou Preview)
+  let imgFinal = '';
+  const previewImg = document.getElementById('prodFilePreview');
+  const urlInput = document.getElementById('prodImageUrlInput');
+
+  if (tempProductImgBase64) {
+    imgFinal = tempProductImgBase64;
+  } else if (urlInput && urlInput.value.trim()) {
+    imgFinal = urlInput.value.trim();
+  } else if (previewImg && previewImg.src && previewImg.style.display !== 'none' && !previewImg.src.endsWith('#')) {
+    imgFinal = previewImg.src;
+  }
+
   const candidate = {
     id: editId || ('prod-' + Date.now()),
     nome: name,
@@ -408,7 +421,7 @@ async function saveProductItem(event) {
     preco_grande: price,
     descricao: desc,
     badge: badge,
-    img_url: tempProductImgBase64 || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+    img_url: imgFinal,
     adicionais: adicionaisList,
     status: 'ativo'
   };
