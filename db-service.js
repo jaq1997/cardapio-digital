@@ -186,7 +186,7 @@ window.DbService = (function () {
           .select('*')
           .order('position', { ascending: true });
 
-        if (!error && Array.isArray(data)) {
+        if (!error && Array.isArray(data) && data.length > 0) {
           _safeSetStorage(STORAGE_KEY_CATEGORIES, data);
           return data;
         }
@@ -200,26 +200,52 @@ window.DbService = (function () {
 
   async function upsertCategory(cat) {
     if (isReady()) {
-      const payload = {
-        id:   cat.id || ('cat-' + Date.now()),
-        name: cat.name || '',
-      };
-
-      let { data, error } = await window.db.from('store_categories').upsert(payload);
-      if (error) {
-        console.error('[Supabase Error Details]:', error);
-      }
+      try {
+        const payload = {
+          id:       cat.id || ('cat-' + Date.now()),
+          name:     cat.name || '',
+          active:   cat.active !== false,
+          position: cat.position || 0,
+        };
+        let { error } = await window.db.from('store_categories').upsert(payload);
+        if (error) {
+          delete payload.active;
+          delete payload.position;
+          await window.db.from('store_categories').upsert(payload);
+        }
+      } catch(e) {}
     }
-    const cats = await getCategories();
-    _safeSetStorage(STORAGE_KEY_CATEGORIES, cats);
+
+    let existing = [];
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_CATEGORIES);
+      if (raw) existing = JSON.parse(raw);
+    } catch(e) {}
+
+    const idx = existing.findIndex(c => String(c.id) === String(cat.id));
+    if (idx >= 0) {
+      existing[idx] = { ...existing[idx], ...cat };
+    } else {
+      existing.push(cat);
+    }
+    _safeSetStorage(STORAGE_KEY_CATEGORIES, existing);
+    return existing;
   }
 
   async function deleteCategory(id) {
     if (isReady()) {
-      await window.db.from('store_categories').delete().eq('id', id);
+      try {
+        await window.db.from('store_categories').delete().eq('id', id);
+      } catch(e) {}
     }
-    const cats = await getCategories();
-    _safeSetStorage(STORAGE_KEY_CATEGORIES, cats);
+    let existing = [];
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_CATEGORIES);
+      if (raw) existing = JSON.parse(raw);
+    } catch(e) {}
+    existing = existing.filter(c => String(c.id) !== String(id));
+    _safeSetStorage(STORAGE_KEY_CATEGORIES, existing);
+    return existing;
   }
 
   /* -------------------------------------------------------------------------

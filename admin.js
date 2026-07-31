@@ -606,13 +606,18 @@ async function saveCategoryWithProducts(event) {
   // Desvincula e vincula produtos selecionados
   const selectedProdIds = Array.from(document.querySelectorAll('.cat-prod-check:checked')).map(cb => cb.value);
   for (let p of currentProducts) {
+    let cats = Array.isArray(p.categorias) ? [...p.categorias] : (p.categoria ? p.categoria.split(',').map(s => s.trim()).filter(Boolean) : []);
     if (selectedProdIds.includes(p.id)) {
-      if (p.categoria !== name) {
-        p.categoria = name;
+      if (!cats.includes(name)) {
+        cats.push(name);
+        p.categoria = cats.join(', ');
+        p.categorias = cats;
         await DbService.upsertProduct(p);
       }
-    } else if (p.categoria === name && editId) {
-      p.categoria = '';
+    } else if (cats.includes(name) && editId) {
+      cats = cats.filter(c => c !== name);
+      p.categoria = cats.join(', ');
+      p.categorias = cats;
       await DbService.upsertProduct(p);
     }
   }
