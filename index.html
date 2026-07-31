@@ -124,15 +124,8 @@
           <!-- FORMA DE ENTREGA E ENDEREÇO -->
           <div class="checkout-section-box">
             <div class="option-group-title">Forma de Entrega</div>
-            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-              <label style="flex: 1; background: #FFF; border: 2px solid var(--ph-border); padding: 10px; border-radius: 6px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 800;">
-                <input type="radio" name="deliveryType" value="entrega" checked onchange="toggleDeliveryTypeUI('entrega')" style="accent-color: var(--ph-red);">
-                <span>Entrega em Domicílio</span>
-              </label>
-              <label style="flex: 1; background: #FFF; border: 2px solid var(--ph-border); padding: 10px; border-radius: 6px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 800;">
-                <input type="radio" name="deliveryType" value="balcao" onchange="toggleDeliveryTypeUI('balcao')" style="accent-color: var(--ph-red);">
-                <span>Retirada no Balcão (Grátis)</span>
-              </label>
+            <div id="deliveryOptionsContainer" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+              <!-- Renderizado dinamicamente via loja.js a partir das zonas do Admin -->
             </div>
 
             <div id="deliveryAddressBox">

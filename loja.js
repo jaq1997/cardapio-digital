@@ -130,14 +130,14 @@ async function loadCatalogData() {
 }
 
 async function loadAndRenderDrawerCategories() {
-  const container = document.getElementById('drawerCategoriesList');
+  const container = document.getElementById('drawerCategoryListContainer') || document.getElementById('drawerCategoriesList');
   if (!container) return;
 
   categories = [];
   if (window.DbService) {
     try {
       const remote = await DbService.getCategories();
-      if (remote && remote.length > 0) categories = remote;
+      if (remote) categories = remote;
     } catch(e) {}
   }
 
@@ -146,20 +146,20 @@ async function loadAndRenderDrawerCategories() {
     if (saved) { try { categories = JSON.parse(saved); } catch(e) {} }
   }
 
-  if (categories.length === 0 && typeof defaultCategories !== 'undefined') {
-    categories = defaultCategories;
+  let html = `<div style="font-size: 0.75rem; font-weight: 700; color: #64748B; margin-bottom: 8px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div>`;
+  html += `<button class="drawer-cat-item ${activeCategory === 'todos' ? 'active' : ''}" onclick="selectDrawerCategory('todos')" style="width: 100%; text-align: left; padding: 12px 16px; background: transparent; border: none; font-weight: 600; font-size: 0.9rem; color: #0F172A; cursor: pointer; border-radius: 8px;">TODOS OS PRODUTOS</button>`;
+
+  if (categories && categories.length > 0) {
+    const activeCats = categories.filter(c => c.active !== false);
+    activeCats.forEach(cat => {
+      const isAct = (activeCategory === cat.name || activeCategory === cat.id);
+      html += `
+        <button class="drawer-cat-item ${isAct ? 'active' : ''}" onclick="selectDrawerCategory('${cat.name}')" style="width: 100%; text-align: left; padding: 12px 16px; background: transparent; border: none; font-weight: 600; font-size: 0.9rem; color: #0F172A; cursor: pointer; border-radius: 8px;">
+          ${cat.name.toUpperCase()}
+        </button>
+      `;
+    });
   }
-
-  let html = `<button class="drawer-cat-item ${activeCategory === 'todos' ? 'active' : ''}" onclick="selectDrawerCategory('todos')" style="width: 100%; text-align: left; padding: 12px 16px; background: transparent; border: none; font-weight: 600; font-size: 0.9rem; color: #0F172A; cursor: pointer; border-radius: 8px;">TODOS OS PRODUTOS</button>`;
-
-  categories.forEach(cat => {
-    const isAct = (activeCategory === cat.name || activeCategory === cat.id);
-    html += `
-      <button class="drawer-cat-item ${isAct ? 'active' : ''}" onclick="selectDrawerCategory('${cat.name}')" style="width: 100%; text-align: left; padding: 12px 16px; background: transparent; border: none; font-weight: 600; font-size: 0.9rem; color: #0F172A; cursor: pointer; border-radius: 8px;">
-        ${cat.name.toUpperCase()}
-      </button>
-    `;
-  });
 
   container.innerHTML = html;
 }
@@ -176,11 +176,25 @@ function selectDrawerCategory(catId) {
 }
 
 function toggleMobileDrawer(open) {
-  const drawer = document.getElementById('mobileDrawer');
-  if (drawer) {
-    if (open === undefined) drawer.classList.toggle('active');
-    else if (open) drawer.classList.add('active');
-    else drawer.classList.remove('active');
+  const overlay = document.getElementById('drawerOverlay');
+  const card = document.getElementById('drawerCard');
+  const legacyDrawer = document.getElementById('mobileDrawer');
+
+  if (open === undefined) {
+    if (overlay) open = !overlay.classList.contains('active');
+  }
+
+  if (overlay) {
+    if (open) overlay.classList.add('active');
+    else overlay.classList.remove('active');
+  }
+  if (card) {
+    if (open) card.classList.add('active');
+    else card.classList.remove('active');
+  }
+  if (legacyDrawer) {
+    if (open) legacyDrawer.classList.add('active');
+    else legacyDrawer.classList.remove('active');
   }
 }
 
@@ -191,7 +205,19 @@ function renderCatalog() {
   const container = document.getElementById('productGridContainer');
   if (!container) return;
 
-  let filtered = catalogData;
+  // Oculta produtos de categorias marcadas como inativas no Admin
+  const inactiveCatNames = (categories || [])
+    .filter(c => c.active === false)
+    .map(c => String(c.name).toLowerCase().trim());
+
+  let filtered = catalogData.filter(p => {
+    if (p.categoria) {
+      const prodCatName = String(p.categoria).toLowerCase().trim();
+      if (inactiveCatNames.includes(prodCatName)) return false;
+    }
+    return true;
+  });
+
   if (activeCategory !== 'todos') {
     const target = String(activeCategory).toLowerCase().trim();
     filtered = filtered.filter(p => {
@@ -363,15 +389,70 @@ function closeProductModal() {
    5. GESTÃO DO CARRINHO (SEU PEDIDO) E CHECKOUT
 ------------------------------------------------------------------------- */
 function updateCartBadge() {
-  const badge = document.getElementById('cartBadgeCount');
   const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
-  if (badge) badge.innerText = totalQty;
+
+  const b1 = document.getElementById('cartCountBadge');
+  if (b1) b1.innerText = totalQty;
+
+  const b2 = document.getElementById('cartBadgeCount');
+  if (b2) b2.innerText = totalQty;
+
+  document.querySelectorAll('.ph-cart-badge, .cart-badge-count').forEach(el => {
+    el.innerText = totalQty;
+  });
 }
 
 function openCartModal() {
   renderCartItems();
+  renderDeliveryOptionsInCart();
   const modal = document.getElementById('cartModal');
   if (modal) modal.classList.add('active');
+}
+
+function renderDeliveryOptionsInCart() {
+  const container = document.getElementById('deliveryOptionsContainer');
+  if (!container) return;
+
+  const zonesToRender = (deliveryZones && deliveryZones.length > 0) ? deliveryZones : [
+    { id: 'def-1', name: 'Entrega em Domicílio', price: 5.00 },
+    { id: 'def-2', name: 'Retirada no Balcão (Grátis)', price: 0.00 }
+  ];
+
+  container.innerHTML = zonesToRender.map((zone, idx) => {
+    const isChecked = (idx === 0);
+    const priceVal = parseFloat(zone.price || 0);
+    const priceTxt = (priceVal === 0) ? 'Grátis' : `R$ ${priceVal.toFixed(2).replace('.', ',')}`;
+
+    return `
+      <label style="background: #FFF; border: 2px solid #E2E8F0; padding: 10px 14px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; font-size: 0.85rem; font-weight: 700;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <input type="radio" name="deliveryZoneRadio" value="${zone.id}" ${isChecked ? 'checked' : ''} onchange="selectDeliveryZone('${zone.id}')" style="accent-color: #18181B; width: 16px; height: 16px;">
+          <span style="color: #0F172A;">${zone.name}</span>
+        </div>
+        <span style="color: #18181B; font-weight: 800;">${priceTxt}</span>
+      </label>
+    `;
+  }).join('');
+
+  if (zonesToRender.length > 0) {
+    selectDeliveryZone(zonesToRender[0].id);
+  }
+}
+
+function selectDeliveryZone(zoneId) {
+  const zone = (deliveryZones || []).find(z => String(z.id) === String(zoneId));
+  const addressBox = document.getElementById('deliveryAddressBox');
+
+  if (zone) {
+    currentSelectedZoneName = zone.name;
+    currentDeliveryFee = parseFloat(zone.price || 0);
+    
+    const isBalcao = zone.name.toLowerCase().includes('retirada') || zone.name.toLowerCase().includes('balcão');
+    if (addressBox) {
+      addressBox.style.display = isBalcao ? 'none' : 'block';
+    }
+  }
+  updateCartTotals();
 }
 
 function closeCartModal() {
@@ -467,9 +548,18 @@ function toggleDeliveryTypeUI(type) {
   const addressBox = document.getElementById('deliveryAddressBox');
   if (type === 'balcao') {
     currentSelectedZoneName = "Retirada no Balcão";
+    currentDeliveryFee = 0;
     if (addressBox) addressBox.style.display = 'none';
   } else {
-    currentSelectedZoneName = "Entrega em Domicílio";
+    // Busca a zona de entrega cadastrada no admin
+    if (deliveryZones && deliveryZones.length > 0) {
+      const activeZone = deliveryZones.find(z => z.name !== "Retirada no Balcão") || deliveryZones[0];
+      currentSelectedZoneName = activeZone.name;
+      currentDeliveryFee = parseFloat(activeZone.price) || 0;
+    } else {
+      currentSelectedZoneName = "Entrega em Domicílio";
+      currentDeliveryFee = 5.00;
+    }
     if (addressBox) addressBox.style.display = 'block';
   }
   updateCartTotals();
@@ -507,8 +597,14 @@ async function buscarCepViaAPI() {
 
     const box = document.getElementById('addressResultBox');
     const txtRua = document.getElementById('txtRuaBairro');
+    const txtFrete = document.getElementById('txtFreteVal');
+
     if (box) box.style.display = 'block';
     if (txtRua) txtRua.innerText = `${data.logradouro}, ${data.bairro} - ${data.localidade}/${data.uf}`;
+    
+    const feeTxt = (currentDeliveryFee === 0) ? 'Grátis' : `R$ ${currentDeliveryFee.toFixed(2).replace('.', ',')}`;
+    if (txtFrete) txtFrete.innerText = `Taxa de Entrega (${currentSelectedZoneName}): ${feeTxt}`;
+
     showToast('Endereço localizado!', 'success');
   } catch(e) {
     showToast('Erro ao buscar CEP.', 'error');
@@ -592,10 +688,10 @@ function sendCartToWhatsApp() {
 }
 
 function showToast(msg, type = 'info') {
-  if (typeof defaultShowToast === 'function') {
-    defaultShowToast(msg, type);
+  if (typeof window.showToast === 'function') {
+    window.showToast(msg, type);
   } else {
-    alert(msg);
+    console.log(`[Toast ${type}] ${msg}`);
   }
 }
 
@@ -613,6 +709,7 @@ window.openCartModal = openCartModal;
 window.closeCartModal = closeCartModal;
 window.changeCartItemQty = changeCartItemQty;
 window.toggleDeliveryTypeUI = toggleDeliveryTypeUI;
+window.selectDeliveryZone = selectDeliveryZone;
 window.toggleSemNumero = toggleSemNumero;
 window.buscarCepViaAPI = buscarCepViaAPI;
 window.enviarPedidoWhatsAppFinal = enviarPedidoWhatsAppFinal;

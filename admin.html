@@ -483,6 +483,22 @@
         <div>
           <label class="admin-label">Nome da Categoria:</label>
           <input type="text" id="catModalNameInput" class="admin-input" placeholder="Ex: Marmitas Fit, Sobremesas, Promos..." required>
+          
+          <div style="margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+            <span style="font-size: 0.72rem; color: #71717A; font-weight: 700;">SUGESTÕES:</span>
+            <button type="button" onclick="document.getElementById('catModalNameInput').value='Pratos Principais'" style="background:#F4F4F7; border:1px solid #E4E4E7; border-radius:4px; padding:2px 8px; font-size:0.75rem; cursor:pointer; font-weight:600; color:#6344F5;">+ Pratos Principais</button>
+            <button type="button" onclick="document.getElementById('catModalNameInput').value='Bebidas'" style="background:#F4F4F7; border:1px solid #E4E4E7; border-radius:4px; padding:2px 8px; font-size:0.75rem; cursor:pointer; font-weight:600; color:#6344F5;">+ Bebidas</button>
+            <button type="button" onclick="document.getElementById('catModalNameInput').value='Sobremesas'" style="background:#F4F4F7; border:1px solid #E4E4E7; border-radius:4px; padding:2px 8px; font-size:0.75rem; cursor:pointer; font-weight:600; color:#6344F5;">+ Sobremesas</button>
+            <button type="button" onclick="document.getElementById('catModalNameInput').value='Entradas & Porções'" style="background:#F4F4F7; border:1px solid #E4E4E7; border-radius:4px; padding:2px 8px; font-size:0.75rem; cursor:pointer; font-weight:600; color:#6344F5;">+ Entradas</button>
+            <button type="button" onclick="document.getElementById('catModalNameInput').value='Promoções'" style="background:#F4F4F7; border:1px solid #E4E4E7; border-radius:4px; padding:2px 8px; font-size:0.75rem; cursor:pointer; font-weight:600; color:#6344F5;">+ Promoções</button>
+          </div>
+        </div>
+
+        <div>
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; color: #18181B; cursor: pointer;">
+            <input type="checkbox" id="catModalStatusInput" checked style="accent-color: #6344F5; width: 16px; height: 16px;">
+            <span>Categoria ativa (Visível no cardápio da loja)</span>
+          </label>
         </div>
 
         <div>

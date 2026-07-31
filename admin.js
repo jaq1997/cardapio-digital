@@ -325,9 +325,14 @@ function renderCategoriesUI() {
 
   container.innerHTML = currentCategories.map(c => {
     const countProds = currentProducts.filter(p => p.categoria === c.name).length;
+    const isInactive = (c.active === false);
+
     return `
-      <div class="cat-pill-tag" data-id="${c.id}" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; background: #F4F4F7; border: 1px solid #E4E4E7; border-radius: 8px; font-weight: 600; font-size: 0.88rem; color: #18181B;">
-        <span onclick="editCategory('${c.id}')" style="cursor: pointer;" title="Clique para editar (${countProds} produtos vinculados)">${c.name} <small style="color: #6344F5; font-size: 0.75rem;">(${countProds})</small></span>
+      <div class="cat-pill-tag" data-id="${c.id}" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; background: ${isInactive ? '#FEF2F2' : '#F4F4F7'}; border: 1px solid ${isInactive ? '#FCA5A5' : '#E4E4E7'}; border-radius: 8px; font-weight: 600; font-size: 0.88rem; color: #18181B;">
+        <span onclick="editCategory('${c.id}')" style="cursor: pointer; ${isInactive ? 'text-decoration: line-through; color: #991B1B;' : ''}" title="Clique para editar (${countProds} produtos vinculados)">
+          ${c.name} <small style="color: #6344F5; font-size: 0.75rem;">(${countProds})</small>
+          ${isInactive ? '<small style="color:#EF4444; font-size:0.7rem; font-weight:700; margin-left:4px;">[Oculta]</small>' : ''}
+        </span>
         <button onclick="editCategory('${c.id}')" title="Editar Categoria" style="background: none; border: none; font-size: 0.8rem; cursor: pointer; color: #6344F5; font-weight: bold; margin-left: 4px;">✎</button>
         <button onclick="deleteCategory('${c.id}')" title="Excluir Categoria" style="background: none; border: none; font-size: 0.95rem; font-weight: bold; cursor: pointer; color: #A1A1AA; display: flex; align-items: center; justify-content: center; padding: 2px; border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.color='#EF4444'" onmouseout="this.style.color='#A1A1AA'">✕</button>
       </div>
@@ -341,7 +346,9 @@ function openAddCategoryModal() {
   
   document.getElementById('catModalNameInput').value = '';
   document.getElementById('catModalEditName').value = '';
-  
+  const statusChk = document.getElementById('catModalStatusInput');
+  if (statusChk) statusChk.checked = true;
+
   populateCatProductsChecklist();
   const modal = document.getElementById('categoryFormModal');
   if (modal) modal.classList.add('active');
@@ -356,6 +363,9 @@ function editCategory(id) {
 
   document.getElementById('catModalNameInput').value = cat.name;
   document.getElementById('catModalEditName').value = cat.id;
+
+  const statusChk = document.getElementById('catModalStatusInput');
+  if (statusChk) statusChk.checked = (cat.active !== false);
 
   populateCatProductsChecklist(cat.name);
   const modal = document.getElementById('categoryFormModal');
@@ -392,6 +402,8 @@ async function saveCategoryWithProducts(event) {
 
   const editId = document.getElementById('catModalEditName').value;
   const name = (document.getElementById('catModalNameInput').value || '').trim();
+  const statusChk = document.getElementById('catModalStatusInput');
+  const isActive = statusChk ? statusChk.checked : true;
 
   if (!name) {
     showToast('Digite o nome da categoria.', 'error');
@@ -401,6 +413,7 @@ async function saveCategoryWithProducts(event) {
   const catObj = {
     id: editId || ('cat-' + Date.now()),
     name: name,
+    active: isActive,
     position: currentCategories.length + 1
   };
 
@@ -678,10 +691,10 @@ async function saveBrandingConfig(event) {
 }
 
 function showToast(msg, type = 'info') {
-  if (typeof defaultShowToast === 'function') {
-    defaultShowToast(msg, type);
+  if (typeof window.showToast === 'function') {
+    window.showToast(msg, type);
   } else {
-    alert(msg);
+    console.log(`[Toast ${type}] ${msg}`);
   }
 }
 

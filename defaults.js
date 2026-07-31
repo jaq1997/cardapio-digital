@@ -99,22 +99,58 @@ const defaultCatalogData = defaultProducts;
    showToast(message, type='info', duration=3000)
    showConfirm(message) -> Promise<boolean>
 */
+/* Toast + Confirm de Produção (100% fluídos sem bloqueadores nativos de sistema) */
 (function(){
   function ensureToastStyle() {
     if (document.getElementById('ptd-toast-styles')) return;
     const style = document.createElement('style');
     style.id = 'ptd-toast-styles';
     style.textContent = `
-      .ptd-toast-container{position:fixed;top:18px;right:18px;z-index:99999;display:flex;flex-direction:column;gap:8px}
-      .ptd-toast{background:#333;color:#fff;padding:10px 14px;border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,0.12);font-weight:600;min-width:220px}
-      .ptd-toast.success{background:#2E7D32}
-      .ptd-toast.error{background:#C62828}
-      .ptd-confirm-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:100000}
-      .ptd-confirm-card{background:#fff;color:#222;padding:20px;border-radius:8px;max-width:420px;box-shadow:0 8px 30px rgba(0,0,0,0.2)}
-      .ptd-confirm-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
-      .ptd-confirm-btn{padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
-      .ptd-confirm-btn.primary{background:#E91C24;color:#fff}
-      .ptd-confirm-btn.ghost{background:#f3f3f3}
+      .ptd-toast-container {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 999999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        pointer-events: none;
+      }
+      .ptd-toast {
+        pointer-events: auto;
+        background: #18181B;
+        color: #FFFFFF;
+        padding: 12px 20px;
+        border-radius: 50px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.22);
+        font-weight: 600;
+        font-size: 0.88rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 260px;
+        max-width: 420px;
+        transform: translateY(-20px);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+      .ptd-toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .ptd-toast.success {
+        background: #10B981;
+        color: #FFFFFF;
+      }
+      .ptd-toast.error {
+        background: #EF4444;
+        color: #FFFFFF;
+      }
+      .ptd-toast.info {
+        background: #6344F5;
+        color: #FFFFFF;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -129,14 +165,27 @@ const defaultCatalogData = defaultProducts;
     return c;
   }
 
-  function showToast(message, type='info', duration=3000){
+  function showToast(message, type='info', duration=3200){
     ensureToastStyle();
     const c = getToastContainer();
     const t = document.createElement('div');
-    t.className = `ptd-toast ${type==='success'?'success':type==='error'?'error':''}`;
-    t.innerText = message;
+    t.className = `ptd-toast ${type}`;
+    
+    let icon = 'ℹ️';
+    if (type === 'success') icon = '✓';
+    if (type === 'error') icon = '✕';
+
+    t.innerHTML = `<span style="font-weight:800; font-size:1rem;">${icon}</span> <span>${message}</span>`;
     c.appendChild(t);
-    setTimeout(()=>{ t.style.opacity = '0'; t.addEventListener('transitionend', ()=> t.remove()); }, duration);
+
+    requestAnimationFrame(() => {
+      t.classList.add('show');
+    });
+
+    setTimeout(() => {
+      t.classList.remove('show');
+      setTimeout(() => t.remove(), 300);
+    }, duration);
     return t;
   }
 
