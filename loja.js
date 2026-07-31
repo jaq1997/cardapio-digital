@@ -135,36 +135,78 @@ async function applyDynamicBranding() {
    2. CARREGAMENTO DO CARDÁPIO E CATEGORIAS
 ------------------------------------------------------------------------- */
 async function loadCatalogData() {
+  let loadedProducts = [];
+
   if (window.DbService) {
     try {
       const products = await DbService.getProducts();
-      if (products && products.length > 0) {
-        catalogData = products.map(p => ({
-          ...p,
-          preco: parseFloat(p.preco || p.preco_grande || 0) || 0,
-          adicionais: Array.isArray(p.adicionais) ? p.adicionais : []
-        }));
-        return;
+      if (products && Array.isArray(products)) {
+        loadedProducts = products;
       }
     } catch(e) { console.warn('[Loja] Erro ao carregar produtos do Supabase:', e); }
   }
 
-  const savedProducts = localStorage.getItem(STORAGE_KEY_PRODUCTS);
-  if (savedProducts) {
-    try {
-      const parsed = JSON.parse(savedProducts);
-      if (parsed && Array.isArray(parsed) && parsed.length > 0) {
-        catalogData = parsed.map(p => ({
-          ...p,
-          preco: parseFloat(p.preco || p.preco_grande || 0) || 0,
-          adicionais: Array.isArray(p.adicionais) ? p.adicionais : []
-        }));
-        return;
-      }
-    } catch(e) {}
+  if (loadedProducts.length > 0) {
+    catalogData = loadedProducts.map(p => ({
+      ...p,
+      preco: parseFloat(p.preco || p.preco_grande || 0) || 0,
+      adicionais: Array.isArray(p.adicionais) ? p.adicionais : []
+    }));
+    return;
   }
 
-  catalogData = typeof defaultProducts !== 'undefined' ? defaultProducts : [];
+  // FALLBACK ESTILO NUVEMSHOP / SHOPIFY:
+  // Exibe 4 modelos demonstrativos bonitos quando o lojista ainda nao cadastrou nenhum produto
+  const placeholderSvg = (typeof PLACEHOLDER_PRODUCT_IMG !== 'undefined') 
+    ? PLACEHOLDER_PRODUCT_IMG 
+    : "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 24 24' fill='%23F4F4F6' stroke='%23A1A1AA' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='3' ry='3'/><circle cx='8.5' cy='8.5' r='1.5'/><polyline points='21 15 16 10 5 21'/></svg>";
+
+  catalogData = [
+    {
+      id: "demo-1",
+      nome: "Prato Executivo (Exemplo)",
+      categoria: "Pratos",
+      categorias: ["Pratos"],
+      descricao: "Este é um produto de demonstração estilo Nuvemshop. Acesse seu painel Admin para cadastrar seus pratos reais!",
+      preco: 29.90,
+      badge: "DEMO",
+      img_url: placeholderSvg,
+      isDemo: true
+    },
+    {
+      id: "demo-2",
+      nome: "Marmita Fitness (Exemplo)",
+      categoria: "Pratos",
+      categorias: ["Pratos"],
+      descricao: "Exemplo de produto modelo para você ver como a sua loja fica bonita. Cadastre suas marmitas no Admin!",
+      preco: 24.90,
+      badge: "MODELO",
+      img_url: placeholderSvg,
+      isDemo: true
+    },
+    {
+      id: "demo-3",
+      nome: "Suco Natural (Exemplo)",
+      categoria: "Bebidas",
+      categorias: ["Bebidas"],
+      descricao: "Produto de demonstração. Seus clientes verão suas fotos e preços assim que você cadastrar no Admin.",
+      preco: 8.50,
+      badge: "DEMO",
+      img_url: placeholderSvg,
+      isDemo: true
+    },
+    {
+      id: "demo-4",
+      nome: "Sobremesa Especial (Exemplo)",
+      categoria: "Sobremesas",
+      categorias: ["Sobremesas"],
+      descricao: "Exemplo de doce/sobremesa. Personalize seu cardápio com suas fotos e categorias a qualquer momento!",
+      preco: 12.00,
+      badge: "MODELO",
+      img_url: placeholderSvg,
+      isDemo: true
+    }
+  ];
 }
 
 async function loadAndRenderDrawerCategories() {
