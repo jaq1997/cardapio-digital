@@ -15,7 +15,7 @@ const STORAGE_KEY_COUPONS        = 'ptd_store_coupons';
 const defaultBranding = {
   storeName: "Minha Loja",
   storeSub: "",
-  wppNumber: "5551989912555",
+  wppNumber: "",
   frete: 5.00,
   primaryColor: "#18181B",
   darkColor: "#09090B",

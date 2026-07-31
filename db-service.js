@@ -1,19 +1,28 @@
 /* ==========================================================================
-   DB SERVICE — Camada de abstração de dados (100% Estável & Resiliente)
-   Utiliza _safeSetStorage para evitar QuotaExceededError no localStorage.
-   Disponível globalmente como `window.DbService`
+   DB SERVICE — Camada de abstração de dados (Multi-Tenant com ISOLAMENTO TOTAL por store_id)
    ========================================================================== */
 
 window.DbService = (function () {
 
   const isReady = () => window.SUPABASE_READY && window.db;
-  const getStoreId = () => (typeof CURRENT_STORE_ID !== 'undefined' ? CURRENT_STORE_ID : 'default');
+  const getStoreId = () => (typeof CURRENT_STORE_ID !== 'undefined' ? CURRENT_STORE_ID : (localStorage.getItem('active_store_id') || 'default'));
 
-  function _safeSetStorage(key, value) {
+  function getStorageKey(baseKey) {
+    return `${baseKey}_${getStoreId()}`;
+  }
+
+  function _safeSetStorage(baseKey, value) {
     try {
-      localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+      localStorage.setItem(getStorageKey(baseKey), typeof value === 'string' ? value : JSON.stringify(value));
+    } catch (e) {}
+  }
+
+  function _safeGetStorage(baseKey) {
+    try {
+      const raw = localStorage.getItem(getStorageKey(baseKey));
+      return raw ? JSON.parse(raw) : null;
     } catch (e) {
-      // Ignora estouro de cota do localStorage (5MB) para utilizar o Supabase em nuvem livremente
+      return null;
     }
   }
 
@@ -23,14 +32,19 @@ window.DbService = (function () {
   async function getBranding() {
     if (isReady()) {
       try {
-        const { data, error } = await window.db
+        let { data, error } = await window.db
           .from('store_branding')
           .select('*')
-          .limit(1)
+          .eq('store_id', getStoreId())
           .maybeSingle();
 
+        if (error) {
+          const retry = await window.db.from('store_branding').select('*').limit(1).maybeSingle();
+          if (!retry.error && retry.data) { data = retry.data; error = null; }
+        }
+
         if (!error && data) {
-          return {
+          const res = {
             storeName:      data.store_name,
             storeSub:       data.store_sub,
             wppNumber:      data.wpp_number,
@@ -44,13 +58,13 @@ window.DbService = (function () {
             storeAddress:   data.store_address,
             storeHours:     data.store_hours,
           };
+          _safeSetStorage(STORAGE_KEY_BRANDING, res);
+          return res;
         }
       } catch(e) {}
     }
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY_BRANDING);
-      return raw ? JSON.parse(raw) : { ...defaultBranding };
-    } catch { return { ...defaultBranding }; }
+    const cached = _safeGetStorage(STORAGE_KEY_BRANDING);
+    return cached || { ...defaultBranding };
   }
 
   async function saveBranding(branding) {
@@ -59,7 +73,7 @@ window.DbService = (function () {
     if (!isReady()) return;
 
     const payload = {
-      id:               1,
+      store_id:         getStoreId(),
       store_name:       branding.storeName      || '',
       store_sub:        branding.storeSub       || '',
       wpp_number:       branding.wppNumber      || '',
@@ -75,7 +89,12 @@ window.DbService = (function () {
       updated_at:       new Date().toISOString(),
     };
 
-    await window.db.from('store_branding').upsert(payload, { onConflict: 'id' });
+    let { error } = await window.db.from('store_branding').upsert(payload);
+    if (error && error.code === 'PGRST204') {
+      delete payload.store_id;
+      payload.id = 1;
+      await window.db.from('store_branding').upsert(payload, { onConflict: 'id' });
+    }
   }
 
   /* -------------------------------------------------------------------------
@@ -108,10 +127,19 @@ window.DbService = (function () {
   async function getProducts() {
     if (isReady()) {
       try {
-        const { data, error } = await window.db
+        let { data, error } = await window.db
           .from('store_products')
           .select('*')
+          .eq('store_id', getStoreId())
           .order('position', { ascending: true });
+
+        if (error) {
+          const retry = await window.db.from('store_products').select('*').order('position', { ascending: true });
+          if (!retry.error && Array.isArray(retry.data)) {
+            data = retry.data.filter(p => !p.store_id || p.store_id === getStoreId());
+            error = null;
+          }
+        }
 
         if (!error && Array.isArray(data)) {
           const normalized = data.map(normalizeProductRecord);
@@ -120,11 +148,8 @@ window.DbService = (function () {
         }
       } catch(e) {}
     }
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY_PRODUCTS);
-      const parsed = raw ? JSON.parse(raw) : [];
-      return Array.isArray(parsed) ? parsed.map(normalizeProductRecord) : [];
-    } catch { return []; }
+    const cached = _safeGetStorage(STORAGE_KEY_PRODUCTS);
+    return Array.isArray(cached) ? cached.map(normalizeProductRecord) : [];
   }
 
   async function upsertProduct(product) {
@@ -133,6 +158,7 @@ window.DbService = (function () {
       const categoryText = serializeCategoryValue(selectedCategories) || 'outros';
       const payload = {
         id:            product.id,
+        store_id:      getStoreId(),
         nome:          product.nome           || '',
         categoria:     categoryText,
         descricao:     product.descricao      || '',
@@ -151,6 +177,7 @@ window.DbService = (function () {
 
       if (error && error.code === 'PGRST204') {
         delete payload.adicionais;
+        delete payload.store_id;
         await window.db.from('store_products').upsert(payload, { onConflict: 'id' });
       }
     }
@@ -166,10 +193,9 @@ window.DbService = (function () {
 
   function _syncProductsToLocalStorage() {
     if (isReady()) {
-      window.db.from('store_products').select('*').order('position').then(({ data }) => {
-        if (data) {
-          const normalized = data.map(normalizeProductRecord);
-          _safeSetStorage(STORAGE_KEY_PRODUCTS, normalized);
+      window.db.from('store_products').select('*').eq('store_id', getStoreId()).order('position').then(({ data, error }) => {
+        if (!error && Array.isArray(data)) {
+          _safeSetStorage(STORAGE_KEY_PRODUCTS, data.map(normalizeProductRecord));
         }
       });
     }
@@ -181,21 +207,28 @@ window.DbService = (function () {
   async function getCategories() {
     if (isReady()) {
       try {
-        const { data, error } = await window.db
+        let { data, error } = await window.db
           .from('store_categories')
           .select('*')
+          .eq('store_id', getStoreId())
           .order('position', { ascending: true });
 
-        if (!error && Array.isArray(data) && data.length > 0) {
+        if (error) {
+          const retry = await window.db.from('store_categories').select('*').order('position', { ascending: true });
+          if (!retry.error && Array.isArray(retry.data)) {
+            data = retry.data.filter(c => !c.store_id || c.store_id === getStoreId());
+            error = null;
+          }
+        }
+
+        if (!error && Array.isArray(data)) {
           _safeSetStorage(STORAGE_KEY_CATEGORIES, data);
           return data;
         }
       } catch(e) {}
     }
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY_CATEGORIES);
-      return raw ? JSON.parse(raw) : [];
-    } catch { return []; }
+    const cached = _safeGetStorage(STORAGE_KEY_CATEGORIES);
+    return Array.isArray(cached) ? cached : [];
   }
 
   async function upsertCategory(cat) {
@@ -203,6 +236,7 @@ window.DbService = (function () {
       try {
         const payload = {
           id:       cat.id || ('cat-' + Date.now()),
+          store_id: getStoreId(),
           name:     cat.name || '',
           active:   cat.active !== false,
           position: cat.position || 0,
@@ -211,17 +245,13 @@ window.DbService = (function () {
         if (error) {
           delete payload.active;
           delete payload.position;
+          delete payload.store_id;
           await window.db.from('store_categories').upsert(payload);
         }
       } catch(e) {}
     }
 
-    let existing = [];
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY_CATEGORIES);
-      if (raw) existing = JSON.parse(raw);
-    } catch(e) {}
-
+    let existing = _safeGetStorage(STORAGE_KEY_CATEGORIES) || [];
     const idx = existing.findIndex(c => String(c.id) === String(cat.id));
     if (idx >= 0) {
       existing[idx] = { ...existing[idx], ...cat };
@@ -238,11 +268,7 @@ window.DbService = (function () {
         await window.db.from('store_categories').delete().eq('id', id);
       } catch(e) {}
     }
-    let existing = [];
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY_CATEGORIES);
-      if (raw) existing = JSON.parse(raw);
-    } catch(e) {}
+    let existing = _safeGetStorage(STORAGE_KEY_CATEGORIES) || [];
     existing = existing.filter(c => String(c.id) !== String(id));
     _safeSetStorage(STORAGE_KEY_CATEGORIES, existing);
     return existing;
@@ -254,10 +280,16 @@ window.DbService = (function () {
   async function getDeliveryZones() {
     if (isReady()) {
       try {
-        const { data, error } = await window.db
+        let { data, error } = await window.db
           .from('store_delivery_zones')
           .select('*')
+          .eq('store_id', getStoreId())
           .order('position', { ascending: true });
+
+        if (error) {
+          const retry = await window.db.from('store_delivery_zones').select('*').order('position', { ascending: true });
+          if (!retry.error && Array.isArray(retry.data)) { data = retry.data; error = null; }
+        }
 
         if (!error && Array.isArray(data)) {
           _safeSetStorage(STORAGE_KEY_DELIVERY_ZONES, data);
@@ -265,21 +297,24 @@ window.DbService = (function () {
         }
       } catch(e) {}
     }
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY_DELIVERY_ZONES);
-      return raw ? JSON.parse(raw) : [];
-    } catch { return []; }
+    const cached = _safeGetStorage(STORAGE_KEY_DELIVERY_ZONES);
+    return Array.isArray(cached) ? cached : [];
   }
 
   async function upsertDeliveryZone(zone) {
     if (isReady()) {
       const payload = {
         id:       zone.id,
+        store_id: getStoreId(),
         name:     zone.name  || '',
         price:    zone.price || 0,
         position: zone.position || 0,
       };
-      await window.db.from('store_delivery_zones').upsert(payload, { onConflict: 'id' });
+      let { error } = await window.db.from('store_delivery_zones').upsert(payload, { onConflict: 'id' });
+      if (error && error.code === 'PGRST204') {
+        delete payload.store_id;
+        await window.db.from('store_delivery_zones').upsert(payload, { onConflict: 'id' });
+      }
     }
     const zones = await getDeliveryZones();
     _safeSetStorage(STORAGE_KEY_DELIVERY_ZONES, zones);
@@ -299,10 +334,16 @@ window.DbService = (function () {
   async function getCoupons() {
     if (isReady()) {
       try {
-        const { data, error } = await window.db
+        let { data, error } = await window.db
           .from('store_coupons')
           .select('*')
+          .eq('store_id', getStoreId())
           .order('created_at', { ascending: false });
+
+        if (error) {
+          const retry = await window.db.from('store_coupons').select('*').order('created_at', { ascending: false });
+          if (!retry.error && Array.isArray(retry.data)) { data = retry.data; error = null; }
+        }
 
         if (!error && Array.isArray(data)) {
           _safeSetStorage(STORAGE_KEY_COUPONS, data);
@@ -310,16 +351,15 @@ window.DbService = (function () {
         }
       } catch(e) {}
     }
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY_COUPONS);
-      return raw ? JSON.parse(raw) : [];
-    } catch { return []; }
+    const cached = _safeGetStorage(STORAGE_KEY_COUPONS);
+    return Array.isArray(cached) ? cached : [];
   }
 
   async function upsertCoupon(coupon) {
     if (isReady()) {
       const payload = {
         id:         coupon.id,
+        store_id:   getStoreId(),
         code:       (coupon.code || '').toUpperCase(),
         type:       coupon.type       || 'fixed',
         value:      coupon.value      || 0,
@@ -327,7 +367,11 @@ window.DbService = (function () {
         active:     coupon.active !== false,
         expires_at: coupon.expiresAt  || coupon.expires_at || null,
       };
-      await window.db.from('store_coupons').upsert(payload, { onConflict: 'id' });
+      let { error } = await window.db.from('store_coupons').upsert(payload, { onConflict: 'id' });
+      if (error && error.code === 'PGRST204') {
+        delete payload.store_id;
+        await window.db.from('store_coupons').upsert(payload, { onConflict: 'id' });
+      }
     }
     const coupons = await getCoupons();
     _safeSetStorage(STORAGE_KEY_COUPONS, coupons);

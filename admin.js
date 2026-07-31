@@ -189,9 +189,10 @@ function renderAdminTable(productsToRender) {
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #F4F4F7; padding-top: 12px; margin-top: 8px;">
             <span style="font-weight: 800; font-size: 1.1rem; color: #18181B;">R$ ${priceVal.toFixed(2).replace('.', ',')}</span>
-            <div style="display: flex; gap: 6px;">
-              <button class="btn-admin btn-admin-secondary" onclick="editProductItem('${p.id}')" style="padding: 6px 12px; font-size: 0.8rem;">Editar</button>
-              <button class="btn-admin btn-admin-danger" onclick="deleteProductItem('${p.id}')" style="padding: 6px 12px; font-size: 0.8rem;">Excluir</button>
+            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+              <button class="btn-admin btn-admin-secondary" onclick="editProductItem('${p.id}')" style="padding: 5px 9px; font-size: 0.75rem;">Editar</button>
+              <button class="btn-admin btn-admin-secondary" onclick="duplicateProductItem('${p.id}')" style="padding: 5px 9px; font-size: 0.75rem; background: #F1EEFE; color: #6344F5; border: 1px solid #DDD6FE;" title="Duplicar produto para criar tamanhos/porções diferentes">Duplicar</button>
+              <button class="btn-admin btn-admin-danger" onclick="deleteProductItem('${p.id}')" style="padding: 5px 9px; font-size: 0.75rem;">Excluir</button>
             </div>
           </div>
         </div>
@@ -416,6 +417,44 @@ function editProductItem(id) {
   if (Array.isArray(adics)) adics.forEach(a => addAdicionalInputRow(a.nome, a.preco));
 
   document.getElementById('productFormModal').classList.add('active');
+}
+
+function duplicateProductItem(id) {
+  const item = currentProducts.find(p => String(p.id) === String(id));
+  if (!item) return;
+
+  document.getElementById('productModalTitle').innerText = 'DUPLICAR PRODUTO';
+  document.getElementById('prodEditId').value = '';
+  document.getElementById('prodName').value = (item.nome || '') + ' (Cópia)';
+  document.getElementById('prodPrice').value = parseFloat(item.preco || item.preco_grande || 0) || 0;
+  document.getElementById('prodDesc').value = item.descricao || '';
+  document.getElementById('prodBadge').value = item.badge || '';
+
+  const catVal = item.categorias || item.categoria || [];
+  populateCategorySelect(catVal);
+
+  tempProductImgBase64 = item.img_url || '';
+  if (document.getElementById('prodImageUrlInput')) {
+    document.getElementById('prodImageUrlInput').value = (tempProductImgBase64.startsWith('http') ? tempProductImgBase64 : '');
+  }
+  const img = document.getElementById('prodFilePreview');
+  const btnRem = document.getElementById('btnRemoveProdImg');
+  if (tempProductImgBase64 && img) {
+    img.src = tempProductImgBase64;
+    img.style.display = 'block';
+    if (btnRem) btnRem.style.display = 'flex';
+  } else {
+    removeProductPhoto();
+  }
+
+  const adicContainer = document.getElementById('adicionaisContainer');
+  adicContainer.innerHTML = '';
+  let adics = item.adicionais;
+  if (typeof adics === 'string') { try { adics = JSON.parse(adics); } catch(e) { adics = []; } }
+  if (Array.isArray(adics)) adics.forEach(a => addAdicionalInputRow(a.nome, a.preco));
+
+  document.getElementById('productFormModal').classList.add('active');
+  showToast('Produto duplicado no modal! Ajuste os dados e clique em Salvar.', 'info');
 }
 
 async function saveProductItem(event) {
@@ -906,6 +945,7 @@ window.removeBannerMob = removeBannerMob;
 window.saveProductItem = saveProductItem;
 window.deleteProductItem = deleteProductItem;
 window.editProductItem = editProductItem;
+window.duplicateProductItem = duplicateProductItem;
 window.addAdicionalInputRow = addAdicionalInputRow;
 window.openAddCategoryModal = openAddCategoryModal;
 window.editCategory = editCategory;
