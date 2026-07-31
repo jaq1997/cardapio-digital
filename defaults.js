@@ -206,6 +206,7 @@ const defaultCatalogData = defaultProducts;
     });
   }
 
+  window.displaySystemToast = showToast;
   window.showToast = showToast;
   window.showConfirm = showConfirm;
 

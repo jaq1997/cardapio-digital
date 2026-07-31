@@ -159,6 +159,16 @@
 
         <!-- COLUNA DIREITA: CUPOM DE DESCONTO, FORMA DE PAGAMENTO E TOTAL -->
         <div style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- CUPOM DE DESCONTO -->
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 8px;">
+            <label style="font-size: 0.72rem; font-weight: 800; color: #64748B; text-transform: uppercase; display: block; margin-bottom: 4px;">Cupom de Desconto</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="inputCartCoupon" placeholder="Código do cupom" style="flex: 1; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-weight: 700; text-transform: uppercase; font-size: 0.85rem;">
+              <button type="button" onclick="applyCartCoupon()" style="background: #18181B; color: #FFF; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer;">APLICAR</button>
+            </div>
+            <div id="txtCouponAppliedStatus" style="font-size: 0.78rem; font-weight: 700; color: #10B981; margin-top: 4px; display: none;"></div>
+          </div>
+
           <!-- TOTAL E BOTÃO FINALIZAR -->
           <div style="background: var(--ph-gray-light); padding: 14px; border-radius: 8px; margin-top: auto;">
             <div id="txtSubtotalFrete" style="font-size: 0.8rem; color: #666; font-weight: 700;">Subtotal: R$ 0,00 | Frete: R$ 0,00</div>

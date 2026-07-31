@@ -515,23 +515,88 @@ function changeCartItemQty(cartId, delta) {
   renderCartItems();
 }
 
+let currentAppliedCoupon = null;
+
+async function applyCartCoupon() {
+  const input = document.getElementById('inputCartCoupon');
+  const statusEl = document.getElementById('txtCouponAppliedStatus');
+  if (!input) return;
+
+  const code = input.value.trim().toUpperCase();
+  if (!code) {
+    showToast('Digite o código do cupom.', 'error');
+    return;
+  }
+
+  let couponsList = [];
+  if (window.DbService) {
+    try {
+      couponsList = (await DbService.getCoupons()) || [];
+    } catch(e) {}
+  }
+
+  const found = couponsList.find(c => String(c.code).toUpperCase() === code && c.active !== false);
+
+  if (!found) {
+    currentAppliedCoupon = null;
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#EF4444';
+      statusEl.innerText = 'Cupom inválido ou inativo.';
+    }
+    showToast('Cupom não encontrado ou inativo.', 'error');
+    updateCartTotals();
+    return;
+  }
+
+  currentAppliedCoupon = found;
+  let descTxt = '';
+  if (found.type === 'percent') descTxt = `${found.value}% OFF`;
+  else if (found.type === 'frete_gratis') descTxt = `Frete Grátis`;
+  else descTxt = `R$ ${parseFloat(found.value).toFixed(2).replace('.', ',')} OFF`;
+
+  if (statusEl) {
+    statusEl.style.display = 'block';
+    statusEl.style.color = '#10B981';
+    statusEl.innerText = `✓ Cupom "${found.code}" aplicado (${descTxt})!`;
+  }
+  showToast(`Cupom ${found.code} aplicado com sucesso!`, 'success');
+  updateCartTotals();
+}
+
 function updateCartTotals() {
   const subtotal = cart.reduce((sum, item) => {
     const adicTotal = (item.adicionais || []).reduce((s, a) => s + (a.preco || 0), 0);
     return sum + ((item.price + adicTotal) * item.qty);
   }, 0);
 
-  const fee = (currentSelectedZoneName === "Retirada no Balcão") ? 0 : currentDeliveryFee;
-  const total = subtotal + fee;
+  let fee = (currentSelectedZoneName === "Retirada no Balcão") ? 0 : currentDeliveryFee;
+  let discount = 0;
+
+  if (currentAppliedCoupon) {
+    if (currentAppliedCoupon.type === 'percent') {
+      discount = subtotal * (parseFloat(currentAppliedCoupon.value || 0) / 100);
+    } else if (currentAppliedCoupon.type === 'frete_gratis') {
+      fee = 0;
+    } else {
+      discount = parseFloat(currentAppliedCoupon.value || 0);
+    }
+  }
+
+  const finalTotal = Math.max(0, subtotal - discount + fee);
 
   const txtSubFee = document.getElementById('txtSubtotalFrete');
   if (txtSubFee) {
-    txtSubFee.innerText = `Subtotal: R$ ${subtotal.toFixed(2).replace('.', ',')} | Frete: R$ ${fee.toFixed(2).replace('.', ',')}`;
+    let textStr = `Subtotal: R$ ${subtotal.toFixed(2).replace('.', ',')} | Frete: R$ ${fee.toFixed(2).replace('.', ',')}`;
+    if (discount > 0) {
+      textStr += ` | Desconto: R$ ${discount.toFixed(2).replace('.', ',')}`;
+    }
+    txtSubFee.innerText = textStr;
   }
 
   const txtTotFinal = document.getElementById('txtTotalCartFinal');
   if (txtTotFinal) {
-    txtTotFinal.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+    txtTotFinal.innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
   }
 
   const subEl = document.getElementById('cartSubtotalDisplay');
@@ -541,7 +606,7 @@ function updateCartTotals() {
   if (feeEl) feeEl.innerText = `R$ ${fee.toFixed(2).replace('.', ',')}`;
 
   const totEl = document.getElementById('cartTotalDisplay');
-  if (totEl) totEl.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+  if (totEl) totEl.innerText = `R$ ${finalTotal.toFixed(2).replace('.', ',')}`;
 }
 
 function toggleDeliveryTypeUI(type) {
@@ -638,22 +703,33 @@ function sendCartToWhatsApp() {
     return;
   }
 
+  const cepInput = document.getElementById('inputCep');
   const numInput = document.getElementById('inputNumero');
   const compInput = document.getElementById('inputComplemento');
   const txtRua = document.getElementById('txtRuaBairro');
 
   let enderecoTxt = currentSelectedZoneName;
-  if (currentSelectedZoneName !== "Retirada no Balcão") {
-    const ruaBairro = txtRua ? txtRua.innerText : '';
+  const isBalcao = currentSelectedZoneName.toLowerCase().includes('retirada') || currentSelectedZoneName.toLowerCase().includes('balcão');
+
+  if (!isBalcao) {
+    const cepVal = cepInput ? cepInput.value.trim() : '';
+    const ruaBairro = (txtRua && txtRua.innerText) ? txtRua.innerText : '';
     const num = numInput ? numInput.value.trim() : '';
     const comp = compInput ? compInput.value.trim() : '';
-    enderecoTxt = `${ruaBairro} nº ${num || 'S/N'} ${comp ? '(' + comp + ')' : ''}`;
+
+    let parts = [];
+    if (ruaBairro) parts.push(ruaBairro);
+    parts.push(`nº ${num || 'S/N'}`);
+    if (comp) parts.push(`(${comp})`);
+    if (cepVal) parts.push(`[CEP: ${cepVal}]`);
+
+    enderecoTxt = parts.join(' ');
   }
 
   let msg = `*NOVO PEDIDO DE COMPRA*\n`;
-  msg += `*Tipo:* ${currentSelectedZoneName}\n`;
-  if (currentSelectedZoneName !== "Retirada no Balcão") {
-    msg += `*Endereço:* ${enderecoTxt}\n`;
+  msg += `*Forma de Entrega:* ${currentSelectedZoneName}\n`;
+  if (!isBalcao) {
+    msg += `*Endereço de Entrega:* ${enderecoTxt}\n`;
   }
   msg += `------------------------------\n`;
   msg += `*ITENS DO PEDIDO:*\n\n`;
@@ -675,21 +751,37 @@ function sendCartToWhatsApp() {
     msg += `\n`;
   });
 
-  const fee = (currentSelectedZoneName === "Retirada no Balcão") ? 0 : currentDeliveryFee;
-  const total = subtotal + fee;
+  let fee = isBalcao ? 0 : currentDeliveryFee;
+  let discount = 0;
+
+  if (currentAppliedCoupon) {
+    if (currentAppliedCoupon.type === 'percent') {
+      discount = subtotal * (parseFloat(currentAppliedCoupon.value || 0) / 100);
+    } else if (currentAppliedCoupon.type === 'frete_gratis') {
+      fee = 0;
+    } else {
+      discount = parseFloat(currentAppliedCoupon.value || 0);
+    }
+  }
+
+  const finalTotal = Math.max(0, subtotal - discount + fee);
 
   msg += `------------------------------\n`;
   msg += `*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+  if (currentAppliedCoupon) {
+    msg += `*Cupom Aplicado:* ${currentAppliedCoupon.code}\n`;
+    msg += `*Desconto:* - R$ ${discount.toFixed(2).replace('.', ',')}\n`;
+  }
   msg += `*Taxa de Entrega:* R$ ${fee.toFixed(2).replace('.', ',')}\n`;
-  msg += `*TOTAL:* R$ ${total.toFixed(2).replace('.', ',')}\n`;
+  msg += `*TOTAL DO PEDIDO:* R$ ${finalTotal.toFixed(2).replace('.', ',')}\n`;
 
   const url = `https://wa.me/${WPP_NUMERO}?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
 }
 
 function showToast(msg, type = 'info') {
-  if (typeof window.showToast === 'function') {
-    window.showToast(msg, type);
+  if (typeof window.displaySystemToast === 'function') {
+    window.displaySystemToast(msg, type);
   } else {
     console.log(`[Toast ${type}] ${msg}`);
   }
@@ -710,6 +802,7 @@ window.closeCartModal = closeCartModal;
 window.changeCartItemQty = changeCartItemQty;
 window.toggleDeliveryTypeUI = toggleDeliveryTypeUI;
 window.selectDeliveryZone = selectDeliveryZone;
+window.applyCartCoupon = applyCartCoupon;
 window.toggleSemNumero = toggleSemNumero;
 window.buscarCepViaAPI = buscarCepViaAPI;
 window.enviarPedidoWhatsAppFinal = enviarPedidoWhatsAppFinal;

@@ -691,8 +691,8 @@ async function saveBrandingConfig(event) {
 }
 
 function showToast(msg, type = 'info') {
-  if (typeof window.showToast === 'function') {
-    window.showToast(msg, type);
+  if (typeof window.displaySystemToast === 'function') {
+    window.displaySystemToast(msg, type);
   } else {
     console.log(`[Toast ${type}] ${msg}`);
   }
