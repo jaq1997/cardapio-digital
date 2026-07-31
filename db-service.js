@@ -88,7 +88,7 @@ window.DbService = (function () {
 
   async function upsertProduct(product) {
     if (isReady()) {
-      const { error } = await window.db.from('store_products').upsert({
+      const payload = {
         id:            product.id,
         nome:          product.nome           || '',
         categoria:     product.categoria      || 'outros',
@@ -100,8 +100,20 @@ window.DbService = (function () {
         badge:         product.badge          || '',
         img_url:       product.img_url        || '',
         status:        product.status         || 'ativo',
+        adicionais:    product.adicionais     || [],
         updated_at:    new Date().toISOString(),
-      }, { onConflict: 'id' });
+      };
+
+      let { error } = await window.db.from('store_products').upsert(payload, { onConflict: 'id' });
+      
+      // Se a coluna adicionais nao existir no banco (erro PGRST204), envia o payload sem adicionais para o Supabase
+      if (error && error.code === 'PGRST204') {
+        console.warn('[DbService] Coluna adicionais ausente no Supabase, salvando via fallback...');
+        delete payload.adicionais;
+        const retry = await window.db.from('store_products').upsert(payload, { onConflict: 'id' });
+        error = retry.error;
+      }
+
       if (error) console.error('[DbService] upsertProduct:', error);
     }
     // Atualiza localStorage como cache
@@ -137,15 +149,15 @@ window.DbService = (function () {
         .from('store_categories')
         .select('*')
         .order('position', { ascending: true });
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
         localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(data));
         return data;
       }
     }
     try {
       const raw = localStorage.getItem(STORAGE_KEY_CATEGORIES);
-      return raw ? JSON.parse(raw) : [...defaultCategories];
-    } catch { return [...defaultCategories]; }
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
   }
 
   async function upsertCategory(cat) {
@@ -177,15 +189,15 @@ window.DbService = (function () {
         .from('store_delivery_zones')
         .select('*')
         .order('position', { ascending: true });
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
         localStorage.setItem(STORAGE_KEY_DELIVERY_ZONES, JSON.stringify(data));
         return data;
       }
     }
     try {
       const raw = localStorage.getItem(STORAGE_KEY_DELIVERY_ZONES);
-      return raw ? JSON.parse(raw) : [...defaultDeliveryZones];
-    } catch { return [...defaultDeliveryZones]; }
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
   }
 
   async function upsertDeliveryZone(zone) {
@@ -218,7 +230,7 @@ window.DbService = (function () {
         .from('store_coupons')
         .select('*')
         .order('created_at', { ascending: false });
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
         localStorage.setItem(STORAGE_KEY_COUPONS, JSON.stringify(data));
         return data;
       }

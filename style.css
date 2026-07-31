@@ -274,9 +274,6 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
   border-radius: var(--radius-pill);
 }
 
-/* ==========================================================================
-   2. CATEGORIES BAR (APENAS AS 4 ESSENCIAIS)
-   ========================================================================== */
 .ph-categories-section {
   background: #FFFFFF;
   border-bottom: 2px solid var(--ph-border);

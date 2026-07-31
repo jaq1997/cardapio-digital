@@ -25,7 +25,7 @@
   <!-- HERO SECTION COMERCIAL -->
   <section class="ph-hero-section">
     <div class="ph-hero-card">
-      <!-- Injetado dinamicamente via loja.js (Banner da loja ou Placeholder estilo NuvemShop) -->
+      <!-- Injetado dinamicamente via loja.js (Banner de Destaque da loja) -->
     </div>
   </section>
 
@@ -65,9 +65,9 @@
   </div>
 
   <!-- MODAL 1: CUSTOMIZADOR DE PRODUTO UNIVERSAL -->
-  <div class="modal-overlay" id="pizzaModal">
+  <div class="modal-overlay" id="productModal">
     <div class="modal-card" style="max-width: 540px; padding: 24px;">
-      <button class="modal-close-btn" onclick="closePizzaModal()">✕</button>
+      <button class="modal-close-btn" onclick="closeProductModal()">✕</button>
       
       <div style="display: flex; flex-direction: column; gap: 16px;">
         <div style="height: 180px; border-radius: 12px; overflow: hidden; background: #FAFAFC; display: flex; align-items: center; justify-content: center; border: 1px solid #E2E8F0; padding: 8px;">
@@ -75,8 +75,8 @@
         </div>
         
         <div>
-          <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--ph-black); font-family: var(--font-display);" id="modalPizzaTitle">Produto</h3>
-          <p style="font-size: 0.86rem; color: #666666; margin-top: 6px; line-height: 1.4;" id="modalPizzaDesc">Descrição do produto...</p>
+          <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--ph-black); font-family: var(--font-display);" id="modalProductTitle">Produto</h3>
+          <p style="font-size: 0.86rem; color: #666666; margin-top: 6px; line-height: 1.4;" id="modalProductDesc">Descrição do produto...</p>
           <div style="font-size: 1.4rem; font-weight: 900; color: var(--ph-black); margin-top: 10px;" id="modalDynamicTotalPrice">R$ 0,00</div>
         </div>
 
