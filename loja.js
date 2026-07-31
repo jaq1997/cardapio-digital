@@ -868,8 +868,23 @@ function sendCartToWhatsApp() {
   msg += `*Taxa de Entrega:* R$ ${fee.toFixed(2).replace('.', ',')}\n`;
   msg += `*TOTAL DO PEDIDO:* R$ ${finalTotal.toFixed(2).replace('.', ',')}\n`;
 
-  const url = `https://wa.me/${WPP_NUMERO}?text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
+  const cleanPhone = String(WPP_NUMERO).replace(/\D/g, '');
+  const wppUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+
+  // Gravação automática no Supabase para alimentar o Kanban do Evolux Core (CRM) ao vivo!
+  if (window.db) {
+    try {
+      const itemsSummary = cart.map(i => `${i.qty}x ${i.title}`).join(', ');
+      window.db.from('orders').insert({
+        customer_name: customerName || 'Cliente WhatsApp',
+        product_name: itemsSummary,
+        status: 'novo_pedido'
+      }).then(() => {});
+    } catch(e) {}
+  }
+
+  window.open(wppUrl, '_blank');
+  closeCartModal();
 }
 
 function showToast(msg, type = 'info') {
