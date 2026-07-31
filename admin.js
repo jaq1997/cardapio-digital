@@ -43,6 +43,16 @@ async function loadAdminSettings() {
       getEl('adminStoreTitleDisplay').innerText = currentBranding.storeName || 'Minha Loja';
     }
 
+    // Exibe o e-mail do usuário logado na sidebar
+    if (window.AUTH && typeof AUTH.getUser === 'function') {
+      try {
+        const user = await AUTH.getUser();
+        if (user && user.email && getEl('adminUserEmailDisplay')) {
+          getEl('adminUserEmailDisplay').innerText = user.email;
+        }
+      } catch(e) {}
+    }
+
     // Preenche contadores na dashboard
     if (getEl('totalProductsCount')) getEl('totalProductsCount').innerText = currentProducts.length;
     if (getEl('totalCatCount')) getEl('totalCatCount').innerText = currentCategories.length;
