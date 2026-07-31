@@ -201,18 +201,13 @@ window.DbService = (function () {
   async function upsertCategory(cat) {
     if (isReady()) {
       const payload = {
-        id:   cat.id,
+        id:   cat.id || ('cat-' + Date.now()),
         name: cat.name || '',
       };
-      if (cat.active !== undefined) payload.active = (cat.active !== false);
 
-      let { error } = await window.db.from('store_categories').upsert(payload);
+      let { data, error } = await window.db.from('store_categories').upsert(payload);
       if (error) {
-        delete payload.active;
-        let retry = await window.db.from('store_categories').upsert(payload);
-        if (retry.error) {
-          console.warn('[DbService] upsertCategory erro:', retry.error);
-        }
+        console.error('[Supabase Error Details]:', error);
       }
     }
     const cats = await getCategories();
