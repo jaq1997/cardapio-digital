@@ -1,4 +1,26 @@
-import { Camera, Mail, MessageCircle, ShoppingBag } from 'lucide-react'
+import { Instagram, Mail, ShoppingBag } from 'lucide-react'
+import { EVOLUX_SITE_URL } from '@/lib/site'
+
+function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  )
+}
 
 const QUICK_LINKS = [
   { label: 'Para quem é', href: '#para-quem-e' },
@@ -7,10 +29,11 @@ const QUICK_LINKS = [
   { label: 'FAQ', href: '#faq' },
 ]
 
-const SOCIALS = [
-  { label: 'Instagram', icon: Camera, href: '#' },
-  { label: 'WhatsApp', icon: MessageCircle, href: '#' },
-  { label: 'E-mail', icon: Mail, href: '#' },
+const SEGMENT_LINKS = [
+  { label: 'Alimentação & Delivery', href: '#para-quem-e' },
+  { label: 'Beleza & Serviços', href: '#para-quem-e' },
+  { label: 'Varejo & Lojas', href: '#para-quem-e' },
+  { label: 'Hospedagem & Turismo', href: '#para-quem-e' },
 ]
 
 export function SiteFooter() {
@@ -29,14 +52,33 @@ export function SiteFooter() {
             </a>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               Sua vitrine digital com a sua marca, seu domínio e seu controle. Pedidos direto no
-              WhatsApp, sem mensalidade.
+              WhatsApp, sem mensalidade por comissão.
             </p>
+            <div className="mt-4 text-xs font-semibold text-muted-foreground">
+              Uma solução <a href={EVOLUX_SITE_URL} target="_blank" rel="noopener noreferrer" className="text-foreground font-bold hover:text-brand underline underline-offset-4 transition-colors">Evolux360</a>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-8 sm:flex-row sm:gap-16">
-            <nav aria-label="Links rápidos">
+          <div className="flex flex-col gap-8 sm:flex-row sm:gap-12">
+            <nav aria-label="Segmentos Atendidos">
+              <p className="text-sm font-bold text-foreground">Segmentos</p>
+              <ul className="mt-4 space-y-2.5">
+                {SEGMENT_LINKS.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <nav aria-label="Navegação">
               <p className="text-sm font-bold text-foreground">Navegação</p>
-              <ul className="mt-4 space-y-3">
+              <ul className="mt-4 space-y-2.5">
                 {QUICK_LINKS.map((link) => (
                   <li key={link.href}>
                     <a
@@ -51,31 +93,38 @@ export function SiteFooter() {
             </nav>
 
             <div>
-              <p className="text-sm font-bold text-foreground">Redes sociais</p>
-              <div className="mt-4 flex gap-3">
-                {SOCIALS.map((s) => {
-                  const Icon = s.icon
-                  return (
-                    <a
-                      key={s.label}
-                      href={s.href}
-                      aria-label={s.label}
-                      className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-brand hover:text-brand"
-                    >
-                      <Icon className="h-5 w-5" aria-hidden="true" />
-                    </a>
-                  )
-                })}
-              </div>
+              <p className="text-sm font-bold text-foreground">Fale Conosco — Evolux360</p>
+              <ul className="mt-4 space-y-3">
+                <li>
+                  <a
+                    href="https://instagram.com/souevolux360"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2.5 text-sm text-muted-foreground transition-colors hover:text-brand"
+                  >
+                    <InstagramIcon className="h-4 w-4 text-brand" />
+                    <span>@souevolux360</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="mailto:contato@evolux360.com.br"
+                    className="flex items-center gap-2.5 text-sm text-muted-foreground transition-colors hover:text-brand"
+                  >
+                    <Mail className="h-4 w-4 text-brand" />
+                    <span>contato@evolux360.com.br</span>
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 border-t border-border pt-6">
+        <div className="mt-12 border-t border-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
-            Design e desenvolvimento humano, ponta a ponta — Evolux360.
+            Desenvolvido com alta performance por <a href={EVOLUX_SITE_URL} target="_blank" rel="noopener noreferrer" className="text-foreground font-bold hover:text-brand transition-colors">Evolux360</a>.
           </p>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             © 2026 Evolux360. Todos os direitos reservados.
           </p>
         </div>

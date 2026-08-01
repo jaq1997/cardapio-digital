@@ -37,6 +37,7 @@ export function Offer() {
 
               <Button
                 size="lg"
+                nativeButton={false}
                 render={<a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer" />}
                 className="mt-8 h-12 w-full px-6 text-base bg-brand-foreground font-bold text-brand-dark hover:bg-brand-soft sm:w-auto"
               >

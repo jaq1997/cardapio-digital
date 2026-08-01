@@ -5,7 +5,6 @@ import { Problem } from '@/components/landing/problem'
 import { Comparison } from '@/components/landing/comparison'
 import { HowItWorks } from '@/components/landing/how-it-works'
 import { Testimonials } from '@/components/landing/testimonials'
-import { Offer } from '@/components/landing/offer'
 import { Faq } from '@/components/landing/faq'
 import { SiteFooter } from '@/components/landing/site-footer'
 
@@ -20,7 +19,6 @@ export default function Page() {
         <Comparison />
         <HowItWorks />
         <Testimonials />
-        <Offer />
         <Faq />
       </main>
       <SiteFooter />

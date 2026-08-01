@@ -51,9 +51,9 @@ export function SiteHeader() {
             size="lg"
             nativeButton={false}
             render={<a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer" />}
-            className="bg-brand font-semibold text-brand-foreground hover:bg-brand-dark"
+            className="bg-brand font-semibold text-brand-foreground hover:bg-brand-dark shadow-sm"
           >
-            Falar no WhatsApp
+            Quero o Evolux Catálogo
           </Button>
         </div>
 
@@ -83,10 +83,11 @@ export function SiteHeader() {
             ))}
             <Button
               size="lg"
+              nativeButton={false}
               render={<a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer" />}
               className="mt-2 bg-brand font-semibold text-brand-foreground hover:bg-brand-dark"
             >
-              Falar no WhatsApp
+              Quero o Evolux Catálogo
             </Button>
           </nav>
         </div>

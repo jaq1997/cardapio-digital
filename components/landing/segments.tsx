@@ -93,17 +93,17 @@ export function Segments() {
           </p>
         </div>
 
-        <Tabs defaultValue="alimentacao" className="mt-12 gap-8">
-          <TabsList className="mx-auto grid h-auto w-full max-w-3xl grid-cols-2 gap-2 bg-transparent p-0 md:grid-cols-4">
+        <Tabs defaultValue="alimentacao" className="mt-12">
+          <TabsList className="mx-auto grid h-auto w-full max-w-3xl grid-cols-2 gap-3 bg-transparent p-0 mb-10 md:grid-cols-4">
             {SEGMENTS.map((seg) => {
               const Icon = seg.icon
               return (
                 <TabsTrigger
                   key={seg.value}
                   value={seg.value}
-                  className="flex h-auto flex-col items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-3 text-xs font-semibold text-muted-foreground data-[state=active]:border-brand data-[state=active]:bg-brand-soft data-[state=active]:text-brand-dark"
+                  className="flex h-auto flex-col items-center gap-2 rounded-xl border border-border bg-card px-4 py-3.5 text-xs font-bold text-muted-foreground transition-all hover:border-brand/40 data-[state=active]:border-brand data-[state=active]:bg-brand-soft data-[state=active]:text-brand-dark data-[state=active]:shadow-sm"
                 >
-                  <Icon className="h-5 w-5" aria-hidden="true" />
+                  <Icon className="h-5 w-5 text-brand" aria-hidden="true" />
                   <span className="text-center leading-tight">{seg.tab}</span>
                 </TabsTrigger>
               )
@@ -111,8 +111,8 @@ export function Segments() {
           </TabsList>
 
           {SEGMENTS.map((seg) => (
-            <TabsContent key={seg.value} value={seg.value} className="mt-0">
-              <div className="grid items-center gap-10 rounded-2xl border border-border bg-card p-6 sm:p-10 lg:grid-cols-2">
+            <TabsContent key={seg.value} value={seg.value} className="mt-6">
+              <div className="grid items-center gap-10 rounded-2xl border border-border bg-card p-6 sm:p-10 lg:grid-cols-2 shadow-sm">
                 <div>
                   <h3 className="text-2xl font-extrabold tracking-tight text-foreground">{seg.title}</h3>
                   <p className="mt-4 text-pretty text-lg leading-relaxed text-muted-foreground">{seg.text}</p>
@@ -127,8 +127,15 @@ export function Segments() {
                     ))}
                   </ul>
                 </div>
+
+                {/* APARELHO CELULAR COM FRAME DE VÍDEO DEMONSTRATIVO */}
                 <div>
-                  <PhoneMockup storeName={seg.store} categories={seg.categories} items={seg.items} />
+                  <PhoneMockup 
+                    storeName={seg.store} 
+                    categories={seg.categories} 
+                    items={seg.items} 
+                    videoPlaceholder={true}
+                  />
                 </div>
               </div>
             </TabsContent>

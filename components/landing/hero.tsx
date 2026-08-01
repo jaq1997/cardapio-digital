@@ -1,5 +1,6 @@
 import { ArrowRight, PlayCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { CHECKOUT_URL } from '@/lib/site'
 import { PhoneMockup } from './phone-mockup'
 
 export function Hero() {
@@ -22,15 +23,17 @@ export function Hero() {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button
               size="lg"
-              render={<a href="#oferta" />}
-              className="h-12 px-6 text-base bg-brand font-semibold text-brand-foreground hover:bg-brand-dark"
+              nativeButton={false}
+              render={<a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer" />}
+              className="h-12 px-6 text-base bg-brand font-semibold text-brand-foreground hover:bg-brand-dark shadow-md transition-all hover:scale-[1.02]"
             >
-              Quero minha vitrine
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              Quero o Evolux Catálogo
+              <ArrowRight className="h-4 w-4 ml-1" aria-hidden="true" />
             </Button>
             <Button
               size="lg"
               variant="outline"
+              nativeButton={false}
               render={<a href="#como-funciona" />}
               className="h-12 px-6 text-base border-border font-semibold text-foreground hover:bg-brand-soft hover:text-brand-dark"
             >
@@ -50,13 +53,10 @@ export function Hero() {
             aria-hidden="true"
           />
           <PhoneMockup
-            storeName="Sua Marca Aqui"
-            categories={['Destaques', 'Mais vendidos', 'Novidades']}
-            items={[
-              { name: 'Produto em destaque', price: 'R$ 62,90', meta: 'Escolha tamanho e adicionais' },
-              { name: 'Combo especial', price: 'R$ 45,00', meta: 'Pronto para pedir' },
-              { name: 'Item da semana', price: 'R$ 29,90', meta: 'Disponível agora' },
-            ]}
+            storeName="Evolux Catálogo"
+            categories={['Destaques']}
+            items={[]}
+            videoPlaceholder={true}
           />
         </div>
       </div>
