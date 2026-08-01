@@ -1,68 +1,64 @@
-# 🍕 Cardápio Digital & Central de Gestão PDV
+# 🚀 Evolux Catálogo — Sistema de Catálogo Digital & Delivery Multi-Tenant
 
-Sistema completo de **Cardápio Digital de Alta Conversão** e **Painel de Gestão Operacional (PDV)**, projetado para delivery de **Pizzarias, Marmitarias, Hamburguerias e Restaurantes**.
+Sistema completo de **Catálogo Digital de Alta Conversão**, projetado como solução White-Label para **Alimentação/Delivery, Serviços, Varejo e Hospedagem**.
 
 ---
 
-## 📌 Visão Geral do Projeto
+## 📌 Visão Geral do Arquitetura
 
-O sistema opera sem necessidade de instalação complexa de banco de dados para testes locais, utilizando a API nativa do `localStorage` para sincronização em tempo real entre o **Painel Admin** e o **Cardápio ao Vivo**.
+O **Evolux Catálogo** é construído com arquitetura **Multi-Tenant Nativa** integrada ao **Supabase (PostgreSQL)** com fallback defensivo para o `localStorage` do navegador. Cada lojista possui isolamento total de seus dados (`store_id`), garantindo privacidade e controle independente.
 
 ### 🌟 Principais Recursos:
-- **Cardápio ao Vivo (`index.html`):** 
-  - Layout limpo em estilo Franquia de Delivery.
-  - Personalização de tamanhos de pizza (Broto, Média, Grande, Gigante).
-  - Divisão de 2 sabores (meio a meio), bordas recheadas e adicionais extras.
-  - Gaveta de carrinho de compras com consulta de CEP via API ViaCEP.
-  - **Tabela de Frete Dinâmica por Bairro / Região** ou Retirada no Balcão.
-  - **Checkout Triplo:** PIX Mercado Pago (instantâneo), Cartão Online e WhatsApp Direct.
-  - **Comprovante Digital em Tela (`#orderConfirmedModal`):** Permite finalizar pedidos com 0 dependência do WhatsApp.
+- **Catálogo Digital e Loja Pública (`index.html`):**
+  - Layout Ultra-Moderno com suporte a temas dinâmicos (Pre-Hydration sem FOUC).
+  - Suporte a **Múltiplas Categorias** por produto (um prato pode estar em *Almoço*, *Promoções*, etc.).
+  - Vitrine de demonstração estilo **Nuvemshop/Shopify** para contas novas zeradas.
+  - Checkout fluido com captura de **Nome do Cliente**, **WhatsApp**, **Observações do Pedido** e **Consulta de CEP via ViaCEP**.
+  - **Envio Automático para WhatsApp** + **Sincronização com o Kanban de Pedidos do Evolux Core (CRM)**.
 
-- **Painel de Gestão PDV (`admin.html`):**
-  - Design Center "Franquia Style" com tipografia de alta precisão em **JetBrains Mono** para preços e IDs.
-  - **Customização da Marca:** Upload direto de arquivos `.png` / `.jpg` para a Logo, cores da marca e número do WhatsApp.
-  - **Gerenciador de Categorias:** Criação e exclusão dinâmica de abas do cardápio.
-  - **Gerenciador de Produtos:** Edição de preços, descrições, tags de destaque e upload direto de fotos por *drag-and-drop*.
-  - **Tabela de Taxas de Entrega por Bairro:** Definição de frete regional customizado.
-  - **Botão de Restauração 1-Clique:** Restaura os padrões de demonstração da *Pizza Todo Dia* instantaneamente.
+- **Painel de Gestão Admin (`admin.html`):**
+  - Autenticação e proteção de rotas via Supabase Auth (`auth.js`).
+  - **Identidade Visual & Banners:** Customização de cores primárias, logo e banners promocionais.
+  - **Gerenciador de Produtos:** Suporte a upload de fotos Base64/URL, adicionais com preços, ordenação e botão **Duplicar Produto** em 1-clique.
+  - **Gerenciador de Categorias:** Checklist multi-seleção de categorias com vinculação dinâmica de produtos.
+  - **Gestão de Frete e Cupons:** Tabela de taxas de entrega regional e cupons de desconto fixo/porcentagem.
+  - **Botão Dinâmico "Visualizar Cardápio":** Redireciona diretamente para o link da loja do usuário autenticado.
 
 ---
 
 ## 📁 Estrutura de Arquivos
 
 ```text
-c:\Users\User\Desktop\pizzaria\
-├── index.html            # Interface pública do Cardápio ao Vivo
-├── style.css             # Estilos CSS da Loja (Design System da Franquia)
-├── loja.js               # Lógica do catálogo, carrinho, CEP e checkout
-├── admin.html            # Painel de Gestão Operacional e PDV
-├── admin.css             # Estilos CSS do Admin (PDV Command Center)
-├── admin.js              # Engine de gerenciamento, uploads Base64 e CRUD
-├── dynamic-components.js # Navegação por abas e menu gaveta responsivo
-└── README.md             # Documentação do projeto
+evolux-catalogo/
+├── app/                                 # 🛒 APLICAÇÃO DO CATÁLOGO & ADMIN
+│   ├── index.html                       # Interface pública da loja/catálogo
+│   ├── style.css                        # Sistema de design (Tokens, Glassmorphism e Responsividade)
+│   ├── loja.js                          # Engine da loja pública, carrinho, CEP e checkout WhatsApp/CRM
+│   ├── admin.html                       # Painel de Controle Admin
+│   ├── admin-login.html                 # Tela de autenticação dos lojistas (Design System Evolux360)
+│   ├── admin.css                        # Estilos do Painel Admin (Dark Mode & Cards)
+│   ├── admin.js                         # Regras de negócio do Admin, CRUD de produtos e categorias
+│   ├── db-service.js                    # Camada de abstração de dados (Supabase Multi-Tenant por store_id)
+│   ├── auth.js                          # Controle de sessão, login/logout e guarda de rotas
+│   ├── defaults.js                      # Configurações padrão e componentes globais
+│   └── dynamic-components.js            # Componentes reutilizáveis (Drawer, Header e Float Wpp)
+│
+├── landing/                             # 🚀 LANDING PAGE DE VENDAS (Reservado)
+│
+├── DOCUMENTACAO-FEATURES-FUTURAS.md     # Roadmap de produtos e feedbacks dos testadores
+└── README.md                            # Documentação técnica do repositório
 ```
 
 ---
 
-## 🗝️ Chaves de Armazenamento Local (`localStorage`)
+## 🔒 Multi-Tenancy & Segurança
 
-Os dados configurados no Admin são armazenados sob as seguintes chaves:
-- `ptd_store_branding`: Configurações de nome, slogan, WhatsApp, cores e logo Base64.
-- `ptd_store_categories`: Lista de categorias ativas no cardápio.
-- `ptd_store_products`: Catálogo de produtos cadastrados.
-- `ptd_delivery_zones`: Tabela de bairros/regiões e valores de entrega.
+Cada requisição ao banco de dados no `db-service.js` valida o `store_id` (ID da conta autenticada no Supabase).
+- As chaves do `localStorage` são isoladas no formato `ptd_store_products_${store_id}`.
+- O salvamento de dados utiliza requisições defensivas limpas, evitando falhas de schema ou estouro de cota do navegador.
 
 ---
 
-## ⚡ Como Rodar no Computador
+## 🌿 Branch Principal para Testes & Produção
 
-Não requer dependências nem `npm install` para a versão Vanilla JS:
-1. Abra o arquivo `index.html` em qualquer navegador para ver o cardápio público.
-2. Abra o arquivo `admin.html` para gerenciar a loja.
-
----
-
-## 🌿 Branches do Git
-
-- **`main`**: Versão Vanilla JS 100% estável, ultra-rápida e pronta para demonstrações em tempo real com clientes.
-- **`feature/react-app`**: Branch dedicada para futura migração/expansão da arquitetura para React + Vite.
+- **`marmitas`**: Branch oficial de produção e testes de clientes ao vivo (Deploy automático no Cloudflare Pages).
