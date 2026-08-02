@@ -87,6 +87,7 @@ async function applyDynamicBranding() {
       if (cfg.logoUrl) {
         const logoBadge = document.querySelector('.ph-logo-badge');
         if (logoBadge) {
+          logoBadge.classList.add('has-custom-logo');
           logoBadge.innerHTML = `<img src="${cfg.logoUrl}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">`;
         }
       }
@@ -244,6 +245,11 @@ async function loadAndRenderDrawerCategories() {
   container.innerHTML = html;
 }
 
+function handleSearch(query) {
+  currentSearchQuery = String(query || '').trim();
+  renderCatalog();
+}
+
 function selectDrawerCategory(catId) {
   activeCategory = catId;
   const catTitleSpan = document.getElementById('catalogCategoryName');
@@ -336,6 +342,19 @@ function renderCatalog() {
 
   container.innerHTML = filtered.map(product => {
     const val = parseFloat(product.preco) || 0;
+    let priceHTML = `<span class="ph-price-val">R$ ${val.toFixed(2).replace('.', ',')}</span>`;
+
+    if (product.is_custom) {
+      const customLabel = product.custom_label ? `<span style="font-size: 0.72rem; font-weight: 700; color: #64748B; text-transform: uppercase; display: block; margin-bottom: 2px;">${product.custom_label}</span>` : '';
+      const customVal = product.custom_value || `R$ ${val.toFixed(2).replace('.', ',')}`;
+      priceHTML = `
+        <div style="display: flex; flex-direction: column;">
+          ${customLabel}
+          <span class="ph-price-val" style="font-size: 1.05rem;">${customVal}</span>
+        </div>
+      `;
+    }
+
     return `
       <div class="ph-card" onclick="openProductModal('${product.id}')">
         <div class="ph-card-img-wrap">
@@ -347,7 +366,7 @@ function renderCatalog() {
           <p class="ph-card-desc">${product.descricao || ''}</p>
           <div class="ph-card-footer">
             <div class="ph-price-wrap">
-              <span class="ph-price-val">R$ ${val.toFixed(2).replace('.', ',')}</span>
+              ${priceHTML}
             </div>
             <button class="ph-btn-add" onclick="event.stopPropagation(); openProductModal('${product.id}')">
               <span>ADICIONAR</span>
@@ -896,6 +915,7 @@ function showToast(msg, type = 'info') {
 }
 
 // Binds Globais no Objeto Window
+window.handleSearch = handleSearch;
 window.selectDrawerCategory = selectDrawerCategory;
 window.toggleMobileDrawer = toggleMobileDrawer;
 window.openProductModal = openProductModal;

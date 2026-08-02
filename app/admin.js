@@ -243,6 +243,11 @@ function populateCategorySelect(selectedCatNames = []) {
   }).join('');
 }
 
+function toggleCustomPriceFields(show) {
+  const box = document.getElementById('customPriceBoxContainer');
+  if (box) box.style.display = show ? 'block' : 'none';
+}
+
 function openAddProductModal() {
   tempProductImgBase64 = '';
   document.getElementById('productModalTitle').innerText = 'CADASTRAR PRODUTO';
@@ -251,6 +256,13 @@ function openAddProductModal() {
   document.getElementById('prodPrice').value = '';
   document.getElementById('prodDesc').value = '';
   document.getElementById('prodBadge').value = '';
+  
+  const chkCustom = document.getElementById('prodIsCustom');
+  if (chkCustom) chkCustom.checked = false;
+  toggleCustomPriceFields(false);
+  if (document.getElementById('prodCustomLabel')) document.getElementById('prodCustomLabel').value = '';
+  if (document.getElementById('prodCustomValue')) document.getElementById('prodCustomValue').value = '';
+
   if (document.getElementById('prodImageUrlInput')) document.getElementById('prodImageUrlInput').value = '';
   document.getElementById('adicionaisContainer').innerHTML = '';
   
@@ -396,6 +408,15 @@ function editProductItem(id) {
   document.getElementById('prodDesc').value = item.descricao || '';
   document.getElementById('prodBadge').value = item.badge || '';
 
+  const isCustom = !!item.is_custom;
+  const chkCustom = document.getElementById('prodIsCustom');
+  if (chkCustom) {
+    chkCustom.checked = isCustom;
+    toggleCustomPriceFields(isCustom);
+  }
+  if (document.getElementById('prodCustomLabel')) document.getElementById('prodCustomLabel').value = item.custom_label || '';
+  if (document.getElementById('prodCustomValue')) document.getElementById('prodCustomValue').value = item.custom_value || '';
+
   const catVal = getProductCategoryNames(item);
   populateCategorySelect(catVal);
 
@@ -499,6 +520,11 @@ async function saveProductItem(event) {
     imgFinal = previewImg.src;
   }
 
+  // Coleta Preço Personalizado
+  const isCustom = document.getElementById('prodIsCustom') ? document.getElementById('prodIsCustom').checked : false;
+  const customLabel = document.getElementById('prodCustomLabel') ? document.getElementById('prodCustomLabel').value.trim() : '';
+  const customValue = document.getElementById('prodCustomValue') ? document.getElementById('prodCustomValue').value.trim() : '';
+
   const candidate = {
     id: editId || ('prod-' + Date.now()),
     nome: name,
@@ -508,6 +534,9 @@ async function saveProductItem(event) {
     preco_grande: price,
     descricao: desc,
     badge: badge,
+    is_custom: isCustom,
+    custom_label: customLabel,
+    custom_value: customValue,
     img_url: imgFinal,
     adicionais: adicionaisList,
     status: 'ativo'
@@ -945,6 +974,7 @@ window.previewBannerDeskUpload = previewBannerDeskUpload;
 window.removeBannerDesk = removeBannerDesk;
 window.previewBannerMobUpload = previewBannerMobUpload;
 window.removeBannerMob = removeBannerMob;
+window.toggleCustomPriceFields = toggleCustomPriceFields;
 window.saveProductItem = saveProductItem;
 window.deleteProductItem = deleteProductItem;
 window.editProductItem = editProductItem;

@@ -354,7 +354,8 @@
               </div>
 
               <div>
-                <label class="admin-label">Cor de Destaque / Links (Accent):</label>
+                <label class="admin-label">Cor de Detalhes & Ícones:</label>
+                <div style="font-size: 0.74rem; color: #64748B; margin-top: -4px; margin-bottom: 6px;">Utilizada nos ícones, links e detalhes do cardápio</div>
                 <div style="display: flex; gap: 8px; align-items: center;">
                   <input type="color" id="cfgAccentColorPicker" style="width: 44px; height: 38px; border: 1px solid #E2E8F0; border-radius: 6px; cursor: pointer; padding: 2px; background: #FFF;" value="#6344F5" onchange="document.getElementById('cfgAccentColor').value = this.value">
                   <input type="text" id="cfgAccentColor" class="admin-input" placeholder="#6344F5" value="#6344F5" onchange="document.getElementById('cfgAccentColorPicker').value = this.value">
@@ -362,7 +363,8 @@
               </div>
 
               <div>
-                <label class="admin-label">Cor dos Selos / Badges:</label>
+                <label class="admin-label">Cor das Etiquetas (Badges):</label>
+                <div style="font-size: 0.74rem; color: #64748B; margin-top: -4px; margin-bottom: 6px;">Cor de fundo dos selos como "Promoção" ou "Mais Pedido"</div>
                 <div style="display: flex; gap: 8px; align-items: center;">
                   <input type="color" id="cfgBadgeBgColorPicker" style="width: 44px; height: 38px; border: 1px solid #E2E8F0; border-radius: 6px; cursor: pointer; padding: 2px; background: #FFF;" value="#F1EEFE" onchange="document.getElementById('cfgBadgeBgColor').value = this.value">
                   <input type="text" id="cfgBadgeBgColor" class="admin-input" placeholder="#F1EEFE" value="#F1EEFE" onchange="document.getElementById('cfgBadgeBgColorPicker').value = this.value">
@@ -407,8 +409,27 @@
             </div>
           </div>
           <div>
-            <label class="admin-label">Preço (R$):</label>
-            <input type="number" id="prodPrice" class="admin-input" step="0.01" placeholder="59.90" required>
+            <label class="admin-label">Preço Base (R$):</label>
+            <input type="number" id="prodPrice" class="admin-input" step="0.01" placeholder="59.90">
+            <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="prodIsCustom" style="width: 16px; height: 16px; accent-color: #6344F5; cursor: pointer;" onchange="toggleCustomPriceFields(this.checked)">
+              <label for="prodIsCustom" style="font-size: 0.82rem; font-weight: 700; color: #18181B; cursor: pointer;">Preço Personalizado / Sob Consulta</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- CAMPOS DINÂMICOS DE PREÇO PERSONALIZADO -->
+        <div id="customPriceBoxContainer" style="display: none; background: #F8FAFC; border: 1px solid #E2E8F0; padding: 14px; border-radius: 8px;">
+          <div style="font-size: 0.76rem; font-weight: 800; color: #6344F5; text-transform: uppercase; margin-bottom: 8px;">Configuração de Preço Personalizado</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div>
+              <label class="admin-label">Rótulo / Texto Exibido:</label>
+              <input type="text" id="prodCustomLabel" class="admin-input" placeholder="Ex: A partir de, Sob consulta, R$/kg...">
+            </div>
+            <div>
+              <label class="admin-label">Valor ou Faixa Exibida:</label>
+              <input type="text" id="prodCustomValue" class="admin-input" placeholder="Ex: R$ 45,00, R$ 12,90/kg, R$ 80 - R$ 150">
+            </div>
           </div>
         </div>
 
