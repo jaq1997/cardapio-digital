@@ -198,23 +198,23 @@ function applyBrandingToUI() {
 }
 
 function renderDynamicCategoriesInHeader() {
-    const savedCategories = localStorage.getItem('ptd_store_categories');
     const navContainer = document.getElementById('categoriesTabContainer');
     const drawerContainer = document.getElementById('drawerCategoryListContainer');
 
     let cats = [];
-    if (savedCategories) {
-        try {
-            cats = JSON.parse(savedCategories);
-        } catch(e) {}
-    }
+    try {
+        const saved = localStorage.getItem('ptd_store_categories_' + (localStorage.getItem('active_store_id') || 'default')) || localStorage.getItem('ptd_store_categories');
+        if (saved) cats = JSON.parse(saved);
+    } catch(e) {}
+
+    // Filtra se houver categorias padroes antigas no cache
+    cats = (cats || []).filter(c => c.name && !['Promoções', 'café da manhã', 'Pratos Principais', 'Sobremesas'].includes(c.name));
 
     if (cats && cats.length > 0) {
         if (navContainer) {
-            let html = '';
-            cats.forEach((c, idx) => {
-                const activeClass = idx === 0 ? 'active' : '';
-                html += `<button class="ph-cat-pill ${activeClass}" data-cat="${c.id}" onclick="filterCategory('${c.id}', this)">${c.name.toUpperCase()}</button>`;
+            let html = `<button class="ph-cat-card active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>`;
+            cats.forEach((c) => {
+                html += `<button class="ph-cat-card" onclick="selectDrawerCategory('${c.name}')">${c.name.toUpperCase()}</button>`;
             });
             navContainer.innerHTML = html;
         }
@@ -223,16 +223,9 @@ function renderDynamicCategoriesInHeader() {
             let dHtml = `<div style="font-size: 0.7rem; font-weight: 900; color: #888; margin-bottom: 4px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div>`;
             dHtml += `<button class="drawer-cat-item active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>`;
             cats.forEach(c => {
-                dHtml += `<button class="drawer-cat-item" onclick="selectDrawerCategory('${c.id}')">${c.name.toUpperCase()}</button>`;
+                dHtml += `<button class="drawer-cat-item" onclick="selectDrawerCategory('${c.name}')">${c.name.toUpperCase()}</button>`;
             });
             drawerContainer.innerHTML = dHtml;
-        }
-    } else {
-        if (navContainer) {
-            navContainer.innerHTML = '';
-        }
-        if (drawerContainer) {
-            drawerContainer.innerHTML = `<div style="font-size: 0.7rem; font-weight: 900; color: #888; margin-bottom: 4px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div><button class="drawer-cat-item active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>`;
         }
     }
 }
