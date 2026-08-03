@@ -177,9 +177,10 @@ function applyBrandingToUI() {
 
         // SE SUBIU LOGO EM IMAGEM (.PNG / .JPG), SUBSTITUI PELO LOGO DA IMAGEM E ATUALIZA FAVICON DA ABA
         if (cfg.logoUrl) {
-            const brandLogoAnchor = document.getElementById('headerBrandLogo');
-            if (brandLogoAnchor) {
-                brandLogoAnchor.innerHTML = `<img src="${cfg.logoUrl}" style="max-height: 44px; border-radius: 4px; object-fit: contain;" alt="${cfg.storeName || 'Logo'}">`;
+            const badge = document.querySelector('.ph-logo-badge');
+            if (badge) {
+                badge.classList.add('has-custom-logo');
+                badge.innerHTML = `<img src="${cfg.logoUrl}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;" alt="${cfg.storeName || 'Logo'}">`;
             }
             const favicon = document.getElementById('pageFavicon');
             if (favicon) favicon.href = cfg.logoUrl;

@@ -308,18 +308,44 @@ function removeProductPhoto() {
   if (btnRem) btnRem.style.display = 'none';
 }
 
-/* UPLOAD E REMOÇÃO DE LOGO */
-function previewLogoFileUpload(input) {
-  if (input.files && input.files[0]) {
+function compressImageFile(file, maxWidth = 1200, maxHeight = 800, quality = 0.82) {
+  return new Promise((resolve) => {
     const reader = new FileReader();
-    reader.onload = function(e) {
-      tempLogoBase64 = e.target.result;
-      const img = document.getElementById('logoFilePreview');
-      const btnRem = document.getElementById('btnRemoveLogo');
-      if (img) { img.src = tempLogoBase64; img.style.display = 'block'; }
-      if (btnRem) btnRem.style.display = 'inline-flex';
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        if (height > maxHeight) {
+          width = Math.round((width * maxHeight) / height);
+          height = maxHeight;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const mime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+        resolve(canvas.toDataURL(mime, quality));
+      };
+      img.src = e.target.result;
     };
-    reader.readAsDataURL(input.files[0]);
+    reader.readAsDataURL(file);
+  });
+}
+
+/* UPLOAD E REMOÇÃO DE LOGO */
+async function previewLogoFileUpload(input) {
+  if (input.files && input.files[0]) {
+    tempLogoBase64 = await compressImageFile(input.files[0], 500, 500, 0.9);
+    const img = document.getElementById('logoFilePreview');
+    const btnRem = document.getElementById('btnRemoveLogo');
+    if (img) { img.src = tempLogoBase64; img.style.display = 'block'; }
+    if (btnRem) btnRem.style.display = 'inline-flex';
   }
 }
 
@@ -334,17 +360,13 @@ function removeLogo() {
 }
 
 /* UPLOAD E REMOÇÃO DE BANNERS */
-function previewBannerDeskUpload(input) {
+async function previewBannerDeskUpload(input) {
   if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      tempBannerDeskBase64 = e.target.result;
-      const img = document.getElementById('bannerDeskPreview');
-      const btnRem = document.getElementById('btnRemoveBannerDesk');
-      if (img) { img.src = tempBannerDeskBase64; img.style.display = 'block'; }
-      if (btnRem) btnRem.style.display = 'inline-flex';
-    };
-    reader.readAsDataURL(input.files[0]);
+    tempBannerDeskBase64 = await compressImageFile(input.files[0], 1200, 600, 0.82);
+    const img = document.getElementById('bannerDeskPreview');
+    const btnRem = document.getElementById('btnRemoveBannerDesk');
+    if (img) { img.src = tempBannerDeskBase64; img.style.display = 'block'; }
+    if (btnRem) btnRem.style.display = 'inline-flex';
   }
 }
 
@@ -358,17 +380,13 @@ function removeBannerDesk() {
   if (btnRem) btnRem.style.display = 'none';
 }
 
-function previewBannerMobUpload(input) {
+async function previewBannerMobUpload(input) {
   if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      tempBannerMobBase64 = e.target.result;
-      const img = document.getElementById('bannerMobPreview');
-      const btnRem = document.getElementById('btnRemoveBannerMob');
-      if (img) { img.src = tempBannerMobBase64; img.style.display = 'block'; }
-      if (btnRem) btnRem.style.display = 'inline-flex';
-    };
-    reader.readAsDataURL(input.files[0]);
+    tempBannerMobBase64 = await compressImageFile(input.files[0], 800, 800, 0.82);
+    const img = document.getElementById('bannerMobPreview');
+    const btnRem = document.getElementById('btnRemoveBannerMob');
+    if (img) { img.src = tempBannerMobBase64; img.style.display = 'block'; }
+    if (btnRem) btnRem.style.display = 'inline-flex';
   }
 }
 
