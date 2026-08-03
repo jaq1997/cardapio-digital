@@ -148,26 +148,19 @@ window.DbService = (function () {
         let { data, error } = await window.db
           .from('store_products')
           .select('*')
-          .eq('store_id', getStoreId())
-          .order('position', { ascending: true });
+          .order('position', { ascending: true, nullsFirst: false });
 
-        if (error) {
-          const retry = await window.db.from('store_products').select('*').order('position', { ascending: true });
-          if (!retry.error && Array.isArray(retry.data)) {
-            data = retry.data.filter(p => !p.store_id || p.store_id === getStoreId());
-            error = null;
-          }
-        }
-
-        if (!error && Array.isArray(data)) {
-          const normalized = data.map(normalizeProductRecord);
-          _safeSetStorage(STORAGE_KEY_PRODUCTS, normalized);
-          return normalized;
+        if (!error && Array.isArray(data) && data.length > 0) {
+          const storeProds = data.filter(p => !p.store_id || p.store_id === getStoreId());
+          const normalizedList = (storeProds.length > 0 ? storeProds : data).map(normalizeProductRecord);
+          _safeSetStorage(STORAGE_KEY_PRODUCTS, normalizedList);
+          try { localStorage.setItem('ptd_store_products', JSON.stringify(normalizedList)); } catch(e){}
+          return normalizedList;
         }
       } catch(e) {}
     }
     const cached = _safeGetStorage(STORAGE_KEY_PRODUCTS);
-    return Array.isArray(cached) ? cached.map(normalizeProductRecord) : [];
+    return (cached && cached.length > 0) ? cached.map(normalizeProductRecord) : [];
   }
 
   async function upsertProduct(product) {

@@ -18,10 +18,6 @@ const SHARED_COMPONENTS = {
                         <path d="M12 22V12"></path>
                     </svg>
                 </div>
-                <div class="ph-logo-text-wrap">
-                    <div class="ph-logo-text" id="headerLogoText"></div>
-                    <div class="ph-logo-sub" id="headerLogoSub"></div>
-                </div>
             </a>
 
             <div class="ph-search-wrap">
@@ -32,13 +28,12 @@ const SHARED_COMPONENTS = {
             </div>
             
             <div class="ph-nav-right">
-                <button class="ph-cart-btn" onclick="openCartModal()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <button class="ph-cart-btn" onclick="openCartModal()" aria-label="Ver Carrinho">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="9" cy="21" r="1"></circle>
                         <circle cx="20" cy="21" r="1"></circle>
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                     </svg>
-                    <span class="cart-btn-txt">SEU PEDIDO</span>
                     <span class="ph-cart-badge" id="cartCountBadge">0</span>
                 </button>
             </div>

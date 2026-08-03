@@ -279,6 +279,20 @@ async function loadAndRenderDrawerCategories() {
   }
 
   container.innerHTML = html;
+
+  // Renderiza a barra de cards visuais de categorias no topo (Estilo Pizza Hut)
+  const topNavContainer = document.getElementById('categoriesTabContainer');
+  if (topNavContainer) {
+    let topHtml = `<button class="ph-cat-card ${activeCategory === 'todos' ? 'active' : ''}" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>`;
+    if (categories && categories.length > 0) {
+      const activeCats = categories.filter(c => c.active !== false);
+      activeCats.forEach(cat => {
+        const isAct = (activeCategory === cat.name || activeCategory === cat.id);
+        topHtml += `<button class="ph-cat-card ${isAct ? 'active' : ''}" onclick="selectDrawerCategory('${cat.name}')">${cat.name.toUpperCase()}</button>`;
+      });
+    }
+    topNavContainer.innerHTML = topHtml;
+  }
 }
 
 function handleSearch(query) {
