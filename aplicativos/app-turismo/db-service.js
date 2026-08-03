@@ -68,7 +68,11 @@ window.DbService = (function () {
 
   async function saveBranding(branding) {
     _safeSetStorage(STORAGE_KEY_BRANDING, branding);
-    localStorage.setItem('ptd_store_branding', JSON.stringify(branding));
+    try {
+      localStorage.setItem('ptd_store_branding', JSON.stringify(branding));
+    } catch(e) {
+      console.warn('[DbService] LocalStorage quota excedida ao salvar branding localmente. Continuando via Supabase...');
+    }
 
     if (!isReady()) return;
 
