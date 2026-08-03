@@ -247,43 +247,59 @@ async function loadCatalogData() {
 }
 
 async function loadAndRenderDrawerCategories() {
-  categories = [];
+  let dbCats = [];
   if (window.DbService) {
     try {
       const remote = await DbService.getCategories();
-      if (remote && remote.length > 0) categories = remote;
+      if (remote && Array.isArray(remote)) dbCats = remote;
     } catch(e) {}
   }
 
-  if (!categories || categories.length === 0) {
+  if ((!dbCats || dbCats.length === 0)) {
     const saved = localStorage.getItem(STORAGE_KEY_CATEGORIES);
-    if (saved) { try { categories = JSON.parse(saved); } catch(e) {} }
+    if (saved) { try { dbCats = JSON.parse(saved); } catch(e) {} }
   }
 
-  // Fallback: se nao encontrou na tabela de categorias, extrai automaticamente das categorias dos produtos cadastrados
-  if (!categories || categories.length === 0) {
-    if (window.DbService) {
-      try {
-        const prods = await DbService.getProducts();
-        if (prods && prods.length > 0) {
-          const catSet = new Set();
-          prods.forEach(p => {
-            const catVal = p.categorias || p.categoria;
-            if (catVal) {
-              const list = Array.isArray(catVal) ? catVal : String(catVal).split(',');
-              list.forEach(c => {
-                const trimmed = String(c).trim();
-                if (trimmed && trimmed.toLowerCase() !== 'outros') catSet.add(trimmed);
-              });
-            }
-          });
-          if (catSet.size > 0) {
-            categories = Array.from(catSet).map(cName => ({ id: cName, name: cName, active: true }));
-          }
-        }
-      } catch(e) {}
-    }
+  const allCatNamesMap = new Map();
+
+  // 1. Adiciona as categorias cadastradas no Admin (mesmo que estejam sem produtos no momento)
+  if (dbCats && dbCats.length > 0) {
+    dbCats.forEach(c => {
+      if (c && c.name) {
+        allCatNamesMap.set(c.name.trim().toLowerCase(), {
+          id: c.id || c.name,
+          name: c.name.trim(),
+          active: c.active !== false
+        });
+      }
+    });
   }
+
+  // 2. Unifica com categorias extraídas dos produtos cadastrados
+  if (window.DbService) {
+    try {
+      const prods = await DbService.getProducts();
+      if (prods && prods.length > 0) {
+        prods.forEach(p => {
+          const catVal = p.categorias || p.categoria;
+          if (catVal) {
+            const list = Array.isArray(catVal) ? catVal : String(catVal).split(',');
+            list.forEach(c => {
+              const trimmed = String(c).trim();
+              if (trimmed && trimmed.toLowerCase() !== 'outros') {
+                const key = trimmed.toLowerCase();
+                if (!allCatNamesMap.has(key)) {
+                  allCatNamesMap.set(key, { id: trimmed, name: trimmed, active: true });
+                }
+              }
+            });
+          }
+        });
+      }
+    } catch(e) {}
+  }
+
+  categories = Array.from(allCatNamesMap.values());
 
   // Remove categorias legadas de teste se houver no cache local
   categories = (categories || []).filter(c => c.name && !['Promoções', 'café da manhã', 'Pratos Principais', 'Sobremesas'].includes(c.name));

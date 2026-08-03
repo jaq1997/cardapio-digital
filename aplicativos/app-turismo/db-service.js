@@ -177,12 +177,11 @@ window.DbService = (function () {
 
         if (!error && Array.isArray(data) && data.length > 0) {
           let activeId = getStoreId();
-          if (activeId === 'default') {
-            const nonDefault = data.find(c => c.store_id && c.store_id !== 'default');
-            if (nonDefault) activeId = nonDefault.store_id;
+          let storeCats = data.filter(c => c.store_id === activeId);
+          if (storeCats.length === 0) {
+            storeCats = data.filter(c => c.store_id && c.store_id !== 'default');
           }
-          const storeCats = data.filter(c => c.store_id === activeId);
-          const finalCats = storeCats.length > 0 ? storeCats : data.filter(c => c.store_id !== 'default');
+          const finalCats = storeCats.length > 0 ? storeCats : data;
           _safeSetStorage(STORAGE_KEY_CATEGORIES, finalCats);
           try { localStorage.setItem('ptd_store_categories', JSON.stringify(finalCats)); } catch(e){}
           return finalCats;
