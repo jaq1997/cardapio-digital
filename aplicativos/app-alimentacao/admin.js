@@ -338,9 +338,14 @@ function compressImageFile(file, maxWidth = 1200, maxHeight = 800, quality = 0.8
   });
 }
 
+let isLogoExplicitlyRemoved = false;
+let isBannerDeskExplicitlyRemoved = false;
+let isBannerMobExplicitlyRemoved = false;
+
 /* UPLOAD E REMOÇÃO DE LOGO */
 async function previewLogoFileUpload(input) {
   if (input.files && input.files[0]) {
+    isLogoExplicitlyRemoved = false;
     tempLogoBase64 = await compressImageFile(input.files[0], 500, 500, 0.9);
     const img = document.getElementById('logoFilePreview');
     const btnRem = document.getElementById('btnRemoveLogo');
@@ -351,6 +356,8 @@ async function previewLogoFileUpload(input) {
 
 function removeLogo() {
   tempLogoBase64 = '';
+  isLogoExplicitlyRemoved = true;
+  if (currentBranding) currentBranding.logoUrl = '';
   const fileInput = document.getElementById('cfgLogoFile');
   const img = document.getElementById('logoFilePreview');
   const btnRem = document.getElementById('btnRemoveLogo');
@@ -362,6 +369,7 @@ function removeLogo() {
 /* UPLOAD E REMOÇÃO DE BANNERS */
 async function previewBannerDeskUpload(input) {
   if (input.files && input.files[0]) {
+    isBannerDeskExplicitlyRemoved = false;
     tempBannerDeskBase64 = await compressImageFile(input.files[0], 1200, 600, 0.82);
     const img = document.getElementById('bannerDeskPreview');
     const btnRem = document.getElementById('btnRemoveBannerDesk');
@@ -372,6 +380,8 @@ async function previewBannerDeskUpload(input) {
 
 function removeBannerDesk() {
   tempBannerDeskBase64 = '';
+  isBannerDeskExplicitlyRemoved = true;
+  if (currentBranding) currentBranding.bannerDeskUrl = '';
   const fileInput = document.getElementById('cfgBannerDeskFile');
   const img = document.getElementById('bannerDeskPreview');
   const btnRem = document.getElementById('btnRemoveBannerDesk');
@@ -382,12 +392,25 @@ function removeBannerDesk() {
 
 async function previewBannerMobUpload(input) {
   if (input.files && input.files[0]) {
+    isBannerMobExplicitlyRemoved = false;
     tempBannerMobBase64 = await compressImageFile(input.files[0], 800, 800, 0.82);
     const img = document.getElementById('bannerMobPreview');
     const btnRem = document.getElementById('btnRemoveBannerMob');
     if (img) { img.src = tempBannerMobBase64; img.style.display = 'block'; }
     if (btnRem) btnRem.style.display = 'inline-flex';
   }
+}
+
+function removeBannerMob() {
+  tempBannerMobBase64 = '';
+  isBannerMobExplicitlyRemoved = true;
+  if (currentBranding) currentBranding.bannerMobUrl = '';
+  const fileInput = document.getElementById('cfgBannerMobFile');
+  const img = document.getElementById('bannerMobPreview');
+  const btnRem = document.getElementById('btnRemoveBannerMob');
+  if (fileInput) fileInput.value = '';
+  if (img) { img.src = ''; img.style.display = 'none'; }
+  if (btnRem) btnRem.style.display = 'none';
 }
 
 function removeBannerMob() {
@@ -958,9 +981,9 @@ async function saveBrandingConfig(event) {
     btnTextColor: document.getElementById('cfgBtnTextColor').value,
     accentColor: document.getElementById('cfgAccentColor').value,
     badgeBgColor: document.getElementById('cfgBadgeBgColor').value,
-    logoUrl: tempLogoBase64 || currentBranding.logoUrl || '',
-    bannerDeskUrl: tempBannerDeskBase64 || currentBranding.bannerDeskUrl || '',
-    bannerMobUrl: tempBannerMobBase64 || currentBranding.bannerMobUrl || ''
+    logoUrl: isLogoExplicitlyRemoved ? '' : (tempLogoBase64 || currentBranding.logoUrl || ''),
+    bannerDeskUrl: isBannerDeskExplicitlyRemoved ? '' : (tempBannerDeskBase64 || currentBranding.bannerDeskUrl || ''),
+    bannerMobUrl: isBannerMobExplicitlyRemoved ? '' : (tempBannerMobBase64 || currentBranding.bannerMobUrl || '')
   };
 
   await DbService.saveBranding(currentBranding);

@@ -89,6 +89,10 @@ async function applyDynamicBranding() {
         if (logoText) {
           logoText.innerHTML = cfg.storeName;
         }
+        const footerTitle = document.getElementById('footerStoreTitle') || document.querySelector('.footer-title');
+        if (footerTitle) {
+          footerTitle.innerText = cfg.storeName.toUpperCase();
+        }
         document.title = `${cfg.storeName}${cfg.storeSub ? ' — ' + cfg.storeSub : ''}`;
       }
       if (cfg.storeSub) {
@@ -96,13 +100,20 @@ async function applyDynamicBranding() {
         if (logoSub) {
           logoSub.innerText = cfg.storeSub;
         }
+        const footerSub = document.getElementById('footerStoreSub');
+        if (footerSub) {
+          footerSub.innerText = cfg.storeSub;
+        }
       }
 
-      if (cfg.logoUrl) {
-        const logoBadge = document.querySelector('.ph-logo-badge');
-        if (logoBadge) {
+      const logoBadge = document.querySelector('.ph-logo-badge');
+      if (logoBadge) {
+        if (cfg.logoUrl) {
           logoBadge.classList.add('has-custom-logo');
           logoBadge.innerHTML = `<img src="${cfg.logoUrl}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">`;
+        } else {
+          logoBadge.classList.remove('has-custom-logo');
+          logoBadge.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 15 10-15-10-5z"></path><path d="M12 22V12"></path></svg>`;
         }
       }
 

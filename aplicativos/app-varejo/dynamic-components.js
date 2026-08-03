@@ -176,14 +176,17 @@ function applyBrandingToUI() {
         }
 
         // SE SUBIU LOGO EM IMAGEM (.PNG / .JPG), SUBSTITUI PELO LOGO DA IMAGEM E ATUALIZA FAVICON DA ABA
-        if (cfg.logoUrl) {
-            const badge = document.querySelector('.ph-logo-badge');
-            if (badge) {
+        const badge = document.querySelector('.ph-logo-badge');
+        if (badge) {
+            if (cfg.logoUrl) {
                 badge.classList.add('has-custom-logo');
                 badge.innerHTML = `<img src="${cfg.logoUrl}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;" alt="${cfg.storeName || 'Logo'}">`;
+                const favicon = document.getElementById('pageFavicon');
+                if (favicon) favicon.href = cfg.logoUrl;
+            } else {
+                badge.classList.remove('has-custom-logo');
+                badge.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 15 10-15-10-5z"></path><path d="M12 22V12"></path></svg>`;
             }
-            const favicon = document.getElementById('pageFavicon');
-            if (favicon) favicon.href = cfg.logoUrl;
         }
 
         if (cfg.wppNumber) {
