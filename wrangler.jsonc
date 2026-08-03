@@ -1,0 +1,7 @@
+{
+  "name": "evolux-alimentacao",
+  "compatibility_date": "2026-08-01",
+  "assets": {
+    "directory": "./aplicativos/app-alimentacao"
+  }
+}
