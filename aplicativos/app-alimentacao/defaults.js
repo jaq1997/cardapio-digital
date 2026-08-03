@@ -13,11 +13,14 @@ const STORAGE_KEY_SHEETS_CONFIG  = 'ptd_sheets_config';
 const STORAGE_KEY_COUPONS        = 'ptd_store_coupons';
 
 const defaultBranding = {
-  storeName: "Minha Loja",
+  storeName: "",
   storeSub: "",
   wppNumber: "",
   frete: 5.00,
   primaryColor: "#18181B",
+  btnTextColor: "#FFFFFF",
+  accentColor: "#6344F5",
+  badgeBgColor: "#F1EEFE",
   darkColor: "#09090B",
   logoUrl: "",
   bannerDeskUrl: "",
