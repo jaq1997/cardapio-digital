@@ -147,8 +147,7 @@ window.DbService = (function () {
       try {
         let { data, error } = await window.db
           .from('store_products')
-          .select('*')
-          .order('position', { ascending: true, nullsFirst: false });
+          .select('*');
 
         if (!error && Array.isArray(data) && data.length > 0) {
           let activeId = getStoreId();
@@ -157,7 +156,7 @@ window.DbService = (function () {
             if (nonDefault) activeId = nonDefault.store_id;
           }
           const storeProds = data.filter(p => p.store_id === activeId);
-          const finalProds = storeProds.length > 0 ? storeProds : data;
+          const finalProds = storeProds.length > 0 ? storeProds : data.filter(p => p.store_id !== 'default');
           const normalizedList = finalProds.map(normalizeProductRecord);
           _safeSetStorage(STORAGE_KEY_PRODUCTS, normalizedList);
           try { localStorage.setItem('ptd_store_products', JSON.stringify(normalizedList)); } catch(e){}
@@ -174,8 +173,7 @@ window.DbService = (function () {
       try {
         let { data, error } = await window.db
           .from('store_categories')
-          .select('*')
-          .order('position', { ascending: true });
+          .select('*');
 
         if (!error && Array.isArray(data) && data.length > 0) {
           let activeId = getStoreId();
@@ -184,7 +182,7 @@ window.DbService = (function () {
             if (nonDefault) activeId = nonDefault.store_id;
           }
           const storeCats = data.filter(c => c.store_id === activeId);
-          const finalCats = storeCats.length > 0 ? storeCats : data;
+          const finalCats = storeCats.length > 0 ? storeCats : data.filter(c => c.store_id !== 'default');
           _safeSetStorage(STORAGE_KEY_CATEGORIES, finalCats);
           try { localStorage.setItem('ptd_store_categories', JSON.stringify(finalCats)); } catch(e){}
           return finalCats;
