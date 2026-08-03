@@ -247,9 +247,6 @@ async function loadCatalogData() {
 }
 
 async function loadAndRenderDrawerCategories() {
-  const container = document.getElementById('drawerCategoryListContainer') || document.getElementById('drawerCategoriesList');
-  if (!container) return;
-
   categories = [];
   if (window.DbService) {
     try {
@@ -266,22 +263,25 @@ async function loadAndRenderDrawerCategories() {
   // Remove categorias legadas de teste se houver no cache local
   categories = (categories || []).filter(c => c.name && !['Promoções', 'café da manhã', 'Pratos Principais', 'Sobremesas'].includes(c.name));
 
-  let html = `<div style="font-size: 0.75rem; font-weight: 700; color: #64748B; margin-bottom: 8px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div>`;
-  html += `<button class="drawer-cat-item ${activeCategory === 'todos' ? 'active' : ''}" onclick="selectDrawerCategory('todos')" style="width: 100%; text-align: left; padding: 12px 16px; background: transparent; border: none; font-weight: 600; font-size: 0.9rem; color: #0F172A; cursor: pointer; border-radius: 8px;">TODOS OS PRODUTOS</button>`;
+  const container = document.getElementById('drawerCategoryListContainer') || document.getElementById('drawerCategoriesList');
+  if (container) {
+    let html = `<div style="font-size: 0.75rem; font-weight: 700; color: #64748B; margin-bottom: 8px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div>`;
+    html += `<button class="drawer-cat-item ${activeCategory === 'todos' ? 'active' : ''}" onclick="selectDrawerCategory('todos')" style="width: 100%; text-align: left; padding: 12px 16px; background: transparent; border: none; font-weight: 600; font-size: 0.9rem; color: #0F172A; cursor: pointer; border-radius: 8px;">TODOS OS PRODUTOS</button>`;
 
-  if (categories && categories.length > 0) {
-    const activeCats = categories.filter(c => c.active !== false);
-    activeCats.forEach(cat => {
-      const isAct = (activeCategory === cat.name || activeCategory === cat.id);
-      html += `
-        <button class="drawer-cat-item ${isAct ? 'active' : ''}" onclick="selectDrawerCategory('${cat.name}')" style="width: 100%; text-align: left; padding: 12px 16px; background: transparent; border: none; font-weight: 600; font-size: 0.9rem; color: #0F172A; cursor: pointer; border-radius: 8px;">
-          ${cat.name.toUpperCase()}
-        </button>
-      `;
-    });
+    if (categories && categories.length > 0) {
+      const activeCats = categories.filter(c => c.active !== false);
+      activeCats.forEach(cat => {
+        const isAct = (activeCategory === cat.name || activeCategory === cat.id);
+        html += `
+          <button class="drawer-cat-item ${isAct ? 'active' : ''}" onclick="selectDrawerCategory('${cat.name}')" style="width: 100%; text-align: left; padding: 12px 16px; background: transparent; border: none; font-weight: 600; font-size: 0.9rem; color: #0F172A; cursor: pointer; border-radius: 8px;">
+            ${cat.name.toUpperCase()}
+          </button>
+        `;
+      });
+    }
+
+    container.innerHTML = html;
   }
-
-  container.innerHTML = html;
 
   // Renderiza a barra de cards visuais de categorias no topo (Estilo Pizza Hut)
   const topNavContainer = document.getElementById('categoriesTabContainer');
