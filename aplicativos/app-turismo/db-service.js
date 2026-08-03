@@ -30,48 +30,45 @@ window.DbService = (function () {
      BRANDING / IDENTIDADE VISUAL
   ------------------------------------------------------------------------- */
   async function getBranding() {
+    const cached = _safeGetStorage(STORAGE_KEY_BRANDING);
     if (isReady()) {
       try {
         let { data, error } = await window.db
           .from('store_branding')
           .select('*')
-          .eq('store_id', getStoreId())
+          .limit(1)
           .maybeSingle();
-
-        if (error) {
-          const retry = await window.db.from('store_branding').select('*').limit(1).maybeSingle();
-          if (!retry.error && retry.data) { data = retry.data; error = null; }
-        }
 
         if (!error && data) {
           const res = {
-            storeName:      data.store_name,
-            storeSub:       data.store_sub,
-            wppNumber:      data.wpp_number,
-            frete:          data.frete,
-            primaryColor:   data.primary_color,
-            darkColor:      data.dark_color,
-            btnTextColor:   data.btn_text_color   || '#FFFFFF',
-            accentColor:    data.accent_color     || '#6344F5',
-            badgeBgColor:   data.badge_bg_color    || '#F1EEFE',
-            logoUrl:        data.logo_url,
-            bannerDeskUrl:  data.banner_desk_url,
-            bannerMobUrl:   data.banner_mob_url,
-            coverageCities: data.coverage_cities,
-            storeAddress:   data.store_address,
-            storeHours:     data.store_hours,
+            storeName:      data.store_name      || cached?.storeName      || defaultBranding.storeName,
+            storeSub:       data.store_sub       || cached?.storeSub       || defaultBranding.storeSub,
+            wppNumber:      data.wpp_number      || cached?.wppNumber      || defaultBranding.wppNumber,
+            frete:          data.frete          || cached?.frete          || defaultBranding.frete,
+            primaryColor:   data.primary_color   || cached?.primaryColor   || defaultBranding.primaryColor,
+            darkColor:      data.dark_color      || cached?.darkColor      || defaultBranding.darkColor,
+            btnTextColor:   data.btn_text_color   || cached?.btnTextColor   || defaultBranding.btnTextColor,
+            accentColor:    data.accent_color     || cached?.accentColor     || defaultBranding.accentColor,
+            badgeBgColor:   data.badge_bg_color    || cached?.badgeBgColor    || defaultBranding.badgeBgColor,
+            logoUrl:        data.logo_url         || cached?.logoUrl         || '',
+            bannerDeskUrl:  data.banner_desk_url  || cached?.bannerDeskUrl  || '',
+            bannerMobUrl:   data.banner_mob_url   || cached?.bannerMobUrl   || '',
+            coverageCities: data.coverage_cities  || cached?.coverageCities || '',
+            storeAddress:   data.store_address    || cached?.storeAddress   || '',
+            storeHours:     data.store_hours      || cached?.storeHours     || '',
           };
           _safeSetStorage(STORAGE_KEY_BRANDING, res);
+          localStorage.setItem('ptd_store_branding', JSON.stringify(res));
           return res;
         }
       } catch(e) {}
     }
-    const cached = _safeGetStorage(STORAGE_KEY_BRANDING);
     return cached || { ...defaultBranding };
   }
 
   async function saveBranding(branding) {
     _safeSetStorage(STORAGE_KEY_BRANDING, branding);
+    localStorage.setItem('ptd_store_branding', JSON.stringify(branding));
 
     if (!isReady()) return;
 
