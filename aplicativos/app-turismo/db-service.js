@@ -151,8 +151,9 @@ window.DbService = (function () {
           .order('position', { ascending: true, nullsFirst: false });
 
         if (!error && Array.isArray(data) && data.length > 0) {
-          const storeProds = data.filter(p => !p.store_id || p.store_id === getStoreId());
-          const normalizedList = (storeProds.length > 0 ? storeProds : data).map(normalizeProductRecord);
+          const realProds = data.filter(p => p.store_id && p.store_id !== 'default');
+          const finalProds = realProds.length > 0 ? realProds : data;
+          const normalizedList = finalProds.map(normalizeProductRecord);
           _safeSetStorage(STORAGE_KEY_PRODUCTS, normalizedList);
           try { localStorage.setItem('ptd_store_products', JSON.stringify(normalizedList)); } catch(e){}
           return normalizedList;
@@ -161,6 +162,27 @@ window.DbService = (function () {
     }
     const cached = _safeGetStorage(STORAGE_KEY_PRODUCTS);
     return (cached && cached.length > 0) ? cached.map(normalizeProductRecord) : [];
+  }
+
+  async function getCategories() {
+    if (isReady()) {
+      try {
+        let { data, error } = await window.db
+          .from('store_categories')
+          .select('*')
+          .order('position', { ascending: true });
+
+        if (!error && Array.isArray(data) && data.length > 0) {
+          const realCats = data.filter(c => c.store_id && c.store_id !== 'default');
+          const finalCats = realCats.length > 0 ? realCats : data;
+          _safeSetStorage(STORAGE_KEY_CATEGORIES, finalCats);
+          try { localStorage.setItem('ptd_store_categories', JSON.stringify(finalCats)); } catch(e){}
+          return finalCats;
+        }
+      } catch(e) {}
+    }
+    const cached = _safeGetStorage(STORAGE_KEY_CATEGORIES);
+    return Array.isArray(cached) ? cached : [];
   }
 
   async function upsertProduct(product) {

@@ -62,28 +62,25 @@ async function loadAdminSettings() {
     if (getEl('cfgAccentColor')) getEl('cfgAccentColor').value = currentBranding.accentColor || '#6344F5';
     if (getEl('cfgBadgeBgColor')) getEl('cfgBadgeBgColor').value = currentBranding.badgeBgColor || '#F1EEFE';
 
-    // Atualiza o link do botão Ver Cardápio Ao Vivo com o ID da loja logada
-    const btnView = getEl('btnViewLiveStore');
-    if (btnView) {
-      const activeId = (typeof CURRENT_STORE_ID !== 'undefined' ? CURRENT_STORE_ID : (localStorage.getItem('active_store_id') || 'default'));
-      btnView.href = `index.html?loja=${activeId}`;
-    }
-
-    // Exibe o e-mail do usuário logado na sidebar
-    if (getEl('adminUserEmailDisplay')) {
-      if (window.db && window.db.auth) {
-        window.db.auth.getSession().then(({ data }) => {
-          if (data && data.session && data.session.user && data.session.user.email) {
-            getEl('adminUserEmailDisplay').innerText = data.session.user.email;
-          } else {
-            getEl('adminUserEmailDisplay').innerText = 'Administrador';
+    // Exibe o e-mail do usuário logado na sidebar e atualiza o link do cardápio com o ID do usuário
+    if (window.db && window.db.auth) {
+      window.db.auth.getSession().then(({ data }) => {
+        if (data && data.session && data.session.user) {
+          const userStoreId = data.session.user.id;
+          localStorage.setItem('active_store_id', userStoreId);
+          const btnView = getEl('btnViewLiveStore');
+          if (btnView) btnView.href = `index.html?loja=${userStoreId}`;
+          if (getEl('adminUserEmailDisplay')) {
+            getEl('adminUserEmailDisplay').innerText = data.session.user.email || 'Administrador';
           }
-        }).catch(() => {
-          getEl('adminUserEmailDisplay').innerText = 'Administrador';
-        });
-      } else {
-        getEl('adminUserEmailDisplay').innerText = 'Administrador';
-      }
+        } else {
+          if (getEl('adminUserEmailDisplay')) getEl('adminUserEmailDisplay').innerText = 'Administrador';
+        }
+      }).catch(() => {
+        if (getEl('adminUserEmailDisplay')) getEl('adminUserEmailDisplay').innerText = 'Administrador';
+      });
+    } else {
+      if (getEl('adminUserEmailDisplay')) getEl('adminUserEmailDisplay').innerText = 'Administrador';
     }
 
     // Carrega pré-visualização da Logo existente
