@@ -252,15 +252,10 @@ window.DbService = (function () {
           id:       cat.id || ('cat-' + Date.now()),
           store_id: getStoreId(),
           name:     cat.name || '',
-          active:   cat.active !== false,
-          position: cat.position || 0,
         };
-        let { error } = await window.db.from('store_categories').upsert(payload);
+        let { error } = await window.db.from('store_categories').upsert(payload, { onConflict: 'id' });
         if (error) {
-          delete payload.active;
-          delete payload.position;
-          delete payload.store_id;
-          await window.db.from('store_categories').upsert(payload);
+          console.warn('[DbService] Erro em upsertCategory no Supabase:', error);
         }
       } catch(e) {}
     }
