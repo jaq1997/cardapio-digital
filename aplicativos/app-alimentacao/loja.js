@@ -251,13 +251,38 @@ async function loadAndRenderDrawerCategories() {
   if (window.DbService) {
     try {
       const remote = await DbService.getCategories();
-      if (remote) categories = remote;
+      if (remote && remote.length > 0) categories = remote;
     } catch(e) {}
   }
 
-  if (categories.length === 0) {
+  if (!categories || categories.length === 0) {
     const saved = localStorage.getItem(STORAGE_KEY_CATEGORIES);
     if (saved) { try { categories = JSON.parse(saved); } catch(e) {} }
+  }
+
+  // Fallback: se nao encontrou na tabela de categorias, extrai automaticamente das categorias dos produtos cadastrados
+  if (!categories || categories.length === 0) {
+    if (window.DbService) {
+      try {
+        const prods = await DbService.getProducts();
+        if (prods && prods.length > 0) {
+          const catSet = new Set();
+          prods.forEach(p => {
+            const catVal = p.categorias || p.categoria;
+            if (catVal) {
+              const list = Array.isArray(catVal) ? catVal : String(catVal).split(',');
+              list.forEach(c => {
+                const trimmed = String(c).trim();
+                if (trimmed && trimmed.toLowerCase() !== 'outros') catSet.add(trimmed);
+              });
+            }
+          });
+          if (catSet.size > 0) {
+            categories = Array.from(catSet).map(cName => ({ id: cName, name: cName, active: true }));
+          }
+        }
+      } catch(e) {}
+    }
   }
 
   // Remove categorias legadas de teste se houver no cache local
