@@ -19,8 +19,8 @@ const SHARED_COMPONENTS = {
                     </svg>
                 </div>
                 <div class="ph-logo-text-wrap">
-                    <div class="ph-logo-text" id="headerLogoText">MINHA <span>LOJA</span></div>
-                    <div class="ph-logo-sub" id="headerLogoSub">CARDÁPIO DIGITAL</div>
+                    <div class="ph-logo-text" id="headerLogoText"></div>
+                    <div class="ph-logo-sub" id="headerLogoSub"></div>
                 </div>
             </a>
 
@@ -181,8 +181,6 @@ function applyBrandingToUI() {
             if (cfg.logoUrl) {
                 badge.classList.add('has-custom-logo');
                 badge.innerHTML = `<img src="${cfg.logoUrl}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;" alt="${cfg.storeName || 'Logo'}">`;
-                const favicon = document.getElementById('pageFavicon');
-                if (favicon) favicon.href = cfg.logoUrl;
             } else {
                 badge.classList.remove('has-custom-logo');
                 badge.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 15 10-15-10-5z"></path><path d="M12 22V12"></path></svg>`;
@@ -190,10 +188,15 @@ function applyBrandingToUI() {
         }
 
         if (cfg.wppNumber) {
-            const wppFloat = document.getElementById('floatWppBtn');
+            let cleanNum = String(cfg.wppNumber).replace(/\D/g, '');
+            if (cleanNum.length > 0 && !cleanNum.startsWith('55') && cleanNum.length <= 11) {
+                cleanNum = '55' + cleanNum;
+            }
+            const wppFloat = document.getElementById('floatWppBtn') || document.querySelector('.floating-wpp-btn') || document.querySelector('a[href*="wa.me"]');
             if (wppFloat) {
                 const textMsg = encodeURIComponent("Olá! Quero fazer meu pedido pelo WhatsApp.");
-                wppFloat.href = `https://wa.me/${cfg.wppNumber}?text=${textMsg}`;
+                wppFloat.href = `https://wa.me/${cleanNum}?text=${textMsg}`;
+                wppFloat.target = "_blank";
             }
         }
     } catch(e) {}

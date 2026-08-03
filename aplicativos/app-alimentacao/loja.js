@@ -67,7 +67,18 @@ async function applyDynamicBranding() {
 
     if (cfg) {
       if (cfg.wppNumber) {
-        WPP_NUMERO = String(cfg.wppNumber).replace(/\D/g, '');
+        let cleanNum = String(cfg.wppNumber).replace(/\D/g, '');
+        if (cleanNum.length > 0 && !cleanNum.startsWith('55') && cleanNum.length <= 11) {
+          cleanNum = '55' + cleanNum;
+        }
+        WPP_NUMERO = cleanNum;
+
+        const floatBtn = document.getElementById('floatWppBtn') || document.querySelector('.floating-wpp-btn') || document.querySelector('a[href*="wa.me"]');
+        if (floatBtn) {
+          const textMsg = encodeURIComponent("Olá! Quero tirar dúvidas / fazer pedido.");
+          floatBtn.href = `https://wa.me/${cleanNum}?text=${textMsg}`;
+          floatBtn.target = "_blank";
+        }
       }
       if (cfg.primaryColor) {
         document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
