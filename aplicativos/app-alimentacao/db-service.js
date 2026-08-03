@@ -96,10 +96,19 @@ window.DbService = (function () {
     };
 
     let { error } = await window.db.from('store_branding').upsert(payload);
-    if (error && error.code === 'PGRST204') {
-      delete payload.store_id;
-      payload.id = 1;
-      await window.db.from('store_branding').upsert(payload, { onConflict: 'id' });
+    if (error) {
+      // Se der erro (ex: colunas novas não existem na tabela do Supabase), tentar salvar com o payload legados e guardar as cores no localStorage
+      const legacyPayload = { ...payload };
+      delete legacyPayload.btn_text_color;
+      delete legacyPayload.accent_color;
+      delete legacyPayload.badge_bg_color;
+      
+      let resLegacy = await window.db.from('store_branding').upsert(legacyPayload);
+      if (resLegacy.error && resLegacy.error.code === 'PGRST204') {
+        delete legacyPayload.store_id;
+        legacyPayload.id = 1;
+        await window.db.from('store_branding').upsert(legacyPayload, { onConflict: 'id' });
+      }
     }
   }
 
