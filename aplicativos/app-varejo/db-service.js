@@ -151,8 +151,13 @@ window.DbService = (function () {
           .order('position', { ascending: true, nullsFirst: false });
 
         if (!error && Array.isArray(data) && data.length > 0) {
-          const realProds = data.filter(p => p.store_id && p.store_id !== 'default');
-          const finalProds = realProds.length > 0 ? realProds : data;
+          let activeId = getStoreId();
+          if (activeId === 'default') {
+            const nonDefault = data.find(p => p.store_id && p.store_id !== 'default');
+            if (nonDefault) activeId = nonDefault.store_id;
+          }
+          const storeProds = data.filter(p => p.store_id === activeId);
+          const finalProds = storeProds.length > 0 ? storeProds : data;
           const normalizedList = finalProds.map(normalizeProductRecord);
           _safeSetStorage(STORAGE_KEY_PRODUCTS, normalizedList);
           try { localStorage.setItem('ptd_store_products', JSON.stringify(normalizedList)); } catch(e){}
@@ -173,8 +178,13 @@ window.DbService = (function () {
           .order('position', { ascending: true });
 
         if (!error && Array.isArray(data) && data.length > 0) {
-          const realCats = data.filter(c => c.store_id && c.store_id !== 'default');
-          const finalCats = realCats.length > 0 ? realCats : data;
+          let activeId = getStoreId();
+          if (activeId === 'default') {
+            const nonDefault = data.find(c => c.store_id && c.store_id !== 'default');
+            if (nonDefault) activeId = nonDefault.store_id;
+          }
+          const storeCats = data.filter(c => c.store_id === activeId);
+          const finalCats = storeCats.length > 0 ? storeCats : data;
           _safeSetStorage(STORAGE_KEY_CATEGORIES, finalCats);
           try { localStorage.setItem('ptd_store_categories', JSON.stringify(finalCats)); } catch(e){}
           return finalCats;
