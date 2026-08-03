@@ -244,32 +244,6 @@ window.DbService = (function () {
   /* -------------------------------------------------------------------------
      CATEGORIAS
   ------------------------------------------------------------------------- */
-  async function getCategories() {
-    if (isReady()) {
-      try {
-        let { data, error } = await window.db
-          .from('store_categories')
-          .select('*')
-          .eq('store_id', getStoreId())
-          .order('position', { ascending: true });
-
-        if (error) {
-          const retry = await window.db.from('store_categories').select('*').order('position', { ascending: true });
-          if (!retry.error && Array.isArray(retry.data)) {
-            data = retry.data.filter(c => !c.store_id || c.store_id === getStoreId());
-            error = null;
-          }
-        }
-
-        if (!error && Array.isArray(data)) {
-          _safeSetStorage(STORAGE_KEY_CATEGORIES, data);
-          return data;
-        }
-      } catch(e) {}
-    }
-    const cached = _safeGetStorage(STORAGE_KEY_CATEGORIES);
-    return Array.isArray(cached) ? cached : [];
-  }
 
   async function upsertCategory(cat) {
     if (isReady()) {
