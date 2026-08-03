@@ -36,6 +36,7 @@ window.DbService = (function () {
         let { data, error } = await window.db
           .from('store_branding')
           .select('*')
+          .order('updated_at', { ascending: false })
           .limit(1)
           .maybeSingle();
 
@@ -58,7 +59,7 @@ window.DbService = (function () {
             storeHours:     data.store_hours      || cached?.storeHours     || '',
           };
           _safeSetStorage(STORAGE_KEY_BRANDING, res);
-          localStorage.setItem('ptd_store_branding', JSON.stringify(res));
+          try { localStorage.setItem('ptd_store_branding', JSON.stringify(res)); } catch(e){}
           return res;
         }
       } catch(e) {}
@@ -77,6 +78,7 @@ window.DbService = (function () {
     if (!isReady()) return;
 
     const payload = {
+      id:               1,
       store_id:         getStoreId(),
       store_name:       branding.storeName      || '',
       store_sub:        branding.storeSub       || '',
@@ -96,7 +98,7 @@ window.DbService = (function () {
       updated_at:       new Date().toISOString(),
     };
 
-    let { error } = await window.db.from('store_branding').upsert(payload);
+    let { error } = await window.db.from('store_branding').upsert(payload, { onConflict: 'id' });
     if (error) {
       // Se der erro (ex: colunas novas não existem na tabela do Supabase), tentar salvar com o payload legados e guardar as cores no localStorage
       const legacyPayload = { ...payload };
