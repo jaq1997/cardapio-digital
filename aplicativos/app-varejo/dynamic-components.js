@@ -197,38 +197,7 @@ function applyBrandingToUI() {
     } catch(e) {}
 }
 
-function renderDynamicCategoriesInHeader() {
-    const navContainer = document.getElementById('categoriesTabContainer');
-    const drawerContainer = document.getElementById('drawerCategoryListContainer');
 
-    let cats = [];
-    try {
-        const saved = localStorage.getItem('ptd_store_categories_' + (localStorage.getItem('active_store_id') || 'default')) || localStorage.getItem('ptd_store_categories');
-        if (saved) cats = JSON.parse(saved);
-    } catch(e) {}
-
-    // Filtra se houver categorias padroes antigas no cache
-    cats = (cats || []).filter(c => c.name && !['Promoções', 'café da manhã', 'Pratos Principais', 'Sobremesas'].includes(c.name));
-
-    if (cats && cats.length > 0) {
-        if (navContainer) {
-            let html = `<button class="ph-cat-card active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>`;
-            cats.forEach((c) => {
-                html += `<button class="ph-cat-card" onclick="selectDrawerCategory('${c.name}')">${c.name.toUpperCase()}</button>`;
-            });
-            navContainer.innerHTML = html;
-        }
-
-        if (drawerContainer) {
-            let dHtml = `<div style="font-size: 0.7rem; font-weight: 900; color: #888; margin-bottom: 4px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div>`;
-            dHtml += `<button class="drawer-cat-item active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>`;
-            cats.forEach(c => {
-                dHtml += `<button class="drawer-cat-item" onclick="selectDrawerCategory('${c.name}')">${c.name.toUpperCase()}</button>`;
-            });
-            drawerContainer.innerHTML = dHtml;
-        }
-    }
-}
 
 function initSharedComponents() {
     const body = document.body;
@@ -254,7 +223,6 @@ function initSharedComponents() {
     footerDiv.innerHTML = SHARED_COMPONENTS.footer;
     body.appendChild(footerDiv.firstElementChild);
 
-    renderDynamicCategoriesInHeader();
     applyBrandingToUI();
 }
 
