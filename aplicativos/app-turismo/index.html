@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cardápio Digital — Faça seu Pedido Online</title>
+
+  <!-- META TAGS DE COMPARTILHAMENTO -->
+  <meta name="description" content="Cardápio digital e delivery direto via WhatsApp. Faça seu pedido online!">
+  <meta property="og:title" content="Cardápio Digital">
+  <meta property="og:description" content="Faça seu pedido online com praticidade!">
+  <meta property="og:type" content="website">
+
+  <link rel="icon" id="pageFavicon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232D6A4F'><path d='M12 2L2 7l10 15 10-15-10-5z'/></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;0,900;1,800;1,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    (function() {
+      try {
+        var storeId = (new URLSearchParams(window.location.search).get('loja')) || localStorage.getItem('active_store_id') || 'default';
+        var raw = localStorage.getItem('ptd_store_branding_' + storeId) || localStorage.getItem('ptd_store_branding');
+        if (raw) {
+          var cfg = JSON.parse(raw);
+          if (cfg.primaryColor) {
+            document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
+            document.documentElement.style.setProperty('--theme-primary', cfg.primaryColor);
+          }
+          if (cfg.btnTextColor) document.documentElement.style.setProperty('--ph-btn-text', cfg.btnTextColor);
+          if (cfg.accentColor) document.documentElement.style.setProperty('--ph-accent', cfg.accentColor);
+        }
+      } catch(e) {}
+    })();
+  </script>
+</head>
+
+<body data-page="index">
+
+  <!-- HERO SECTION COMERCIAL -->
+  <section class="ph-hero-section">
+    <div class="ph-hero-card">
+      <!-- Injetado dinamicamente via loja.js (Banner de Destaque da loja) -->
+    </div>
+  </section>
+
+  <!-- CATALOG SECTION -->
+  <main class="ph-section-container" id="catalogSection">
+    <div class="ph-section-title-row">
+      <h2 class="ph-section-heading"><span id="catalogCategoryName">TODOS OS PRODUTOS</span></h2>
+      <div style="font-size: 0.85rem; font-weight: 800; color: #777777;" id="itemCountDisplay">Carregando...</div>
+    </div>
+
+    <!-- PRODUCT GRID CONTAINER -->
+    <div class="ph-product-grid" id="productGridContainer">
+      <!-- Injetado via loja.js -->
+    </div>
+  </main>
+
+  <!-- MODAL: ÁREA DE COBERTURA -->
+  <div class="modal-overlay" id="coverageModal">
+    <div class="modal-card" style="max-width: 440px;">
+      <button class="modal-close-btn" onclick="closeCoverageModal()">✕</button>
+      <div class="modal-content-body">
+        <h2 class="checkout-main-title">ÁREA DE ATENDIMENTO</h2>
+        <p style="font-size: 0.86rem; color: #555;">Entregamos nas seguintes regiões e cidades:</p>
+        
+        <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="background: var(--ph-gray-light); padding: 14px; border-radius: var(--radius-md); border-left: 4px solid var(--ph-red);">
+            <div style="font-family: var(--font-display); font-weight: 900; font-style: italic; font-size: 1.1rem; color: var(--ph-black);" id="covCity1">REGIÃO DE ATENDIMENTO</div>
+            <div style="font-size: 0.8rem; color: #666; margin-top: 4px;">Consulte no momento do checkout as taxas de entrega para o seu bairro.</div>
+          </div>
+        </div>
+
+        <button class="ph-btn-red-lg" style="width: 100%; margin-top: 14px;" onclick="closeCoverageModal()">
+          ENTENDI, VER CARDÁPIO
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 1: CUSTOMIZADOR DE PRODUTO UNIVERSAL -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal-card" style="max-width: 540px; padding: 24px;">
+      <button class="modal-close-btn" onclick="closeProductModal()">✕</button>
+      
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="height: 180px; border-radius: 12px; overflow: hidden; background: #FAFAFC; display: flex; align-items: center; justify-content: center; border: 1px solid #E2E8F0; padding: 8px;">
+          <img id="modalHeroBg" src="" alt="Produto" style="max-height: 100%; max-width: 100%; object-fit: contain; border-radius: 8px;">
+        </div>
+        
+        <div>
+          <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--ph-black); font-family: var(--font-display);" id="modalProductTitle">Produto</h3>
+          <p style="font-size: 0.86rem; color: #666666; margin-top: 6px; line-height: 1.4;" id="modalProductDesc">Descrição do produto...</p>
+          <div style="font-size: 1.4rem; font-weight: 900; color: var(--ph-black); margin-top: 10px;" id="modalDynamicTotalPrice">R$ 0,00</div>
+        </div>
+
+        <!-- CAMPO DE OBSERVAÇÕES -->
+        <div>
+          <label style="font-size: 0.8rem; font-weight: 700; color: #444; margin-bottom: 6px; display: block;">Observações do Item:</label>
+          <textarea id="modalObsInput" class="modal-obs-textarea" placeholder="Ex: Tirar molho, bem passado, embalagem separada..." rows="2" style="width: 100%; border: 1px solid var(--ph-border); border-radius: 8px; padding: 10px; font-size: 0.86rem;"></textarea>
+        </div>
+
+        <!-- ADICIONAIS DO PRODUTO (OPCIONAL) -->
+        <div id="modalAdicionaisContainer" style="display: none; border: 1px solid var(--ph-border); border-radius: 8px; padding: 12px; background: #FAFAFC;">
+          <label style="font-size: 0.8rem; font-weight: 700; color: #18181B; margin-bottom: 8px; display: block;">Opcionais / Adicionais:</label>
+          <div id="modalAdicionaisList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+
+        <!-- CONTROLES DE QUANTIDADE E ADICIONAR -->
+        <div style="display: flex; gap: 12px; align-items: center; margin-top: 8px;">
+          <div style="display: flex; align-items: center; border: 1px solid var(--ph-border); border-radius: 8px; padding: 2px;">
+            <button type="button" onclick="changeModalQty(-1)" style="width: 36px; height: 36px; border: none; background: #F4F4F6; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">-</button>
+            <span id="modalQtyDisplay" style="width: 36px; text-align: center; font-weight: 700; font-size: 1rem;">1</span>
+            <button type="button" onclick="changeModalQty(1)" style="width: 36px; height: 36px; border: none; background: #F4F4F6; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">+</button>
+          </div>
+
+          <button class="ph-btn-red-lg" style="flex: 1; margin-top: 0; padding: 14px;" onclick="addModalProductToCart()">
+            <span>ADICIONAR AO CARRINHO</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: CHECKOUT DO CLIENTE -->
+  <div class="modal-overlay" id="cartModal">
+    <div class="modal-card" style="max-width: 800px; padding: 24px; max-height: 90vh; overflow-y: auto;">
+      <button class="modal-close-btn" onclick="closeCartModal()">✕</button>
+      
+      <div class="modal-customizer-grid">
+        <!-- COLUNA ESQUERDA: ITENS DO CARRINHO E ENDEREÇO -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <h2 class="checkout-main-title">SEU PEDIDO</h2>
+          
+          <!-- ITENS DO CARRINHO -->
+          <div id="cartItemsContainer" style="max-height: 260px; overflow-y: auto;"></div>
+
+          <!-- DADOS DO CLIENTE (NOME, WHATSAPP, OBSERVAÇÕES) -->
+          <div class="checkout-section-box">
+            <div class="option-group-title">Seus Dados</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 800; color: #666; text-transform: uppercase;">Seu Nome *:</label>
+                <input type="text" class="cep-input" id="inputCustomerName" placeholder="Ex: Maria Silva" style="width: 100%; font-size: 0.85rem;" required>
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 800; color: #666; text-transform: uppercase;">Seu WhatsApp *:</label>
+                <input type="tel" class="cep-input" id="inputCustomerPhone" placeholder="Ex: (51) 99999-9999" style="width: 100%; font-size: 0.85rem;" required>
+              </div>
+            </div>
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 800; color: #666; text-transform: uppercase;">Observações do Pedido (opcional):</label>
+              <input type="text" class="cep-input" id="inputOrderNotes" placeholder="Ex: Tirar a cebola, campainha com defeito..." style="width: 100%; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <!-- FORMA DE ENTREGA E ENDEREÇO -->
+          <div class="checkout-section-box">
+            <div class="option-group-title">Forma de Entrega</div>
+            <div id="deliveryOptionsContainer" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+              <!-- Renderizado dinamicamente via loja.js a partir das zonas do Admin -->
+            </div>
+
+            <div id="deliveryAddressBox">
+              <div class="option-group-title">Endereço de Entrega (CEP)</div>
+              <div class="cep-row">
+                <input type="text" class="cep-input" id="inputCep" placeholder="Digite seu CEP (ex: 90010-000)" maxlength="9">
+                <button class="btn-cep-search" onclick="buscarCepViaAPI()">BUSCAR</button>
+              </div>
+              
+              <div class="address-result-box" id="addressResultBox" style="display: none; margin-top: 8px;">
+                <div id="txtRuaBairro">Rua Principal, Centro</div>
+                <div class="txt-frete-val" id="txtFreteVal">Taxa de Entrega: R$ 5,00</div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                <div>
+                  <label style="font-size: 0.72rem; font-weight: 800; color: #666; text-transform: uppercase;">Número:</label>
+                  <input type="text" class="cep-input" id="inputNumero" placeholder="Ex: 236" style="width: 100%;">
+                  <label style="font-size: 0.72rem; font-weight: 700; color: #555; display: flex; align-items: center; gap: 4px; margin-top: 4px; cursor: pointer;">
+                    <input type="checkbox" id="chkSemNumero" onchange="toggleSemNumero(this)"> Sem número
+                  </label>
+                </div>
+                <div>
+                  <label style="font-size: 0.72rem; font-weight: 800; color: #666; text-transform: uppercase;">Complemento:</label>
+                  <input type="text" class="cep-input" id="inputComplemento" placeholder="Ex: Ap 405 / Bloco B" style="width: 100%;">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUNA DIREITA: CUPOM DE DESCONTO, FORMA DE PAGAMENTO E TOTAL -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- CUPOM DE DESCONTO -->
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 8px;">
+            <label style="font-size: 0.72rem; font-weight: 800; color: #64748B; text-transform: uppercase; display: block; margin-bottom: 4px;">Cupom de Desconto</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="inputCartCoupon" placeholder="Código do cupom" style="flex: 1; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; font-weight: 700; text-transform: uppercase; font-size: 0.85rem;">
+              <button type="button" onclick="applyCartCoupon()" style="background: #18181B; color: #FFF; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer;">APLICAR</button>
+            </div>
+            <div id="txtCouponAppliedStatus" style="font-size: 0.78rem; font-weight: 700; color: #10B981; margin-top: 4px; display: none;"></div>
+          </div>
+
+          <!-- TOTAL E BOTÃO FINALIZAR -->
+          <div style="background: var(--ph-gray-light); padding: 14px; border-radius: 8px; margin-top: auto;">
+            <div id="txtSubtotalFrete" style="font-size: 0.8rem; color: #666; font-weight: 700;">Subtotal: R$ 0,00 | Frete: R$ 0,00</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+              <span style="font-family: var(--font-display); font-weight: 900; font-size: 1.1rem;">TOTAL:</span>
+              <span style="font-family: var(--font-display); font-weight: 900; font-size: 1.8rem; color: var(--ph-red);" id="txtTotalCartFinal">R$ 0,00</span>
+            </div>
+          </div>
+
+          <button class="ph-btn-red-lg" style="width: 100%; margin-top: 4px; background: var(--ph-red, #18181B);" onclick="enviarPedidoWhatsAppFinal()">
+            <span>FINALIZAR PEDIDO</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="db-service.js"></script>
+  <script src="dynamic-components.js"></script>
+  <script src="defaults.js"></script>
+  <script src="loja.js"></script>
+</body>
+
+</html>
