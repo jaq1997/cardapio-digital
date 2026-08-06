@@ -91,9 +91,15 @@ window.DbService = (function () {
       updated_at:       new Date().toISOString(),
     };
 
-    // PGRST204 = upsert com sucesso sem retorno de dados — não é erro real.
-    // Nunca fazer retry removendo store_id, pois quebraria o isolamento entre contas.
-    await window.db.from('store_branding').upsert(payload);
+    try {
+      const { error } = await window.db.from('store_branding').upsert(payload, { onConflict: 'store_id' });
+      if (error) {
+        console.error('[saveBranding] Erro ao salvar no Supabase:', error);
+        if (typeof showToast === 'function') showToast('⚠️ Erro ao salvar no servidor: ' + error.message, 'error');
+      }
+    } catch(e) {
+      console.error('[saveBranding] Exceção:', e);
+    }
   }
 
   /* -------------------------------------------------------------------------

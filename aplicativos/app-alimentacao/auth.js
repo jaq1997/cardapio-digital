@@ -21,13 +21,14 @@ const AUTH = {
     }
 
     if (session.user) {
-      const previousStoreId = localStorage.getItem('active_store_id');
       const newStoreId = session.user.id;
       localStorage.setItem('active_store_id', newStoreId);
 
-      // Se mudou de conta, recarrega a página para que o config.js
-      // recalcule o CURRENT_STORE_ID com o UUID correto da nova conta.
-      if (previousStoreId && previousStoreId !== newStoreId) {
+      // Compara o CURRENT_STORE_ID que foi setado no page load (config.js) com o
+      // UUID real da sessão. Se for diferente (ex: primeiro login onde era 'default',
+      // ou troca de conta), recarrega para recalcular CURRENT_STORE_ID corretamente.
+      const currentConstStoreId = (typeof CURRENT_STORE_ID !== 'undefined') ? CURRENT_STORE_ID : null;
+      if (currentConstStoreId !== newStoreId) {
         window.location.reload();
         return;
       }
