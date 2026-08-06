@@ -18,6 +18,10 @@ const SHARED_COMPONENTS = {
                         <path d="M12 22V12"></path>
                     </svg>
                 </div>
+                <div class="ph-logo-text-wrap">
+                    <div class="ph-logo-text" id="headerLogoText">MINHA <span>LOJA</span></div>
+                    <div class="ph-logo-sub" id="headerLogoSub">CARDÁPIO DIGITAL</div>
+                </div>
             </a>
 
             <div class="ph-search-wrap">
@@ -28,12 +32,13 @@ const SHARED_COMPONENTS = {
             </div>
             
             <div class="ph-nav-right">
-                <button class="ph-cart-btn" onclick="openCartModal()" aria-label="Ver Carrinho">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <button class="ph-cart-btn" onclick="openCartModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="9" cy="21" r="1"></circle>
                         <circle cx="20" cy="21" r="1"></circle>
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                     </svg>
+                    <span class="cart-btn-txt">SEU PEDIDO</span>
                     <span class="ph-cart-badge" id="cartCountBadge">0</span>
                 </button>
             </div>
@@ -171,33 +176,64 @@ function applyBrandingToUI() {
         }
 
         // SE SUBIU LOGO EM IMAGEM (.PNG / .JPG), SUBSTITUI PELO LOGO DA IMAGEM E ATUALIZA FAVICON DA ABA
-        const badge = document.querySelector('.ph-logo-badge');
-        if (badge) {
-            if (cfg.logoUrl) {
-                badge.classList.add('has-custom-logo');
-                badge.innerHTML = `<img src="${cfg.logoUrl}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;" alt="${cfg.storeName || 'Logo'}">`;
-            } else {
-                badge.classList.remove('has-custom-logo');
-                badge.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 15 10-15-10-5z"></path><path d="M12 22V12"></path></svg>`;
+        if (cfg.logoUrl) {
+            const brandLogoAnchor = document.getElementById('headerBrandLogo');
+            if (brandLogoAnchor) {
+                brandLogoAnchor.innerHTML = `<img src="${cfg.logoUrl}" style="max-height: 44px; border-radius: 4px; object-fit: contain;" alt="${cfg.storeName || 'Logo'}">`;
             }
+            const favicon = document.getElementById('pageFavicon');
+            if (favicon) favicon.href = cfg.logoUrl;
         }
 
         if (cfg.wppNumber) {
-            let cleanNum = String(cfg.wppNumber).replace(/\D/g, '');
-            if (cleanNum.length > 0 && !cleanNum.startsWith('55') && cleanNum.length <= 11) {
-                cleanNum = '55' + cleanNum;
-            }
-            const wppFloat = document.getElementById('floatWppBtn') || document.querySelector('.floating-wpp-btn') || document.querySelector('a[href*="wa.me"]');
+            const wppFloat = document.getElementById('floatWppBtn');
             if (wppFloat) {
                 const textMsg = encodeURIComponent("Olá! Quero fazer meu pedido pelo WhatsApp.");
-                wppFloat.href = `https://wa.me/${cleanNum}?text=${textMsg}`;
-                wppFloat.target = "_blank";
+                wppFloat.href = `https://wa.me/${cfg.wppNumber}?text=${textMsg}`;
             }
         }
     } catch(e) {}
 }
 
+function renderDynamicCategoriesInHeader() {
+    const savedCategories = localStorage.getItem('ptd_store_categories');
+    const navContainer = document.getElementById('categoriesTabContainer');
+    const drawerContainer = document.getElementById('drawerCategoryListContainer');
 
+    let cats = [];
+    if (savedCategories) {
+        try {
+            cats = JSON.parse(savedCategories);
+        } catch(e) {}
+    }
+
+    if (cats && cats.length > 0) {
+        if (navContainer) {
+            let html = '';
+            cats.forEach((c, idx) => {
+                const activeClass = idx === 0 ? 'active' : '';
+                html += `<button class="ph-cat-pill ${activeClass}" data-cat="${c.id}" onclick="filterCategory('${c.id}', this)">${c.name.toUpperCase()}</button>`;
+            });
+            navContainer.innerHTML = html;
+        }
+
+        if (drawerContainer) {
+            let dHtml = `<div style="font-size: 0.7rem; font-weight: 900; color: #888; margin-bottom: 4px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div>`;
+            dHtml += `<button class="drawer-cat-item active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>`;
+            cats.forEach(c => {
+                dHtml += `<button class="drawer-cat-item" onclick="selectDrawerCategory('${c.id}')">${c.name.toUpperCase()}</button>`;
+            });
+            drawerContainer.innerHTML = dHtml;
+        }
+    } else {
+        if (navContainer) {
+            navContainer.innerHTML = '';
+        }
+        if (drawerContainer) {
+            drawerContainer.innerHTML = `<div style="font-size: 0.7rem; font-weight: 900; color: #888; margin-bottom: 4px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div><button class="drawer-cat-item active" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>`;
+        }
+    }
+}
 
 function initSharedComponents() {
     const body = document.body;
@@ -223,6 +259,7 @@ function initSharedComponents() {
     footerDiv.innerHTML = SHARED_COMPONENTS.footer;
     body.appendChild(footerDiv.firstElementChild);
 
+    renderDynamicCategoriesInHeader();
     applyBrandingToUI();
 }
 

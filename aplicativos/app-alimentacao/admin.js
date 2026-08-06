@@ -62,25 +62,28 @@ async function loadAdminSettings() {
     if (getEl('cfgAccentColor')) getEl('cfgAccentColor').value = currentBranding.accentColor || '#6344F5';
     if (getEl('cfgBadgeBgColor')) getEl('cfgBadgeBgColor').value = currentBranding.badgeBgColor || '#F1EEFE';
 
-    // Exibe o e-mail do usuário logado na sidebar e atualiza o link do cardápio com o ID do usuário
-    if (window.db && window.db.auth) {
-      window.db.auth.getSession().then(({ data }) => {
-        if (data && data.session && data.session.user) {
-          const userStoreId = data.session.user.id;
-          localStorage.setItem('active_store_id', userStoreId);
-          const btnView = getEl('btnViewLiveStore');
-          if (btnView) btnView.href = `index.html?loja=${userStoreId}`;
-          if (getEl('adminUserEmailDisplay')) {
-            getEl('adminUserEmailDisplay').innerText = data.session.user.email || 'Administrador';
+    // Atualiza o link do botão Ver Cardápio Ao Vivo com o ID da loja logada
+    const btnView = getEl('btnViewLiveStore');
+    if (btnView) {
+      const activeId = (typeof CURRENT_STORE_ID !== 'undefined' ? CURRENT_STORE_ID : (localStorage.getItem('active_store_id') || 'default'));
+      btnView.href = `index.html?loja=${activeId}`;
+    }
+
+    // Exibe o e-mail do usuário logado na sidebar
+    if (getEl('adminUserEmailDisplay')) {
+      if (window.db && window.db.auth) {
+        window.db.auth.getSession().then(({ data }) => {
+          if (data && data.session && data.session.user && data.session.user.email) {
+            getEl('adminUserEmailDisplay').innerText = data.session.user.email;
+          } else {
+            getEl('adminUserEmailDisplay').innerText = 'Administrador';
           }
-        } else {
-          if (getEl('adminUserEmailDisplay')) getEl('adminUserEmailDisplay').innerText = 'Administrador';
-        }
-      }).catch(() => {
-        if (getEl('adminUserEmailDisplay')) getEl('adminUserEmailDisplay').innerText = 'Administrador';
-      });
-    } else {
-      if (getEl('adminUserEmailDisplay')) getEl('adminUserEmailDisplay').innerText = 'Administrador';
+        }).catch(() => {
+          getEl('adminUserEmailDisplay').innerText = 'Administrador';
+        });
+      } else {
+        getEl('adminUserEmailDisplay').innerText = 'Administrador';
+      }
     }
 
     // Carrega pré-visualização da Logo existente
@@ -305,56 +308,23 @@ function removeProductPhoto() {
   if (btnRem) btnRem.style.display = 'none';
 }
 
-function compressImageFile(file, maxWidth = 1200, maxHeight = 800, quality = 0.82) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
-        }
-        if (height > maxHeight) {
-          width = Math.round((width * maxHeight) / height);
-          height = maxHeight;
-        }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        const mime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
-        resolve(canvas.toDataURL(mime, quality));
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-let isLogoExplicitlyRemoved = false;
-let isBannerDeskExplicitlyRemoved = false;
-let isBannerMobExplicitlyRemoved = false;
-
 /* UPLOAD E REMOÇÃO DE LOGO */
-async function previewLogoFileUpload(input) {
+function previewLogoFileUpload(input) {
   if (input.files && input.files[0]) {
-    isLogoExplicitlyRemoved = false;
-    tempLogoBase64 = await compressImageFile(input.files[0], 500, 500, 0.9);
-    const img = document.getElementById('logoFilePreview');
-    const btnRem = document.getElementById('btnRemoveLogo');
-    if (img) { img.src = tempLogoBase64; img.style.display = 'block'; }
-    if (btnRem) btnRem.style.display = 'inline-flex';
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      tempLogoBase64 = e.target.result;
+      const img = document.getElementById('logoFilePreview');
+      const btnRem = document.getElementById('btnRemoveLogo');
+      if (img) { img.src = tempLogoBase64; img.style.display = 'block'; }
+      if (btnRem) btnRem.style.display = 'inline-flex';
+    };
+    reader.readAsDataURL(input.files[0]);
   }
 }
 
 function removeLogo() {
   tempLogoBase64 = '';
-  isLogoExplicitlyRemoved = true;
-  if (currentBranding) currentBranding.logoUrl = '';
   const fileInput = document.getElementById('cfgLogoFile');
   const img = document.getElementById('logoFilePreview');
   const btnRem = document.getElementById('btnRemoveLogo');
@@ -364,21 +334,22 @@ function removeLogo() {
 }
 
 /* UPLOAD E REMOÇÃO DE BANNERS */
-async function previewBannerDeskUpload(input) {
+function previewBannerDeskUpload(input) {
   if (input.files && input.files[0]) {
-    isBannerDeskExplicitlyRemoved = false;
-    tempBannerDeskBase64 = await compressImageFile(input.files[0], 1200, 600, 0.82);
-    const img = document.getElementById('bannerDeskPreview');
-    const btnRem = document.getElementById('btnRemoveBannerDesk');
-    if (img) { img.src = tempBannerDeskBase64; img.style.display = 'block'; }
-    if (btnRem) btnRem.style.display = 'inline-flex';
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      tempBannerDeskBase64 = e.target.result;
+      const img = document.getElementById('bannerDeskPreview');
+      const btnRem = document.getElementById('btnRemoveBannerDesk');
+      if (img) { img.src = tempBannerDeskBase64; img.style.display = 'block'; }
+      if (btnRem) btnRem.style.display = 'inline-flex';
+    };
+    reader.readAsDataURL(input.files[0]);
   }
 }
 
 function removeBannerDesk() {
   tempBannerDeskBase64 = '';
-  isBannerDeskExplicitlyRemoved = true;
-  if (currentBranding) currentBranding.bannerDeskUrl = '';
   const fileInput = document.getElementById('cfgBannerDeskFile');
   const img = document.getElementById('bannerDeskPreview');
   const btnRem = document.getElementById('btnRemoveBannerDesk');
@@ -387,27 +358,18 @@ function removeBannerDesk() {
   if (btnRem) btnRem.style.display = 'none';
 }
 
-async function previewBannerMobUpload(input) {
+function previewBannerMobUpload(input) {
   if (input.files && input.files[0]) {
-    isBannerMobExplicitlyRemoved = false;
-    tempBannerMobBase64 = await compressImageFile(input.files[0], 800, 800, 0.82);
-    const img = document.getElementById('bannerMobPreview');
-    const btnRem = document.getElementById('btnRemoveBannerMob');
-    if (img) { img.src = tempBannerMobBase64; img.style.display = 'block'; }
-    if (btnRem) btnRem.style.display = 'inline-flex';
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      tempBannerMobBase64 = e.target.result;
+      const img = document.getElementById('bannerMobPreview');
+      const btnRem = document.getElementById('btnRemoveBannerMob');
+      if (img) { img.src = tempBannerMobBase64; img.style.display = 'block'; }
+      if (btnRem) btnRem.style.display = 'inline-flex';
+    };
+    reader.readAsDataURL(input.files[0]);
   }
-}
-
-function removeBannerMob() {
-  tempBannerMobBase64 = '';
-  isBannerMobExplicitlyRemoved = true;
-  if (currentBranding) currentBranding.bannerMobUrl = '';
-  const fileInput = document.getElementById('cfgBannerMobFile');
-  const img = document.getElementById('bannerMobPreview');
-  const btnRem = document.getElementById('btnRemoveBannerMob');
-  if (fileInput) fileInput.value = '';
-  if (img) { img.src = ''; img.style.display = 'none'; }
-  if (btnRem) btnRem.style.display = 'none';
 }
 
 function removeBannerMob() {
@@ -978,9 +940,9 @@ async function saveBrandingConfig(event) {
     btnTextColor: document.getElementById('cfgBtnTextColor').value,
     accentColor: document.getElementById('cfgAccentColor').value,
     badgeBgColor: document.getElementById('cfgBadgeBgColor').value,
-    logoUrl: isLogoExplicitlyRemoved ? '' : (tempLogoBase64 || currentBranding.logoUrl || ''),
-    bannerDeskUrl: isBannerDeskExplicitlyRemoved ? '' : (tempBannerDeskBase64 || currentBranding.bannerDeskUrl || ''),
-    bannerMobUrl: isBannerMobExplicitlyRemoved ? '' : (tempBannerMobBase64 || currentBranding.bannerMobUrl || '')
+    logoUrl: tempLogoBase64 || currentBranding.logoUrl || '',
+    bannerDeskUrl: tempBannerDeskBase64 || currentBranding.bannerDeskUrl || '',
+    bannerMobUrl: tempBannerMobBase64 || currentBranding.bannerMobUrl || ''
   };
 
   await DbService.saveBranding(currentBranding);

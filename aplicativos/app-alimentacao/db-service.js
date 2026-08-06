@@ -30,55 +30,48 @@ window.DbService = (function () {
      BRANDING / IDENTIDADE VISUAL
   ------------------------------------------------------------------------- */
   async function getBranding() {
-    const cached = _safeGetStorage(STORAGE_KEY_BRANDING);
     if (isReady()) {
       try {
         let { data, error } = await window.db
           .from('store_branding')
           .select('*')
-          .order('updated_at', { ascending: false })
-          .limit(1)
+          .eq('store_id', getStoreId())
           .maybeSingle();
 
+        // Sem retry sem filtro — se falhar, cai no cache local (isolamento garantido)
         if (!error && data) {
           const res = {
-            storeName:      data.store_name      || cached?.storeName      || defaultBranding.storeName,
-            storeSub:       data.store_sub       || cached?.storeSub       || defaultBranding.storeSub,
-            wppNumber:      data.wpp_number      || cached?.wppNumber      || defaultBranding.wppNumber,
-            frete:          data.frete          || cached?.frete          || defaultBranding.frete,
-            primaryColor:   data.primary_color   || cached?.primaryColor   || defaultBranding.primaryColor,
-            darkColor:      data.dark_color      || cached?.darkColor      || defaultBranding.darkColor,
-            btnTextColor:   data.btn_text_color   || cached?.btnTextColor   || defaultBranding.btnTextColor,
-            accentColor:    data.accent_color     || cached?.accentColor     || defaultBranding.accentColor,
-            badgeBgColor:   data.badge_bg_color    || cached?.badgeBgColor    || defaultBranding.badgeBgColor,
-            logoUrl:        data.logo_url         || cached?.logoUrl         || '',
-            bannerDeskUrl:  data.banner_desk_url  || cached?.bannerDeskUrl  || '',
-            bannerMobUrl:   data.banner_mob_url   || cached?.bannerMobUrl   || '',
-            coverageCities: data.coverage_cities  || cached?.coverageCities || '',
-            storeAddress:   data.store_address    || cached?.storeAddress   || '',
-            storeHours:     data.store_hours      || cached?.storeHours     || '',
+            storeName:      data.store_name,
+            storeSub:       data.store_sub,
+            wppNumber:      data.wpp_number,
+            frete:          data.frete,
+            primaryColor:   data.primary_color,
+            darkColor:      data.dark_color,
+            btnTextColor:   data.btn_text_color   || '#FFFFFF',
+            accentColor:    data.accent_color     || '#6344F5',
+            badgeBgColor:   data.badge_bg_color    || '#F1EEFE',
+            logoUrl:        data.logo_url,
+            bannerDeskUrl:  data.banner_desk_url,
+            bannerMobUrl:   data.banner_mob_url,
+            coverageCities: data.coverage_cities,
+            storeAddress:   data.store_address,
+            storeHours:     data.store_hours,
           };
           _safeSetStorage(STORAGE_KEY_BRANDING, res);
-          try { localStorage.setItem('ptd_store_branding', JSON.stringify(res)); } catch(e){}
           return res;
         }
       } catch(e) {}
     }
+    const cached = _safeGetStorage(STORAGE_KEY_BRANDING);
     return cached || { ...defaultBranding };
   }
 
   async function saveBranding(branding) {
     _safeSetStorage(STORAGE_KEY_BRANDING, branding);
-    try {
-      localStorage.setItem('ptd_store_branding', JSON.stringify(branding));
-    } catch(e) {
-      console.warn('[DbService] LocalStorage quota excedida ao salvar branding localmente. Continuando via Supabase...');
-    }
 
     if (!isReady()) return;
 
     const payload = {
-      id:               1,
       store_id:         getStoreId(),
       store_name:       branding.storeName      || '',
       store_sub:        branding.storeSub       || '',
@@ -98,21 +91,9 @@ window.DbService = (function () {
       updated_at:       new Date().toISOString(),
     };
 
-    let { error } = await window.db.from('store_branding').upsert(payload, { onConflict: 'id' });
-    if (error) {
-      // Se der erro (ex: colunas novas não existem na tabela do Supabase), tentar salvar com o payload legados e guardar as cores no localStorage
-      const legacyPayload = { ...payload };
-      delete legacyPayload.btn_text_color;
-      delete legacyPayload.accent_color;
-      delete legacyPayload.badge_bg_color;
-      
-      let resLegacy = await window.db.from('store_branding').upsert(legacyPayload);
-      if (resLegacy.error && resLegacy.error.code === 'PGRST204') {
-        delete legacyPayload.store_id;
-        legacyPayload.id = 1;
-        await window.db.from('store_branding').upsert(legacyPayload, { onConflict: 'id' });
-      }
-    }
+    // PGRST204 = upsert com sucesso sem retorno de dados — não é erro real.
+    // Nunca fazer retry removendo store_id, pois quebraria o isolamento entre contas.
+    await window.db.from('store_branding').upsert(payload);
   }
 
   /* -------------------------------------------------------------------------
@@ -145,51 +126,22 @@ window.DbService = (function () {
   async function getProducts() {
     if (isReady()) {
       try {
-        let { data, error } = await window.db
+        const { data, error } = await window.db
           .from('store_products')
-          .select('*');
+          .select('*')
+          .eq('store_id', getStoreId())
+          .order('position', { ascending: true });
 
-        if (!error && Array.isArray(data) && data.length > 0) {
-          let activeId = getStoreId();
-          if (activeId === 'default') {
-            const nonDefault = data.find(p => p.store_id && p.store_id !== 'default');
-            if (nonDefault) activeId = nonDefault.store_id;
-          }
-          const storeProds = data.filter(p => p.store_id === activeId);
-          const finalProds = storeProds.length > 0 ? storeProds : data.filter(p => p.store_id !== 'default');
-          const normalizedList = finalProds.map(normalizeProductRecord);
-          _safeSetStorage(STORAGE_KEY_PRODUCTS, normalizedList);
-          try { localStorage.setItem('ptd_store_products', JSON.stringify(normalizedList)); } catch(e){}
-          return normalizedList;
+        // Sem retry sem filtro — se falhar, cai no cache local (isolamento garantido)
+        if (!error && Array.isArray(data)) {
+          const normalized = data.map(normalizeProductRecord);
+          _safeSetStorage(STORAGE_KEY_PRODUCTS, normalized);
+          return normalized;
         }
       } catch(e) {}
     }
     const cached = _safeGetStorage(STORAGE_KEY_PRODUCTS);
-    return (cached && cached.length > 0) ? cached.map(normalizeProductRecord) : [];
-  }
-
-  async function getCategories() {
-    if (isReady()) {
-      try {
-        let { data, error } = await window.db
-          .from('store_categories')
-          .select('*');
-
-        if (!error && Array.isArray(data) && data.length > 0) {
-          let activeId = getStoreId();
-          let storeCats = data.filter(c => c.store_id === activeId);
-          if (storeCats.length === 0) {
-            storeCats = data.filter(c => c.store_id && c.store_id !== 'default');
-          }
-          const finalCats = storeCats.length > 0 ? storeCats : data;
-          _safeSetStorage(STORAGE_KEY_CATEGORIES, finalCats);
-          try { localStorage.setItem('ptd_store_categories', JSON.stringify(finalCats)); } catch(e){}
-          return finalCats;
-        }
-      } catch(e) {}
-    }
-    const cached = _safeGetStorage(STORAGE_KEY_CATEGORIES);
-    return Array.isArray(cached) ? cached : [];
+    return Array.isArray(cached) ? cached.map(normalizeProductRecord) : [];
   }
 
   async function upsertProduct(product) {
@@ -215,10 +167,12 @@ window.DbService = (function () {
 
       let { error } = await window.db.from('store_products').upsert(payload, { onConflict: 'id' });
 
-      if (error && error.code === 'PGRST204') {
-        delete payload.adicionais;
-        delete payload.store_id;
-        await window.db.from('store_products').upsert(payload, { onConflict: 'id' });
+      if (error && error.code !== 'PGRST204') {
+        // Fallback: tenta sem o campo 'adicionais' (pode não existir na tabela)
+        // NUNCA remove store_id — isolamento entre contas deve ser preservado
+        const fallbackPayload = { ...payload };
+        delete fallbackPayload.adicionais;
+        await window.db.from('store_products').upsert(fallbackPayload, { onConflict: 'id' });
       }
     }
     _syncProductsToLocalStorage();
@@ -244,6 +198,25 @@ window.DbService = (function () {
   /* -------------------------------------------------------------------------
      CATEGORIAS
   ------------------------------------------------------------------------- */
+  async function getCategories() {
+    if (isReady()) {
+      try {
+        const { data, error } = await window.db
+          .from('store_categories')
+          .select('*')
+          .eq('store_id', getStoreId())
+          .order('position', { ascending: true });
+
+        // Sem retry sem filtro — se falhar, cai no cache local (isolamento garantido)
+        if (!error && Array.isArray(data)) {
+          _safeSetStorage(STORAGE_KEY_CATEGORIES, data);
+          return data;
+        }
+      } catch(e) {}
+    }
+    const cached = _safeGetStorage(STORAGE_KEY_CATEGORIES);
+    return Array.isArray(cached) ? cached : [];
+  }
 
   async function upsertCategory(cat) {
     if (isReady()) {
@@ -252,10 +225,15 @@ window.DbService = (function () {
           id:       cat.id || ('cat-' + Date.now()),
           store_id: getStoreId(),
           name:     cat.name || '',
+          active:   cat.active !== false,
+          position: cat.position || 0,
         };
-        let { error } = await window.db.from('store_categories').upsert(payload, { onConflict: 'id' });
+        let { error } = await window.db.from('store_categories').upsert(payload);
         if (error) {
-          console.warn('[DbService] Erro em upsertCategory no Supabase:', error);
+          delete payload.active;
+          delete payload.position;
+          delete payload.store_id;
+          await window.db.from('store_categories').upsert(payload);
         }
       } catch(e) {}
     }

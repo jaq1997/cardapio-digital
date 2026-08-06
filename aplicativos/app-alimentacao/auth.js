@@ -21,7 +21,16 @@ const AUTH = {
     }
 
     if (session.user) {
-      localStorage.setItem('active_store_id', session.user.id);
+      const previousStoreId = localStorage.getItem('active_store_id');
+      const newStoreId = session.user.id;
+      localStorage.setItem('active_store_id', newStoreId);
+
+      // Se mudou de conta, recarrega a página para que o config.js
+      // recalcule o CURRENT_STORE_ID com o UUID correto da nova conta.
+      if (previousStoreId && previousStoreId !== newStoreId) {
+        window.location.reload();
+        return;
+      }
     }
 
     AUTH._showAdminContent();
