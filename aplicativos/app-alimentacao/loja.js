@@ -67,18 +67,7 @@ async function applyDynamicBranding() {
 
     if (cfg) {
       if (cfg.wppNumber) {
-        let cleanNum = String(cfg.wppNumber).replace(/\D/g, '');
-        if (cleanNum.length > 0 && !cleanNum.startsWith('55') && cleanNum.length <= 11) {
-          cleanNum = '55' + cleanNum;
-        }
-        WPP_NUMERO = cleanNum;
-
-        const floatBtn = document.getElementById('floatWppBtn') || document.querySelector('.floating-wpp-btn') || document.querySelector('a[href*="wa.me"]');
-        if (floatBtn) {
-          const textMsg = encodeURIComponent("Olá! Quero tirar dúvidas / fazer pedido.");
-          floatBtn.href = `https://wa.me/${cleanNum}?text=${textMsg}`;
-          floatBtn.target = "_blank";
-        }
+        WPP_NUMERO = String(cfg.wppNumber).replace(/\D/g, '');
       }
       if (cfg.primaryColor) {
         document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
@@ -95,36 +84,11 @@ async function applyDynamicBranding() {
         document.documentElement.style.setProperty('--ph-badge-bg', cfg.badgeBgColor);
       }
 
-      if (cfg.storeName) {
-        const logoText = document.getElementById('headerLogoText');
-        if (logoText) {
-          logoText.innerHTML = cfg.storeName;
-        }
-        const footerTitle = document.getElementById('footerStoreTitle') || document.querySelector('.footer-title');
-        if (footerTitle) {
-          footerTitle.innerText = cfg.storeName.toUpperCase();
-        }
-        document.title = `${cfg.storeName}${cfg.storeSub ? ' — ' + cfg.storeSub : ''}`;
-      }
-      if (cfg.storeSub) {
-        const logoSub = document.getElementById('headerLogoSub');
-        if (logoSub) {
-          logoSub.innerText = cfg.storeSub;
-        }
-        const footerSub = document.getElementById('footerStoreSub');
-        if (footerSub) {
-          footerSub.innerText = cfg.storeSub;
-        }
-      }
-
-      const logoBadge = document.querySelector('.ph-logo-badge');
-      if (logoBadge) {
-        if (cfg.logoUrl) {
+      if (cfg.logoUrl) {
+        const logoBadge = document.querySelector('.ph-logo-badge');
+        if (logoBadge) {
           logoBadge.classList.add('has-custom-logo');
           logoBadge.innerHTML = `<img src="${cfg.logoUrl}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">`;
-        } else {
-          logoBadge.classList.remove('has-custom-logo');
-          logoBadge.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 15 10-15-10-5z"></path><path d="M12 22V12"></path></svg>`;
         }
       }
 
@@ -165,6 +129,9 @@ async function applyDynamicBranding() {
     }
   } catch (e) {
     console.warn('[Loja] Erro ao carregar branding:', e);
+  } finally {
+    // Revela a página após aplicar o branding (evita flash/piscada)
+    document.body.style.opacity = '1';
   }
 }
 
@@ -247,96 +214,38 @@ async function loadCatalogData() {
 }
 
 async function loadAndRenderDrawerCategories() {
-  let dbCats = [];
+  const container = document.getElementById('drawerCategoryListContainer') || document.getElementById('drawerCategoriesList');
+  if (!container) return;
+
+  categories = [];
   if (window.DbService) {
     try {
       const remote = await DbService.getCategories();
-      if (remote && Array.isArray(remote)) dbCats = remote;
+      if (remote) categories = remote;
     } catch(e) {}
   }
 
-  if ((!dbCats || dbCats.length === 0)) {
+  if (categories.length === 0) {
     const saved = localStorage.getItem(STORAGE_KEY_CATEGORIES);
-    if (saved) { try { dbCats = JSON.parse(saved); } catch(e) {} }
+    if (saved) { try { categories = JSON.parse(saved); } catch(e) {} }
   }
 
-  const allCatNamesMap = new Map();
+  let html = `<div style="font-size: 0.75rem; font-weight: 700; color: #64748B; margin-bottom: 8px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div>`;
+  html += `<button class="drawer-cat-item ${activeCategory === 'todos' ? 'active' : ''}" onclick="selectDrawerCategory('todos')" style="width: 100%; text-align: left; padding: 12px 16px; background: transparent; border: none; font-weight: 600; font-size: 0.9rem; color: #0F172A; cursor: pointer; border-radius: 8px;">TODOS OS PRODUTOS</button>`;
 
-  // 1. Adiciona as categorias cadastradas no Admin (mesmo que estejam sem produtos no momento)
-  if (dbCats && dbCats.length > 0) {
-    dbCats.forEach(c => {
-      if (c && c.name) {
-        allCatNamesMap.set(c.name.trim().toLowerCase(), {
-          id: c.id || c.name,
-          name: c.name.trim(),
-          active: c.active !== false
-        });
-      }
+  if (categories && categories.length > 0) {
+    const activeCats = categories.filter(c => c.active !== false);
+    activeCats.forEach(cat => {
+      const isAct = (activeCategory === cat.name || activeCategory === cat.id);
+      html += `
+        <button class="drawer-cat-item ${isAct ? 'active' : ''}" onclick="selectDrawerCategory('${cat.name}')" style="width: 100%; text-align: left; padding: 12px 16px; background: transparent; border: none; font-weight: 600; font-size: 0.9rem; color: #0F172A; cursor: pointer; border-radius: 8px;">
+          ${cat.name.toUpperCase()}
+        </button>
+      `;
     });
   }
 
-  // 2. Unifica com categorias extraídas dos produtos cadastrados
-  if (window.DbService) {
-    try {
-      const prods = await DbService.getProducts();
-      if (prods && prods.length > 0) {
-        prods.forEach(p => {
-          const catVal = p.categorias || p.categoria;
-          if (catVal) {
-            const list = Array.isArray(catVal) ? catVal : String(catVal).split(',');
-            list.forEach(c => {
-              const trimmed = String(c).trim();
-              if (trimmed && trimmed.toLowerCase() !== 'outros') {
-                const key = trimmed.toLowerCase();
-                if (!allCatNamesMap.has(key)) {
-                  allCatNamesMap.set(key, { id: trimmed, name: trimmed, active: true });
-                }
-              }
-            });
-          }
-        });
-      }
-    } catch(e) {}
-  }
-
-  categories = Array.from(allCatNamesMap.values());
-
-  // Remove categorias legadas de teste se houver no cache local
-  categories = (categories || []).filter(c => c.name && !['Promoções', 'café da manhã', 'Pratos Principais', 'Sobremesas'].includes(c.name));
-
-  const container = document.getElementById('drawerCategoryListContainer') || document.getElementById('drawerCategoriesList');
-  if (container) {
-    let html = `<div style="font-size: 0.75rem; font-weight: 700; color: #64748B; margin-bottom: 8px; text-transform: uppercase;">CARDÁPIO PRINCIPAL</div>`;
-    html += `<button class="drawer-cat-item ${activeCategory === 'todos' ? 'active' : ''}" onclick="selectDrawerCategory('todos')" style="width: 100%; text-align: left; padding: 12px 16px; background: transparent; border: none; font-weight: 600; font-size: 0.9rem; color: #0F172A; cursor: pointer; border-radius: 8px;">TODOS OS PRODUTOS</button>`;
-
-    if (categories && categories.length > 0) {
-      const activeCats = categories.filter(c => c.active !== false);
-      activeCats.forEach(cat => {
-        const isAct = (activeCategory === cat.name || activeCategory === cat.id);
-        html += `
-          <button class="drawer-cat-item ${isAct ? 'active' : ''}" onclick="selectDrawerCategory('${cat.name}')" style="width: 100%; text-align: left; padding: 12px 16px; background: transparent; border: none; font-weight: 600; font-size: 0.9rem; color: #0F172A; cursor: pointer; border-radius: 8px;">
-            ${cat.name.toUpperCase()}
-          </button>
-        `;
-      });
-    }
-
-    container.innerHTML = html;
-  }
-
-  // Renderiza a barra de cards visuais de categorias no topo (Estilo Pizza Hut)
-  const topNavContainer = document.getElementById('categoriesTabContainer');
-  if (topNavContainer) {
-    let topHtml = `<button class="ph-cat-card ${activeCategory === 'todos' ? 'active' : ''}" onclick="selectDrawerCategory('todos')">TODOS OS PRODUTOS</button>`;
-    if (categories && categories.length > 0) {
-      const activeCats = categories.filter(c => c.active !== false);
-      activeCats.forEach(cat => {
-        const isAct = (activeCategory === cat.name || activeCategory === cat.id);
-        topHtml += `<button class="ph-cat-card ${isAct ? 'active' : ''}" onclick="selectDrawerCategory('${cat.name}')">${cat.name.toUpperCase()}</button>`;
-      });
-    }
-    topNavContainer.innerHTML = topHtml;
-  }
+  container.innerHTML = html;
 }
 
 function handleSearch(query) {
