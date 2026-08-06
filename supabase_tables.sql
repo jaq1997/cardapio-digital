@@ -27,9 +27,9 @@ DROP FUNCTION IF EXISTS public.handle_new_user();
 -- store_id = UUID do usuário autenticado (auth.uid())
 -- ============================================================
 
--- 1. BRANDING — configurações visuais da loja (1 linha por store_id)
+-- 1. BRANDING — 1 linha por loja, store_id é a chave primária
 CREATE TABLE store_branding (
-  store_id         TEXT PRIMARY KEY,    -- UUID do dono da loja
+  store_id         TEXT PRIMARY KEY,
   store_name       TEXT    DEFAULT 'Minha Loja',
   store_sub        TEXT    DEFAULT '',
   wpp_number       TEXT    DEFAULT '',
@@ -92,7 +92,7 @@ CREATE TABLE store_coupons (
   id         TEXT PRIMARY KEY,
   store_id   TEXT NOT NULL,
   code       TEXT NOT NULL,
-  type       TEXT    DEFAULT 'fixed',  -- 'fixed' ou 'percent'
+  type       TEXT    DEFAULT 'fixed',
   value      NUMERIC DEFAULT 0,
   min_order  NUMERIC DEFAULT 0,
   active     BOOLEAN DEFAULT TRUE,
@@ -100,14 +100,13 @@ CREATE TABLE store_coupons (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 6. PERFIS DE USUÁRIO (para futuro CRM)
+-- 6. PERFIS DE USUÁRIO (futuro CRM)
 CREATE TABLE profiles (
   id         UUID PRIMARY KEY REFERENCES auth.users ON DELETE CASCADE,
   full_name  TEXT,
   avatar_url TEXT
 );
 
--- Trigger: cria perfil automaticamente ao cadastrar novo usuário
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
 AS $$
@@ -123,9 +122,7 @@ CREATE TRIGGER on_auth_user_created
 
 -- ============================================================
 -- PARTE 3: ROW LEVEL SECURITY (RLS) — MULTI-TENANT CORRETO
---
--- LEITURA:  pública — clientes veem o cardápio sem precisar de login
--- ESCRITA:  isolada — cada lojista só acessa e modifica os próprios dados
+-- Leitura: pública | Escrita: só o dono autenticado
 -- ============================================================
 
 ALTER TABLE store_branding       ENABLE ROW LEVEL SECURITY;
@@ -185,5 +182,5 @@ CREATE INDEX idx_zones_store_id          ON store_delivery_zones (store_id);
 CREATE INDEX idx_coupons_store_id        ON store_coupons        (store_id);
 CREATE INDEX idx_coupons_code            ON store_coupons        (code);
 
--- Atualiza cache da API do Supabase
+-- Atualiza cache da API
 NOTIFY pgrst, 'reload schema';
