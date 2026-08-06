@@ -129,6 +129,9 @@ async function applyDynamicBranding() {
     }
   } catch (e) {
     console.warn('[Loja] Erro ao carregar branding:', e);
+  } finally {
+    // Revela a página após aplicar o branding (evita flash/piscada)
+    document.body.style.opacity = '1';
   }
 }
 

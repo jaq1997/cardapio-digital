@@ -38,11 +38,7 @@ window.DbService = (function () {
           .eq('store_id', getStoreId())
           .maybeSingle();
 
-        if (error) {
-          const retry = await window.db.from('store_branding').select('*').limit(1).maybeSingle();
-          if (!retry.error && retry.data) { data = retry.data; error = null; }
-        }
-
+        // Sem retry sem filtro — se falhar, cai no cache local (isolamento garantido)
         if (!error && data) {
           const res = {
             storeName:      data.store_name,
@@ -95,12 +91,9 @@ window.DbService = (function () {
       updated_at:       new Date().toISOString(),
     };
 
-    let { error } = await window.db.from('store_branding').upsert(payload);
-    if (error && error.code === 'PGRST204') {
-      delete payload.store_id;
-      payload.id = 1;
-      await window.db.from('store_branding').upsert(payload, { onConflict: 'id' });
-    }
+    // PGRST204 = upsert com sucesso sem retorno de dados — não é erro real.
+    // Nunca fazer retry removendo store_id, pois quebraria o isolamento entre contas.
+    await window.db.from('store_branding').upsert(payload);
   }
 
   /* -------------------------------------------------------------------------
@@ -133,20 +126,13 @@ window.DbService = (function () {
   async function getProducts() {
     if (isReady()) {
       try {
-        let { data, error } = await window.db
+        const { data, error } = await window.db
           .from('store_products')
           .select('*')
           .eq('store_id', getStoreId())
           .order('position', { ascending: true });
 
-        if (error) {
-          const retry = await window.db.from('store_products').select('*').order('position', { ascending: true });
-          if (!retry.error && Array.isArray(retry.data)) {
-            data = retry.data.filter(p => !p.store_id || p.store_id === getStoreId());
-            error = null;
-          }
-        }
-
+        // Sem retry sem filtro — se falhar, cai no cache local (isolamento garantido)
         if (!error && Array.isArray(data)) {
           const normalized = data.map(normalizeProductRecord);
           _safeSetStorage(STORAGE_KEY_PRODUCTS, normalized);
@@ -181,10 +167,12 @@ window.DbService = (function () {
 
       let { error } = await window.db.from('store_products').upsert(payload, { onConflict: 'id' });
 
-      if (error && error.code === 'PGRST204') {
-        delete payload.adicionais;
-        delete payload.store_id;
-        await window.db.from('store_products').upsert(payload, { onConflict: 'id' });
+      if (error && error.code !== 'PGRST204') {
+        // Fallback: tenta sem o campo 'adicionais' (pode não existir na tabela)
+        // NUNCA remove store_id — isolamento entre contas deve ser preservado
+        const fallbackPayload = { ...payload };
+        delete fallbackPayload.adicionais;
+        await window.db.from('store_products').upsert(fallbackPayload, { onConflict: 'id' });
       }
     }
     _syncProductsToLocalStorage();
@@ -213,20 +201,13 @@ window.DbService = (function () {
   async function getCategories() {
     if (isReady()) {
       try {
-        let { data, error } = await window.db
+        const { data, error } = await window.db
           .from('store_categories')
           .select('*')
           .eq('store_id', getStoreId())
           .order('position', { ascending: true });
 
-        if (error) {
-          const retry = await window.db.from('store_categories').select('*').order('position', { ascending: true });
-          if (!retry.error && Array.isArray(retry.data)) {
-            data = retry.data.filter(c => !c.store_id || c.store_id === getStoreId());
-            error = null;
-          }
-        }
-
+        // Sem retry sem filtro — se falhar, cai no cache local (isolamento garantido)
         if (!error && Array.isArray(data)) {
           _safeSetStorage(STORAGE_KEY_CATEGORIES, data);
           return data;

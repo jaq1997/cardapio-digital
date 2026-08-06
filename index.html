@@ -35,6 +35,10 @@
       } catch(e) {}
     })();
   </script>
+  <style>
+    /* Evita flash (FOUC) ao carregar branding assíncrono */
+    body { opacity: 0; transition: opacity 0.22s ease; }
+  </style>
 </head>
 
 <body data-page="index">
