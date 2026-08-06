@@ -91,9 +91,8 @@ window.DbService = (function () {
       updated_at:       new Date().toISOString(),
     };
 
-    // PGRST204 = upsert com sucesso sem retorno de dados — não é erro real.
-    // Nunca fazer retry removendo store_id, pois quebraria o isolamento entre contas.
-    await window.db.from('store_branding').upsert(payload);
+    // store_id é a PRIMARY KEY no novo schema — upsert correto
+    await window.db.from('store_branding').upsert(payload, { onConflict: 'store_id' });
   }
 
   /* -------------------------------------------------------------------------
@@ -180,7 +179,8 @@ window.DbService = (function () {
 
   async function deleteProduct(id) {
     if (isReady()) {
-      await window.db.from('store_products').delete().eq('id', id);
+      // Filtra por store_id para garantir que só deleta produtos do próprio tenant
+      await window.db.from('store_products').delete().eq('id', id).eq('store_id', getStoreId());
     }
     _syncProductsToLocalStorage();
   }
@@ -228,13 +228,8 @@ window.DbService = (function () {
           active:   cat.active !== false,
           position: cat.position || 0,
         };
-        let { error } = await window.db.from('store_categories').upsert(payload);
-        if (error) {
-          delete payload.active;
-          delete payload.position;
-          delete payload.store_id;
-          await window.db.from('store_categories').upsert(payload);
-        }
+        // NUNCA remove store_id no fallback — isolamento entre contas deve ser preservado
+        await window.db.from('store_categories').upsert(payload, { onConflict: 'id' });
       } catch(e) {}
     }
 
@@ -252,7 +247,7 @@ window.DbService = (function () {
   async function deleteCategory(id) {
     if (isReady()) {
       try {
-        await window.db.from('store_categories').delete().eq('id', id);
+        await window.db.from('store_categories').delete().eq('id', id).eq('store_id', getStoreId());
       } catch(e) {}
     }
     let existing = _safeGetStorage(STORAGE_KEY_CATEGORIES) || [];
@@ -267,17 +262,13 @@ window.DbService = (function () {
   async function getDeliveryZones() {
     if (isReady()) {
       try {
-        let { data, error } = await window.db
+        const { data, error } = await window.db
           .from('store_delivery_zones')
           .select('*')
           .eq('store_id', getStoreId())
           .order('position', { ascending: true });
 
-        if (error) {
-          const retry = await window.db.from('store_delivery_zones').select('*').order('position', { ascending: true });
-          if (!retry.error && Array.isArray(retry.data)) { data = retry.data; error = null; }
-        }
-
+        // Sem retry sem filtro — se falhar, cai no cache local (isolamento garantido)
         if (!error && Array.isArray(data)) {
           _safeSetStorage(STORAGE_KEY_DELIVERY_ZONES, data);
           return data;
@@ -297,11 +288,8 @@ window.DbService = (function () {
         price:    zone.price || 0,
         position: zone.position || 0,
       };
-      let { error } = await window.db.from('store_delivery_zones').upsert(payload, { onConflict: 'id' });
-      if (error && error.code === 'PGRST204') {
-        delete payload.store_id;
-        await window.db.from('store_delivery_zones').upsert(payload, { onConflict: 'id' });
-      }
+      // NUNCA remove store_id no fallback — isolamento entre contas deve ser preservado
+      await window.db.from('store_delivery_zones').upsert(payload, { onConflict: 'id' });
     }
     const zones = await getDeliveryZones();
     _safeSetStorage(STORAGE_KEY_DELIVERY_ZONES, zones);
@@ -309,7 +297,7 @@ window.DbService = (function () {
 
   async function deleteDeliveryZone(id) {
     if (isReady()) {
-      await window.db.from('store_delivery_zones').delete().eq('id', id);
+      await window.db.from('store_delivery_zones').delete().eq('id', id).eq('store_id', getStoreId());
     }
     const zones = await getDeliveryZones();
     _safeSetStorage(STORAGE_KEY_DELIVERY_ZONES, zones);
@@ -321,17 +309,13 @@ window.DbService = (function () {
   async function getCoupons() {
     if (isReady()) {
       try {
-        let { data, error } = await window.db
+        const { data, error } = await window.db
           .from('store_coupons')
           .select('*')
           .eq('store_id', getStoreId())
           .order('created_at', { ascending: false });
 
-        if (error) {
-          const retry = await window.db.from('store_coupons').select('*').order('created_at', { ascending: false });
-          if (!retry.error && Array.isArray(retry.data)) { data = retry.data; error = null; }
-        }
-
+        // Sem retry sem filtro — se falhar, cai no cache local (isolamento garantido)
         if (!error && Array.isArray(data)) {
           _safeSetStorage(STORAGE_KEY_COUPONS, data);
           return data;
@@ -354,11 +338,8 @@ window.DbService = (function () {
         active:     coupon.active !== false,
         expires_at: coupon.expiresAt  || coupon.expires_at || null,
       };
-      let { error } = await window.db.from('store_coupons').upsert(payload, { onConflict: 'id' });
-      if (error && error.code === 'PGRST204') {
-        delete payload.store_id;
-        await window.db.from('store_coupons').upsert(payload, { onConflict: 'id' });
-      }
+      // NUNCA remove store_id no fallback — isolamento entre contas deve ser preservado
+      await window.db.from('store_coupons').upsert(payload, { onConflict: 'id' });
     }
     const coupons = await getCoupons();
     _safeSetStorage(STORAGE_KEY_COUPONS, coupons);
@@ -366,7 +347,7 @@ window.DbService = (function () {
 
   async function deleteCoupon(id) {
     if (isReady()) {
-      await window.db.from('store_coupons').delete().eq('id', id);
+      await window.db.from('store_coupons').delete().eq('id', id).eq('store_id', getStoreId());
     }
     const coupons = await getCoupons();
     _safeSetStorage(STORAGE_KEY_COUPONS, coupons);
