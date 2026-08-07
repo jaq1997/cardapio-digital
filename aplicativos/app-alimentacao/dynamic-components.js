@@ -11,7 +11,7 @@ const SHARED_COMPONENTS = {
                 </svg>
             </button>
 
-            <a href="index.html" class="ph-brand-logo" id="headerBrandLogo">
+            <a href="#" onclick="selectDrawerCategory('todos'); return false;" class="ph-brand-logo" id="headerBrandLogo">
                 <div class="ph-logo-badge">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 2L2 7l10 15 10-15-10-5z"></path>

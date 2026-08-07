@@ -84,6 +84,21 @@ async function applyDynamicBranding() {
         document.documentElement.style.setProperty('--ph-badge-bg', cfg.badgeBgColor);
       }
 
+      if (cfg.storeName) {
+        const logoText = document.getElementById('headerLogoText');
+        if (logoText) {
+          const parts = cfg.storeName.trim().split(' ');
+          const first = parts.slice(0, -1).join(' ') || parts[0];
+          const last  = parts.length > 1 ? parts[parts.length - 1] : '';
+          logoText.innerHTML = last ? `${first} <span>${last}</span>` : first;
+        }
+        document.title = cfg.storeName + (cfg.storeSub ? ' — ' + cfg.storeSub : '');
+      }
+      if (cfg.storeSub) {
+        const logoSub = document.getElementById('headerLogoSub');
+        if (logoSub) logoSub.textContent = cfg.storeSub;
+      }
+
       if (cfg.logoUrl) {
         const logoBadge = document.querySelector('.ph-logo-badge');
         if (logoBadge) {
