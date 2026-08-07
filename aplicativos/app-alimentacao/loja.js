@@ -68,6 +68,8 @@ async function applyDynamicBranding() {
     if (cfg) {
       if (cfg.wppNumber) {
         WPP_NUMERO = String(cfg.wppNumber).replace(/\D/g, '');
+        const floatWppBtn = document.getElementById('floatWppBtn');
+        if (floatWppBtn) floatWppBtn.href = `https://wa.me/${WPP_NUMERO}`;
       }
       if (cfg.primaryColor) {
         document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
@@ -93,6 +95,8 @@ async function applyDynamicBranding() {
           logoText.innerHTML = last ? `${first} <span>${last}</span>` : first;
         }
         document.title = cfg.storeName + (cfg.storeSub ? ' — ' + cfg.storeSub : '');
+        const footerTitle = document.getElementById('footerStoreTitle');
+        if (footerTitle) footerTitle.innerText = cfg.storeName.toUpperCase();
       }
       if (cfg.storeSub) {
         const logoSub = document.getElementById('headerLogoSub');
