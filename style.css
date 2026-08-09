@@ -295,6 +295,40 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
   display: none;
 }
 
+/* Barra de filtros/categorias visível abaixo do banner */
+.ph-categories-bar-wrap {
+  background: #FFFFFF;
+  border-bottom: 2px solid var(--ph-border);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  position: sticky;
+  top: 56px;
+  z-index: 90;
+}
+
+.ph-categories-bar-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+.ph-categories-bar {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  white-space: nowrap;
+  flex-wrap: nowrap;
+}
+
+.ph-categories-bar::-webkit-scrollbar {
+  display: none;
+}
+
+
 .ph-categories-wrapper {
   max-width: 1280px;
   margin: 0 auto;

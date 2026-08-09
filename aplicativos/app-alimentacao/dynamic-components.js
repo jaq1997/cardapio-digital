@@ -174,14 +174,12 @@ function applyBrandingToUI() {
             if (hoursEl) hoursEl.innerText = cfg.storeHours;
         }
 
-        // SE SUBIU LOGO EM IMAGEM (.PNG / .JPG), SUBSTITUI PELO LOGO DA IMAGEM E ATUALIZA FAVICON DA ABA
+        // SE SUBIU LOGO EM IMAGEM (.PNG / .JPG), SUBSTITUI PELO LOGO DA IMAGEM
         if (cfg.logoUrl) {
             const brandLogoAnchor = document.getElementById('headerBrandLogo');
             if (brandLogoAnchor) {
                 brandLogoAnchor.innerHTML = `<img src="${cfg.logoUrl}" style="max-height: 44px; border-radius: 4px; object-fit: contain;" alt="${cfg.storeName || 'Logo'}">`;
             }
-            const favicon = document.getElementById('pageFavicon');
-            if (favicon) favicon.href = cfg.logoUrl;
         }
 
         if (cfg.wppNumber) {
