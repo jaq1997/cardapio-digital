@@ -76,12 +76,11 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 
 /* ==========================================================================
    1. HEADER & NAVBAR (LIMPO SEM CAIXA DE LOCALIZAÇÃO)
-   ========================================================================== */
-.ph-header {
+   ====================================================================.ph-header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: var(--ph-white);
+  background: #09090B;
   border-bottom: 4px solid var(--theme-primary);
   box-shadow: var(--ph-shadow-sm);
 }
@@ -138,7 +137,7 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
   justify-content: center;
   background: transparent;
   border: none;
-  color: var(--ph-black);
+  color: #FFFFFF;
   cursor: pointer;
   padding: 6px;
   border-radius: 4px;
@@ -146,7 +145,7 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 }
 
 .mobile-hamburger-btn:hover {
-  background: var(--ph-gray-light);
+  background: #18181B;
 }
 
 .ph-brand-logo {
@@ -173,10 +172,19 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 }
 
 .ph-logo-badge.has-custom-logo {
+  width: auto !important;
+  height: 52px !important;
+  min-width: 52px !important;
+  min-height: 52px !important;
+  max-width: 220px !important;
   background: transparent !important;
   box-shadow: none !important;
   transform: none !important;
   border-radius: 0 !important;
+}
+
+.ph-logo-badge.has-custom-logo + .ph-logo-text-wrap {
+  display: none !important;
 }
 
 .ph-logo-text-wrap {
@@ -187,7 +195,7 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 .ph-logo-text {
   font-size: 1.6rem;
   font-weight: 900;
-  color: var(--ph-black-pure);
+  color: #FFFFFF;
   letter-spacing: -1.5px;
   text-transform: uppercase;
   font-style: normal;
@@ -201,8 +209,9 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 .ph-logo-sub {
   font-size: 0.65rem;
   font-weight: 800;
-  color: #777777;
+  color: #A1A1AA;
   text-transform: uppercase;
+}ppercase;
   letter-spacing: 0.5px;
   margin-top: 2px;
 }
@@ -216,19 +225,23 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 .ph-search-input {
   width: 100%;
   padding: 10px 16px 10px 40px;
-  background: var(--ph-gray-light);
-  border: 1px solid #DDD;
+  background: #18181B;
+  border: 1px solid #27272A;
   border-radius: var(--radius-pill);
   font-size: 0.84rem;
   font-weight: 600;
-  color: var(--ph-black);
+  color: #FFFFFF;
   outline: none;
   transition: all 0.2s ease;
 }
 
+.ph-search-input::placeholder {
+  color: #71717A;
+}
+
 .ph-search-input:focus {
   border-color: var(--theme-primary);
-  background: #FFF;
+  background: #27272A;
   box-shadow: 0 0 0 3px rgba(233, 28, 36, 0.12);
 }
 
