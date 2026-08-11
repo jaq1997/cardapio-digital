@@ -66,8 +66,12 @@ async function applyDynamicBranding() {
     }
 
     if (cfg) {
+      window.__evoluxBrandingConfig = cfg;
+
       if (cfg.wppNumber) {
         WPP_NUMERO = String(cfg.wppNumber).replace(/\D/g, '');
+        const floatWppBtn = document.getElementById('floatWppBtn');
+        if (floatWppBtn) floatWppBtn.href = `https://wa.me/${WPP_NUMERO}`;
       }
       if (cfg.primaryColor) {
         document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
@@ -84,54 +88,49 @@ async function applyDynamicBranding() {
         document.documentElement.style.setProperty('--ph-badge-bg', cfg.badgeBgColor);
       }
 
-      if (cfg.logoUrl) {
-        const logoBadge = document.querySelector('.ph-logo-badge');
-        if (logoBadge) {
-          logoBadge.classList.add('has-custom-logo');
-          logoBadge.innerHTML = `<img src="${cfg.logoUrl}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">`;
-        }
+      if (window.applyBrandingToUI) {
+        window.applyBrandingToUI(cfg);
       }
 
-      // Renderização do Banner Principal (Hero Card)
       const heroCard = document.querySelector('.ph-hero-card');
-      if (heroCard) {
+      const updateHeroBanner = () => {
+        if (!heroCard) return;
         const isMobile = window.innerWidth <= 768;
         const bannerUrl = isMobile ? (cfg.bannerMobUrl || cfg.bannerDeskUrl) : (cfg.bannerDeskUrl || cfg.bannerMobUrl);
 
         if (bannerUrl) {
+          heroCard.style.display = 'grid';
           heroCard.classList.add('has-custom-banner');
-          heroCard.classList.toggle('is-mobile-banner', isMobile);
-          heroCard.style.backgroundImage = `url('${bannerUrl}')`;
-          heroCard.style.backgroundSize = 'cover';
-          heroCard.style.backgroundPosition = 'center';
-          heroCard.innerHTML = '';
-        } else {
-          heroCard.classList.remove('has-custom-banner');
           heroCard.classList.remove('is-mobile-banner');
           heroCard.style.backgroundImage = 'none';
           heroCard.style.backgroundColor = 'transparent';
           heroCard.innerHTML = `
-            <div style="width: 100%; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 32px 20px; border: 1px dashed #CBD5E1; border-radius: 16px; background: #F8FAFC;">
-              <div style="width: 52px; height: 52px; border-radius: 12px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                  <circle cx="8.5" cy="8.5" r="1.5"/>
-                  <polyline points="21 15 16 10 5 21"/>
-                </svg>
-              </div>
-              <div style="font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: #0F172A; margin-bottom: 4px;">Banner Principal da Loja</div>
-              <div style="font-size: 0.82rem; color: #64748B; max-width: 440px; line-height: 1.4;">
-                Envie as imagens promocionais da sua loja através da aba <strong>"Identidade Visual & Banners"</strong> no Painel Admin.
-              </div>
-            </div>
+            <img class="ph-hero-banner-img" src="${bannerUrl}" alt="Banner da loja" />
           `;
+        } else {
+          heroCard.style.display = 'none';
+          heroCard.innerHTML = '';
         }
+      };
+
+      updateHeroBanner();
+      if (!window.__evoluxBannerResizeAttached) {
+        window.addEventListener('resize', () => {
+          if (window.__evoluxBannerResizeTimeout) {
+            clearTimeout(window.__evoluxBannerResizeTimeout);
+          }
+          window.__evoluxBannerResizeTimeout = setTimeout(() => {
+            if (window.__evoluxBrandingConfig) {
+              updateHeroBanner();
+            }
+          }, 150);
+        });
+        window.__evoluxBannerResizeAttached = true;
       }
     }
   } catch (e) {
     console.warn('[Loja] Erro ao carregar branding:', e);
   } finally {
-    // Revela a página após aplicar o branding (evita flash/piscada)
     document.body.style.opacity = '1';
   }
 }

@@ -29,8 +29,15 @@
             document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
             document.documentElement.style.setProperty('--theme-primary', cfg.primaryColor);
           }
+          if (cfg.footerBgColor) {
+            document.documentElement.style.setProperty('--footer-bg', cfg.footerBgColor);
+          }
           if (cfg.btnTextColor) document.documentElement.style.setProperty('--ph-btn-text', cfg.btnTextColor);
           if (cfg.accentColor) document.documentElement.style.setProperty('--ph-accent', cfg.accentColor);
+          if (cfg.searchBgColor) document.documentElement.style.setProperty('--search-bg', cfg.searchBgColor);
+          if (cfg.headerBgColor) document.documentElement.style.setProperty('--header-bg', cfg.headerBgColor);
+          if (cfg.useDarkMode) document.body.classList.add('dark-mode');
+          if (cfg.searchBgColor) document.documentElement.style.setProperty('--search-bg', cfg.searchBgColor);
         }
       } catch(e) {}
     })();
@@ -49,13 +56,6 @@
       <!-- Injetado dinamicamente via loja.js (Banner de Destaque da loja) -->
     </div>
   </section>
-
-  <!-- BARRA DE FILTROS / CATEGORIAS -->
-  <div class="ph-categories-bar-wrap">
-    <div class="ph-categories-bar" id="categoriesTabContainer">
-      <!-- Injetado via dynamic-components.js -->
-    </div>
-  </div>
 
   <!-- CATALOG SECTION -->
   <main class="ph-section-container" id="catalogSection">

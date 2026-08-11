@@ -96,9 +96,10 @@ async function applyDynamicBranding() {
       const updateHeroBanner = () => {
         if (!heroCard) return;
         const isMobile = window.innerWidth <= 768;
-        const bannerUrl = isMobile ? null : (cfg.bannerDeskUrl || cfg.bannerMobUrl);
+        const bannerUrl = isMobile ? (cfg.bannerMobUrl || cfg.bannerDeskUrl) : (cfg.bannerDeskUrl || cfg.bannerMobUrl);
 
         if (bannerUrl) {
+          heroCard.style.display = 'grid';
           heroCard.classList.add('has-custom-banner');
           heroCard.classList.remove('is-mobile-banner');
           heroCard.style.backgroundImage = 'none';
@@ -107,25 +108,8 @@ async function applyDynamicBranding() {
             <img class="ph-hero-banner-img" src="${bannerUrl}" alt="Banner da loja" />
           `;
         } else {
-          heroCard.classList.remove('has-custom-banner');
-          heroCard.classList.remove('is-mobile-banner');
-          heroCard.style.backgroundImage = 'none';
-          heroCard.style.backgroundColor = 'transparent';
-          heroCard.innerHTML = `
-            <div style="width: 100%; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 32px 20px; border: 1px dashed #CBD5E1; border-radius: 16px; background: #F8FAFC;">
-              <div style="width: 52px; height: 52px; border-radius: 12px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                  <circle cx="8.5" cy="8.5" r="1.5"/>
-                  <polyline points="21 15 16 10 5 21"/>
-                </svg>
-              </div>
-              <div style="font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: #0F172A; margin-bottom: 4px;">Banner Principal da Loja</div>
-              <div style="font-size: 0.82rem; color: #64748B; max-width: 440px; line-height: 1.4;">
-                Envie as imagens promocionais da sua loja através da aba <strong>"Identidade Visual & Banners"</strong> no Painel Admin.
-              </div>
-            </div>
-          `;
+          heroCard.style.display = 'none';
+          heroCard.innerHTML = '';
         }
       };
 

@@ -24,12 +24,11 @@ const AUTH = {
       const newStoreId = session.user.id;
       localStorage.setItem('active_store_id', newStoreId);
 
-      // Recarrega se CURRENT_STORE_ID (definido no load da página, antes do auth)
-      // não bate com o usuário autenticado. Isso cobre:
-      // - Login fresh (incógnito): CURRENT_STORE_ID = 'default' ≠ UUID → recarrega
-      // - Troca de conta: CURRENT_STORE_ID = UUID_A ≠ UUID_B → recarrega
-      // - Mesma conta: CURRENT_STORE_ID = UUID → não recarrega ✅
-      if (typeof CURRENT_STORE_ID !== 'undefined' && CURRENT_STORE_ID !== newStoreId) {
+      // Compara o CURRENT_STORE_ID que foi setado no page load (config.js) com o
+      // UUID real da sessão. Se for diferente (ex: primeiro login onde era 'default',
+      // ou troca de conta), recarrega para recalcular CURRENT_STORE_ID corretamente.
+      const currentConstStoreId = (typeof CURRENT_STORE_ID !== 'undefined') ? CURRENT_STORE_ID : null;
+      if (currentConstStoreId !== newStoreId) {
         window.location.reload();
         return;
       }

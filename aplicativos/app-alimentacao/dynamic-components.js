@@ -82,7 +82,7 @@ const SHARED_COMPONENTS = {
                     <div>
                         <div id="footerBrandLogo" class="ph-footer-logo" style="display: none; width: 160px; height: 160px; margin-bottom: 18px; border-radius: 18px; overflow: hidden; align-items: center; justify-content: center;"></div>
                         <div style="font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; margin-bottom: 6px;" id="footerStoreTitle">MINHA LOJA</div>
-                        <p style="font-size: 0.84rem; color: #A1A1AA; margin-bottom: 10px;" id="footerStoreSub">Cardápio Digital & Delivery Direto via WhatsApp</p>
+                        <p style="font-size: 0.84rem; color: #A1A1AA; margin-bottom: 10px;" id="footerStoreSub">CARDÁPIO DIGITAL</p>
                         <div class="footer-info-item" id="footerAddressBox" style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #D4D4D8; margin-top: 6px;">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                             <span id="footerAddressText">Atendimento online com entrega no seu endereço</span>
@@ -218,12 +218,23 @@ function applyBrandingToUI(config) {
             const path = window.location.pathname || 'index.html';
             logoAnchor.setAttribute('href', `${path}?loja=${storeId}`);
         }
+    }
 
-        const footerLogoBox = document.getElementById('footerBrandLogo');
-        if (cfg.logoUrl && footerLogoBox) {
+    // Aplica o logo em imagem (se houver) no Header e no Footer
+    if (cfg.logoUrl) {
+        const logoBadge = document.querySelector('.ph-logo-badge');
+        if (logoBadge) {
+            logoBadge.classList.add('has-custom-logo');
+            logoBadge.innerHTML = `<img src="${cfg.logoUrl}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;" alt="${cfg.storeName || 'Logo'}">`;
+        }
+    }
+
+    const footerLogoBox = document.getElementById('footerBrandLogo');
+    if (footerLogoBox) {
+        if (cfg.logoUrl) {
             footerLogoBox.style.display = 'flex';
             footerLogoBox.innerHTML = `<img src="${cfg.logoUrl}" alt="${cfg.storeName || 'Logo'}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 18px;">`;
-        } else if (footerLogoBox) {
+        } else {
             footerLogoBox.style.display = 'none';
             footerLogoBox.innerHTML = '';
         }

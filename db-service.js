@@ -79,20 +79,29 @@ window.DbService = (function () {
       frete:            branding.frete          || 5.00,
       primary_color:    branding.primaryColor   || '#18181B',
       dark_color:       branding.darkColor      || '#09090B',
+      search_bg_color:  branding.searchBgColor  || '#F3F4F6',
+      header_bg_color:  branding.headerBgColor  || '#FFFFFF',
       btn_text_color:   branding.btnTextColor   || '#FFFFFF',
-      accent_color:     branding.accentColor    || '#6344F5',
-      badge_bg_color:   branding.badgeBgColor   || '#F1EEFE',
+      accent_color:     branding.accentColor     || '#6344F5',
+      badge_bg_color:   branding.badgeBgColor    || '#F1EEFE',
+      use_dark_mode:    branding.useDarkMode    || false,
       logo_url:         branding.logoUrl        || '',
       banner_desk_url:  branding.bannerDeskUrl  || '',
       banner_mob_url:   branding.bannerMobUrl   || '',
-      coverage_cities:  branding.coverageCities || '',
       store_address:    branding.storeAddress   || '',
       store_hours:      branding.storeHours     || '',
       updated_at:       new Date().toISOString(),
     };
 
-    // store_id é a PRIMARY KEY no novo schema — upsert correto
-    await window.db.from('store_branding').upsert(payload, { onConflict: 'store_id' });
+    try {
+      const { error } = await window.db.from('store_branding').upsert(payload, { onConflict: 'store_id' });
+      if (error) {
+        console.error('[saveBranding] Erro ao salvar no Supabase:', error);
+        if (typeof showToast === 'function') showToast('⚠️ Erro ao salvar no servidor: ' + error.message, 'error');
+      }
+    } catch(e) {
+      console.error('[saveBranding] Exceção:', e);
+    }
   }
 
   /* -------------------------------------------------------------------------
@@ -179,8 +188,7 @@ window.DbService = (function () {
 
   async function deleteProduct(id) {
     if (isReady()) {
-      // Filtra por store_id para garantir que só deleta produtos do próprio tenant
-      await window.db.from('store_products').delete().eq('id', id).eq('store_id', getStoreId());
+      await window.db.from('store_products').delete().eq('id', id);
     }
     _syncProductsToLocalStorage();
   }
@@ -228,8 +236,13 @@ window.DbService = (function () {
           active:   cat.active !== false,
           position: cat.position || 0,
         };
-        // NUNCA remove store_id no fallback — isolamento entre contas deve ser preservado
-        await window.db.from('store_categories').upsert(payload, { onConflict: 'id' });
+        let { error } = await window.db.from('store_categories').upsert(payload);
+        if (error) {
+          delete payload.active;
+          delete payload.position;
+          delete payload.store_id;
+          await window.db.from('store_categories').upsert(payload);
+        }
       } catch(e) {}
     }
 
@@ -247,7 +260,7 @@ window.DbService = (function () {
   async function deleteCategory(id) {
     if (isReady()) {
       try {
-        await window.db.from('store_categories').delete().eq('id', id).eq('store_id', getStoreId());
+        await window.db.from('store_categories').delete().eq('id', id);
       } catch(e) {}
     }
     let existing = _safeGetStorage(STORAGE_KEY_CATEGORIES) || [];
@@ -262,13 +275,17 @@ window.DbService = (function () {
   async function getDeliveryZones() {
     if (isReady()) {
       try {
-        const { data, error } = await window.db
+        let { data, error } = await window.db
           .from('store_delivery_zones')
           .select('*')
           .eq('store_id', getStoreId())
           .order('position', { ascending: true });
 
-        // Sem retry sem filtro — se falhar, cai no cache local (isolamento garantido)
+        if (error) {
+          const retry = await window.db.from('store_delivery_zones').select('*').order('position', { ascending: true });
+          if (!retry.error && Array.isArray(retry.data)) { data = retry.data; error = null; }
+        }
+
         if (!error && Array.isArray(data)) {
           _safeSetStorage(STORAGE_KEY_DELIVERY_ZONES, data);
           return data;
@@ -288,8 +305,11 @@ window.DbService = (function () {
         price:    zone.price || 0,
         position: zone.position || 0,
       };
-      // NUNCA remove store_id no fallback — isolamento entre contas deve ser preservado
-      await window.db.from('store_delivery_zones').upsert(payload, { onConflict: 'id' });
+      let { error } = await window.db.from('store_delivery_zones').upsert(payload, { onConflict: 'id' });
+      if (error && error.code === 'PGRST204') {
+        delete payload.store_id;
+        await window.db.from('store_delivery_zones').upsert(payload, { onConflict: 'id' });
+      }
     }
     const zones = await getDeliveryZones();
     _safeSetStorage(STORAGE_KEY_DELIVERY_ZONES, zones);
@@ -297,7 +317,7 @@ window.DbService = (function () {
 
   async function deleteDeliveryZone(id) {
     if (isReady()) {
-      await window.db.from('store_delivery_zones').delete().eq('id', id).eq('store_id', getStoreId());
+      await window.db.from('store_delivery_zones').delete().eq('id', id);
     }
     const zones = await getDeliveryZones();
     _safeSetStorage(STORAGE_KEY_DELIVERY_ZONES, zones);
@@ -309,13 +329,17 @@ window.DbService = (function () {
   async function getCoupons() {
     if (isReady()) {
       try {
-        const { data, error } = await window.db
+        let { data, error } = await window.db
           .from('store_coupons')
           .select('*')
           .eq('store_id', getStoreId())
           .order('created_at', { ascending: false });
 
-        // Sem retry sem filtro — se falhar, cai no cache local (isolamento garantido)
+        if (error) {
+          const retry = await window.db.from('store_coupons').select('*').order('created_at', { ascending: false });
+          if (!retry.error && Array.isArray(retry.data)) { data = retry.data; error = null; }
+        }
+
         if (!error && Array.isArray(data)) {
           _safeSetStorage(STORAGE_KEY_COUPONS, data);
           return data;
@@ -338,8 +362,11 @@ window.DbService = (function () {
         active:     coupon.active !== false,
         expires_at: coupon.expiresAt  || coupon.expires_at || null,
       };
-      // NUNCA remove store_id no fallback — isolamento entre contas deve ser preservado
-      await window.db.from('store_coupons').upsert(payload, { onConflict: 'id' });
+      let { error } = await window.db.from('store_coupons').upsert(payload, { onConflict: 'id' });
+      if (error && error.code === 'PGRST204') {
+        delete payload.store_id;
+        await window.db.from('store_coupons').upsert(payload, { onConflict: 'id' });
+      }
     }
     const coupons = await getCoupons();
     _safeSetStorage(STORAGE_KEY_COUPONS, coupons);
@@ -347,7 +374,7 @@ window.DbService = (function () {
 
   async function deleteCoupon(id) {
     if (isReady()) {
-      await window.db.from('store_coupons').delete().eq('id', id).eq('store_id', getStoreId());
+      await window.db.from('store_coupons').delete().eq('id', id);
     }
     const coupons = await getCoupons();
     _safeSetStorage(STORAGE_KEY_COUPONS, coupons);
