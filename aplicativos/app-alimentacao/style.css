@@ -34,6 +34,11 @@
   --radius-md: 16px;
   --radius-lg: 20px;
   --radius-pill: 50px;
+  /* Footer fixo alinhado com identidade visual padrão (não sobrescrever por primaryColor) */
+  --footer-bg: #0b0b0c;
+  /* Texto padrão para header/footer (ajustados dinamicamente pelo branding) */
+  --header-text: var(--ph-black);
+  --footer-text: #FFFFFF;
 }
 
 html, body {
@@ -167,7 +172,7 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
   justify-content: center;
   background: transparent;
   border: none;
-  color: var(--ph-black);
+  color: var(--header-text, var(--ph-black));
   cursor: pointer;
   padding: 6px;
   border-radius: 4px;
@@ -1283,11 +1288,17 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 /* FOOTER COM ÍCONES DA LUCIDE */
 .ph-footer {
   background: var(--footer-bg, #0b0b0c);
-  color: #FFFFFF;
+  color: var(--footer-text, #FFFFFF);
   padding: 40px 24px;
   margin-top: 60px;
   border-top: 1px solid #27272A;
 }
+
+/* Força z-index para evitar que o logo sobreponha o botão hamburguer */
+.mobile-hamburger-btn { z-index: 1100; }
+.ph-brand-logo { z-index: 100; }
+/* Force hamburger visible on desktop too (restore previous behavior) */
+.mobile-hamburger-btn { display: flex !important; }
 
 .ph-footer-inner {
   max-width: 1280px;

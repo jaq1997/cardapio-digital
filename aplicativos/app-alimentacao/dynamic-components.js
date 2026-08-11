@@ -132,7 +132,6 @@ function applyBrandingToUI(config) {
 
     if (cfg.primaryColor) {
         document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
-        document.documentElement.style.setProperty('--footer-bg', cfg.primaryColor);
     }
     if (cfg.darkColor) {
         document.documentElement.style.setProperty('--ph-red-dark', cfg.darkColor);
@@ -146,9 +145,37 @@ function applyBrandingToUI(config) {
     if (cfg.headerBgColor) {
         document.documentElement.style.setProperty('--header-bg', cfg.headerBgColor);
     }
+    // Helpers: converte hex para RGB e calcula luminância relativa
+    function hexToRgb(hex) {
+        if (!hex) return null;
+        hex = String(hex).trim().replace('#', '');
+        if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+        if (hex.length !== 6) return null;
+        const int = parseInt(hex, 16);
+        return { r: (int >> 16) & 255, g: (int >> 8) & 255, b: int & 255 };
+    }
+    function relativeLuminance({ r, g, b }) {
+        const srgb = [r, g, b].map(v => v / 255).map(v => v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4));
+        return 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
+    }
+    function isDarkColor(hex) {
+        const rgb = hexToRgb(hex);
+        if (!rgb) return false;
+        return relativeLuminance(rgb) < 0.5;
+    }
+
     const headerEl = document.querySelector('.ph-header');
+    const computedHeaderBg = (cfg.headerBgColor || getComputedStyle(document.documentElement).getPropertyValue('--header-bg') || '#FFFFFF').trim();
+    const computedFooterBg = (cfg.footerBgColor || getComputedStyle(document.documentElement).getPropertyValue('--footer-bg') || '#0b0b0c').trim();
+
+    // Ajusta texto do header/footer automaticamente para garantir contraste
+    const headerIsDark = isDarkColor(computedHeaderBg);
+    const footerIsDark = isDarkColor(computedFooterBg);
+    document.documentElement.style.setProperty('--header-text', headerIsDark ? '#FFFFFF' : '#111827');
+    document.documentElement.style.setProperty('--footer-text', footerIsDark ? '#FFFFFF' : '#111827');
+
     if (headerEl) {
-        if (cfg.useDarkMode) {
+        if (cfg.useDarkMode || headerIsDark) {
             headerEl.classList.add('ph-header-dark');
         } else {
             headerEl.classList.remove('ph-header-dark');
@@ -175,6 +202,14 @@ function applyBrandingToUI(config) {
 
         const footerTitle = document.getElementById('footerStoreTitle');
         if (footerTitle) footerTitle.innerText = name.toUpperCase();
+
+        // Ajusta href do logo para preservar o parâmetro ?loja= atual (evita voltar para default)
+        const logoAnchor = document.getElementById('headerBrandLogo');
+        if (logoAnchor) {
+            const storeId = (new URLSearchParams(window.location.search).get('loja')) || localStorage.getItem('active_store_id') || 'default';
+            const path = window.location.pathname || 'index.html';
+            logoAnchor.setAttribute('href', `${path}?loja=${storeId}`);
+        }
 
         const footerLogoBox = document.getElementById('footerBrandLogo');
         if (cfg.logoUrl && footerLogoBox) {
