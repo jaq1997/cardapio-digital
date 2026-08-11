@@ -3,6 +3,14 @@
 const SHARED_COMPONENTS = {
     nav: `
         <nav class="ph-main-nav">
+            <button class="mobile-hamburger-btn" onclick="toggleMobileDrawer(true)" aria-label="Abrir Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
             <a href="index.html" class="ph-brand-logo" id="headerBrandLogo">
                 <div class="ph-logo-text-wrap">
                     <div class="ph-logo-text" id="headerLogoText">MINHA <span>LOJA</span></div>
