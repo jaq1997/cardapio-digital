@@ -489,10 +489,20 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 
 .ph-hero-card.has-custom-banner {
   display: block !important;
-  grid-template-columns: 1fr !important;
-  min-height: 280px;
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  min-height: 220px;
   background-size: cover !important;
   background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+@media (max-width: 768px) {
+  .ph-hero-card.has-custom-banner {
+    aspect-ratio: 2 / 3;
+    min-height: auto;
+    height: auto !important;
+  }
 }
 
 .ph-hero-card.has-custom-banner .ph-hero-text-side,
@@ -1205,7 +1215,7 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 
 /* FOOTER COM ÍCONES DA LUCIDE */
 .ph-footer {
-  background: #18181B;
+  background: #0b0b0c;
   color: #FFFFFF;
   padding: 40px 24px;
   margin-top: 60px;

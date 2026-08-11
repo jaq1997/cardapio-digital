@@ -31,6 +31,10 @@
           }
           if (cfg.btnTextColor) document.documentElement.style.setProperty('--ph-btn-text', cfg.btnTextColor);
           if (cfg.accentColor) document.documentElement.style.setProperty('--ph-accent', cfg.accentColor);
+          if (cfg.searchBgColor) document.documentElement.style.setProperty('--search-bg', cfg.searchBgColor);
+          if (cfg.headerBgColor) document.documentElement.style.setProperty('--header-bg', cfg.headerBgColor);
+          if (cfg.useDarkMode) document.body.classList.add('dark-mode');
+          if (cfg.searchBgColor) document.documentElement.style.setProperty('--search-bg', cfg.searchBgColor);
         }
       } catch(e) {}
     })();
