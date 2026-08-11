@@ -12,12 +12,6 @@ const SHARED_COMPONENTS = {
             </button>
 
             <a href="index.html" class="ph-brand-logo" id="headerBrandLogo">
-                <div class="ph-logo-badge">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2L2 7l10 15 10-15-10-5z"></path>
-                        <path d="M12 22V12"></path>
-                    </svg>
-                </div>
                 <div class="ph-logo-text-wrap">
                     <div class="ph-logo-text" id="headerLogoText">MINHA <span>LOJA</span></div>
                     <div class="ph-logo-sub" id="headerLogoSub">CARDÁPIO DIGITAL</div>
@@ -83,10 +77,11 @@ const SHARED_COMPONENTS = {
         </div>
     `,
     footer: `
-        <footer class="ph-footer" style="background: #18181B; color: #FFF; padding: 40px 24px 28px; margin-top: 60px; border-top: 1px solid #27272A;">
+        <footer class="ph-footer" style="color: #FFF; padding: 40px 24px 28px; margin-top: 60px; border-top: 1px solid #27272A;">
             <div class="ph-footer-inner" style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
                 <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; width: 100%;">
                     <div>
+                        <div id="footerBrandLogo" class="ph-footer-logo" style="display: none; width: 120px; height: 120px; margin-bottom: 18px; border-radius: 18px; overflow: hidden; align-items: center; justify-content: center;"></div>
                         <div style="font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; margin-bottom: 6px;" id="footerStoreTitle">MINHA LOJA</div>
                         <p style="font-size: 0.84rem; color: #A1A1AA; margin-bottom: 10px;" id="footerStoreSub">Cardápio Digital & Delivery Direto via WhatsApp</p>
                         <div class="footer-info-item" id="footerAddressBox" style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #D4D4D8; margin-top: 6px;">
@@ -126,73 +121,103 @@ function selectDrawerCategory(catName) {
     toggleMobileDrawer(false);
 }
 
-function applyBrandingToUI() {
-    const savedBranding = localStorage.getItem('ptd_store_branding');
-    if (!savedBranding) return;
-
-    try {
-        const cfg = JSON.parse(savedBranding);
-
-        if (cfg.primaryColor) {
-            document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
-        }
-        if (cfg.darkColor) {
-            document.documentElement.style.setProperty('--ph-red-dark', cfg.darkColor);
-        }
-
-        if (cfg.storeName) {
-            const name = cfg.storeName.trim();
-            const textEl = document.getElementById('headerLogoText');
-            if (textEl) {
-                const words = name.split(' ');
-                if (words.length > 1) {
-                    textEl.innerHTML = `${words[0]} <span>${words.slice(1).join(' ')}</span>`;
-                } else {
-                    textEl.innerText = name;
-                }
+function applyBrandingToUI(config) {
+    let cfg = null;
+    if (config && typeof config === 'object') {
+        cfg = config;
+    } else {
+        const storeId = (new URLSearchParams(window.location.search).get('loja')) || localStorage.getItem('active_store_id') || 'default';
+        const savedBranding = localStorage.getItem('ptd_store_branding_' + storeId) || localStorage.getItem('ptd_store_branding');
+        if (savedBranding) {
+            try {
+                cfg = JSON.parse(savedBranding);
+            } catch (e) {
+                cfg = null;
             }
-            const drawerTitle = document.getElementById('drawerStoreTitle');
-            if (drawerTitle) drawerTitle.innerText = name.toUpperCase();
-
-            const footerTitle = document.getElementById('footerStoreTitle');
-            if (footerTitle) footerTitle.innerText = name.toUpperCase();
         }
+    }
 
-        if (cfg.storeSub) {
-            const subEl = document.getElementById('headerLogoSub');
-            if (subEl) subEl.innerText = cfg.storeSub.toUpperCase();
-            const footerSub = document.getElementById('footerStoreSub');
-            if (footerSub) footerSub.innerText = cfg.storeSub;
+    if (!cfg) return;
+
+    if (cfg.primaryColor) {
+        document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
+    }
+    if (cfg.darkColor) {
+        document.documentElement.style.setProperty('--ph-red-dark', cfg.darkColor);
+    }
+    if (cfg.searchBgColor) {
+        document.documentElement.style.setProperty('--search-bg', cfg.searchBgColor);
+    }
+    if (cfg.headerBgColor) {
+        document.documentElement.style.setProperty('--header-bg', cfg.headerBgColor);
+    }
+    const headerEl = document.querySelector('.ph-header');
+    if (headerEl) {
+        if (cfg.useDarkMode) {
+            headerEl.classList.add('ph-header-dark');
+        } else {
+            headerEl.classList.remove('ph-header-dark');
         }
+    }
 
-        if (cfg.storeAddress) {
-            const addrEl = document.getElementById('footerAddressText');
-            if (addrEl) addrEl.innerText = cfg.storeAddress;
+    const setStoreNameText = (name) => {
+        const textEl = document.getElementById('headerLogoText');
+        if (!textEl) return;
+        const words = name.split(' ');
+        if (words.length > 1) {
+            textEl.innerHTML = `${words[0]} <span>${words.slice(1).join(' ')}</span>`;
+        } else {
+            textEl.innerText = name;
         }
+    };
 
-        if (cfg.storeHours) {
-            const hoursEl = document.getElementById('footerHoursText');
-            if (hoursEl) hoursEl.innerText = cfg.storeHours;
-        }
+    if (cfg.storeName) {
+        const name = cfg.storeName.trim();
+        setStoreNameText(name);
 
-        // SE SUBIU LOGO EM IMAGEM (.PNG / .JPG), SUBSTITUI PELO LOGO DA IMAGEM E ATUALIZA FAVICON DA ABA
-        if (cfg.logoUrl) {
-            const brandLogoAnchor = document.getElementById('headerBrandLogo');
-            if (brandLogoAnchor) {
-                brandLogoAnchor.innerHTML = `<img src="${cfg.logoUrl}" style="max-height: 44px; border-radius: 4px; object-fit: contain;" alt="${cfg.storeName || 'Logo'}">`;
-            }
-            const favicon = document.getElementById('pageFavicon');
-            if (favicon) favicon.href = cfg.logoUrl;
-        }
+        const drawerTitle = document.getElementById('drawerStoreTitle');
+        if (drawerTitle) drawerTitle.innerText = name.toUpperCase();
 
-        if (cfg.wppNumber) {
+        const footerTitle = document.getElementById('footerStoreTitle');
+        if (footerTitle) footerTitle.innerText = name.toUpperCase();
+    }
+
+    if (cfg.storeSub) {
+        const subEl = document.getElementById('headerLogoSub');
+        if (subEl) subEl.innerText = cfg.storeSub.toUpperCase();
+        const footerSub = document.getElementById('footerStoreSub');
+        if (footerSub) footerSub.innerText = cfg.storeSub;
+    }
+
+    if (cfg.storeAddress) {
+        const addrEl = document.getElementById('footerAddressText');
+        if (addrEl) addrEl.innerText = cfg.storeAddress;
+    }
+
+    if (cfg.storeHours) {
+        const hoursEl = document.getElementById('footerHoursText');
+        if (hoursEl) hoursEl.innerText = cfg.storeHours;
+    }
+
+    const footerLogoBox = document.getElementById('footerBrandLogo');
+    if (cfg.logoUrl && footerLogoBox) {
+        footerLogoBox.style.display = 'flex';
+        footerLogoBox.innerHTML = `<img src="${cfg.logoUrl}" alt="${cfg.storeName || 'Logo'}" style="width: 100%; height: 100%; object-fit: contain;">`;
+    } else if (footerLogoBox) {
+        footerLogoBox.style.display = 'none';
+        footerLogoBox.innerHTML = '';
+    }
+
+    if (cfg.wppNumber) {
+        const cleanNumber = String(cfg.wppNumber).replace(/\D/g, '');
+        if (cleanNumber) {
             const wppFloat = document.getElementById('floatWppBtn');
             if (wppFloat) {
-                const textMsg = encodeURIComponent("Olá! Quero fazer meu pedido pelo WhatsApp.");
-                wppFloat.href = `https://wa.me/${cfg.wppNumber}?text=${textMsg}`;
+                const textMsg = encodeURIComponent('Olá! Quero fazer meu pedido pelo WhatsApp.');
+                wppFloat.href = `https://wa.me/${cleanNumber}?text=${textMsg}`;
             }
         }
-    } catch(e) {}
+    }
 }
 
 function renderDynamicCategoriesInHeader() {

@@ -100,13 +100,14 @@ async function applyDynamicBranding() {
 
         if (bannerUrl) {
           heroCard.classList.add('has-custom-banner');
+          heroCard.classList.toggle('is-mobile-banner', isMobile);
           heroCard.style.backgroundImage = `url('${bannerUrl}')`;
           heroCard.style.backgroundSize = 'cover';
           heroCard.style.backgroundPosition = 'center';
-          heroCard.style.minHeight = '220px';
           heroCard.innerHTML = '';
         } else {
           heroCard.classList.remove('has-custom-banner');
+          heroCard.classList.remove('is-mobile-banner');
           heroCard.style.backgroundImage = 'none';
           heroCard.style.backgroundColor = 'transparent';
           heroCard.innerHTML = `

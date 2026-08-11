@@ -66,6 +66,8 @@ async function applyDynamicBranding() {
     }
 
     if (cfg) {
+      window.__evoluxBrandingConfig = cfg;
+
       if (cfg.wppNumber) {
         WPP_NUMERO = String(cfg.wppNumber).replace(/\D/g, '');
       }
@@ -84,29 +86,27 @@ async function applyDynamicBranding() {
         document.documentElement.style.setProperty('--ph-badge-bg', cfg.badgeBgColor);
       }
 
-      if (cfg.logoUrl) {
-        const logoBadge = document.querySelector('.ph-logo-badge');
-        if (logoBadge) {
-          logoBadge.classList.add('has-custom-logo');
-          logoBadge.innerHTML = `<img src="${cfg.logoUrl}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">`;
-        }
+      if (window.applyBrandingToUI) {
+        window.applyBrandingToUI(cfg);
       }
 
-      // Renderização do Banner Principal (Hero Card)
       const heroCard = document.querySelector('.ph-hero-card');
-      if (heroCard) {
+      const updateHeroBanner = () => {
+        if (!heroCard) return;
         const isMobile = window.innerWidth <= 768;
-        const bannerUrl = isMobile ? (cfg.bannerMobUrl || cfg.bannerDeskUrl) : (cfg.bannerDeskUrl || cfg.bannerMobUrl);
+        const bannerUrl = isMobile ? null : (cfg.bannerDeskUrl || cfg.bannerMobUrl);
 
         if (bannerUrl) {
           heroCard.classList.add('has-custom-banner');
-          heroCard.style.backgroundImage = `url('${bannerUrl}')`;
-          heroCard.style.backgroundSize = 'cover';
-          heroCard.style.backgroundPosition = 'center';
-          heroCard.style.minHeight = '220px';
-          heroCard.innerHTML = '';
+          heroCard.classList.remove('is-mobile-banner');
+          heroCard.style.backgroundImage = 'none';
+          heroCard.style.backgroundColor = 'transparent';
+          heroCard.innerHTML = `
+            <img class="ph-hero-banner-img" src="${bannerUrl}" alt="Banner da loja" />
+          `;
         } else {
           heroCard.classList.remove('has-custom-banner');
+          heroCard.classList.remove('is-mobile-banner');
           heroCard.style.backgroundImage = 'none';
           heroCard.style.backgroundColor = 'transparent';
           heroCard.innerHTML = `
@@ -125,12 +125,26 @@ async function applyDynamicBranding() {
             </div>
           `;
         }
+      };
+
+      updateHeroBanner();
+      if (!window.__evoluxBannerResizeAttached) {
+        window.addEventListener('resize', () => {
+          if (window.__evoluxBannerResizeTimeout) {
+            clearTimeout(window.__evoluxBannerResizeTimeout);
+          }
+          window.__evoluxBannerResizeTimeout = setTimeout(() => {
+            if (window.__evoluxBrandingConfig) {
+              updateHeroBanner();
+            }
+          }, 150);
+        });
+        window.__evoluxBannerResizeAttached = true;
       }
     }
   } catch (e) {
     console.warn('[Loja] Erro ao carregar branding:', e);
   } finally {
-    // Revela a página após aplicar o branding (evita flash/piscada)
     document.body.style.opacity = '1';
   }
 }

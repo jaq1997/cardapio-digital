@@ -61,6 +61,9 @@ async function loadAdminSettings() {
     if (getEl('cfgBtnTextColor')) getEl('cfgBtnTextColor').value = currentBranding.btnTextColor || '#FFFFFF';
     if (getEl('cfgAccentColor')) getEl('cfgAccentColor').value = currentBranding.accentColor || '#6344F5';
     if (getEl('cfgBadgeBgColor')) getEl('cfgBadgeBgColor').value = currentBranding.badgeBgColor || '#F1EEFE';
+    if (getEl('cfgSearchBgColor')) getEl('cfgSearchBgColor').value = currentBranding.searchBgColor || '#F3F4F6';
+    if (getEl('cfgHeaderBgColor')) getEl('cfgHeaderBgColor').value = currentBranding.headerBgColor || '#FFFFFF';
+    if (getEl('cfgUseDarkMode')) getEl('cfgUseDarkMode').checked = currentBranding.useDarkMode || false;
 
     // Atualiza o link do botão Ver Cardápio Ao Vivo com o ID da loja logada
     const btnView = getEl('btnViewLiveStore');
@@ -391,7 +394,10 @@ function addAdicionalInputRow(nome = '', preco = '') {
   div.style.cssText = 'display: flex; gap: 8px; margin-bottom: 8px; align-items: center;';
   div.innerHTML = `
     <input type="text" class="admin-input adic-nome" placeholder="Nome do opcional (ex: Queijo Extra)" value="${nome}" style="flex: 2;">
-    <input type="number" step="0.50" class="admin-input adic-preco" placeholder="Preço R$" value="${preco}" style="flex: 1;">
+    <div class="input-icon-field" style="flex: 1;">
+      <span class="icon-input"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.89 8.82 10a2 2 0 0 1 2.83 0l6.47 6.47"/><circle cx="8.5" cy="8.5" r="1.5"/><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg></span>
+      <input type="number" step="0.50" class="admin-input adic-preco" placeholder="Valor" value="${preco}" style="width: 100;">
+    </div>
     <button type="button" class="btn-admin btn-admin-danger" onclick="this.parentElement.remove()" style="padding: 6px 10px;">✕</button>
   `;
   container.appendChild(div);
@@ -940,6 +946,9 @@ async function saveBrandingConfig(event) {
     btnTextColor: document.getElementById('cfgBtnTextColor').value,
     accentColor: document.getElementById('cfgAccentColor').value,
     badgeBgColor: document.getElementById('cfgBadgeBgColor').value,
+    searchBgColor: document.getElementById('cfgSearchBgColor').value,
+    headerBgColor: document.getElementById('cfgHeaderBgColor') ? document.getElementById('cfgHeaderBgColor').value : currentBranding.headerBgColor,
+    useDarkMode: document.getElementById('cfgUseDarkMode') ? document.getElementById('cfgUseDarkMode').checked : currentBranding.useDarkMode,
     logoUrl: tempLogoBase64 || currentBranding.logoUrl || '',
     bannerDeskUrl: tempBannerDeskBase64 || currentBranding.bannerDeskUrl || '',
     bannerMobUrl: tempBannerMobBase64 || currentBranding.bannerMobUrl || ''
