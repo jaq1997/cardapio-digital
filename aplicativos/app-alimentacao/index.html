@@ -28,6 +28,10 @@
           if (cfg.primaryColor) {
             document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
             document.documentElement.style.setProperty('--theme-primary', cfg.primaryColor);
+            document.documentElement.style.setProperty('--footer-bg', cfg.primaryColor);
+          }
+          if (cfg.footerBgColor) {
+            document.documentElement.style.setProperty('--footer-bg', cfg.footerBgColor);
           }
           if (cfg.btnTextColor) document.documentElement.style.setProperty('--ph-btn-text', cfg.btnTextColor);
           if (cfg.accentColor) document.documentElement.style.setProperty('--ph-accent', cfg.accentColor);

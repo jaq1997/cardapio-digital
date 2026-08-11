@@ -1282,7 +1282,7 @@ h1, h2, h3, .ph-logo-text, .ph-section-heading {
 
 /* FOOTER COM ÍCONES DA LUCIDE */
 .ph-footer {
-  background: #0b0b0c;;
+  background: var(--footer-bg, #0b0b0c);
   color: #FFFFFF;
   padding: 40px 24px;
   margin-top: 60px;

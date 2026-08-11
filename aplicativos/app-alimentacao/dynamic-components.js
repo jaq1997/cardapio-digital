@@ -4,12 +4,6 @@ const SHARED_COMPONENTS = {
     nav: `
         <nav class="ph-main-nav">
             <a href="index.html" class="ph-brand-logo" id="headerBrandLogo">
-                <div class="ph-logo-badge">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2L2 7l10 15 10-15-10-5z"></path>
-                        <path d="M12 22V12"></path>
-                    </svg>
-                </div>
                 <div class="ph-logo-text-wrap">
                     <div class="ph-logo-text" id="headerLogoText">MINHA <span>LOJA</span></div>
                     <div class="ph-logo-sub" id="headerLogoSub">CARDÁPIO DIGITAL</div>
@@ -78,7 +72,7 @@ const SHARED_COMPONENTS = {
             <div class="ph-footer-inner" style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
                 <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; width: 100%;">
                     <div>
-                        <div id="footerBrandLogo" class="ph-footer-logo" style="display: none; width: 120px; height: 120px; margin-bottom: 18px; border-radius: 18px; overflow: hidden; align-items: center; justify-content: center;"></div>
+                        <div id="footerBrandLogo" class="ph-footer-logo" style="display: none; width: 160px; height: 160px; margin-bottom: 18px; border-radius: 18px; overflow: hidden; align-items: center; justify-content: center;"></div>
                         <div style="font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; margin-bottom: 6px;" id="footerStoreTitle">MINHA LOJA</div>
                         <p style="font-size: 0.84rem; color: #A1A1AA; margin-bottom: 10px;" id="footerStoreSub">Cardápio Digital & Delivery Direto via WhatsApp</p>
                         <div class="footer-info-item" id="footerAddressBox" style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: #D4D4D8; margin-top: 6px;">
@@ -138,9 +132,13 @@ function applyBrandingToUI(config) {
 
     if (cfg.primaryColor) {
         document.documentElement.style.setProperty('--ph-red', cfg.primaryColor);
+        document.documentElement.style.setProperty('--footer-bg', cfg.primaryColor);
     }
     if (cfg.darkColor) {
         document.documentElement.style.setProperty('--ph-red-dark', cfg.darkColor);
+    }
+    if (cfg.footerBgColor) {
+        document.documentElement.style.setProperty('--footer-bg', cfg.footerBgColor);
     }
     if (cfg.searchBgColor) {
         document.documentElement.style.setProperty('--search-bg', cfg.searchBgColor);
@@ -172,18 +170,20 @@ function applyBrandingToUI(config) {
         const name = cfg.storeName.trim();
         setStoreNameText(name);
 
-        if (cfg.logoUrl) {
-            const brandLogoAnchor = document.getElementById('headerBrandLogo');
-            if (brandLogoAnchor) {
-                brandLogoAnchor.innerHTML = `<img src="${cfg.logoUrl}" style="max-height: 44px; border-radius: 4px; object-fit: contain;" alt="${cfg.storeName || 'Logo'}">`;
-            }
-        }
-
         const drawerTitle = document.getElementById('drawerStoreTitle');
         if (drawerTitle) drawerTitle.innerText = name.toUpperCase();
 
         const footerTitle = document.getElementById('footerStoreTitle');
         if (footerTitle) footerTitle.innerText = name.toUpperCase();
+
+        const footerLogoBox = document.getElementById('footerBrandLogo');
+        if (cfg.logoUrl && footerLogoBox) {
+            footerLogoBox.style.display = 'flex';
+            footerLogoBox.innerHTML = `<img src="${cfg.logoUrl}" alt="${cfg.storeName || 'Logo'}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 18px;">`;
+        } else if (footerLogoBox) {
+            footerLogoBox.style.display = 'none';
+            footerLogoBox.innerHTML = '';
+        }
     }
 
     if (cfg.storeSub) {
@@ -201,15 +201,6 @@ function applyBrandingToUI(config) {
     if (cfg.storeHours) {
         const hoursEl = document.getElementById('footerHoursText');
         if (hoursEl) hoursEl.innerText = cfg.storeHours;
-    }
-
-    const footerLogoBox = document.getElementById('footerBrandLogo');
-    if (cfg.logoUrl && footerLogoBox) {
-        footerLogoBox.style.display = 'flex';
-        footerLogoBox.innerHTML = `<img src="${cfg.logoUrl}" alt="${cfg.storeName || 'Logo'}" style="width: 100%; height: 100%; object-fit: contain;">`;
-    } else if (footerLogoBox) {
-        footerLogoBox.style.display = 'none';
-        footerLogoBox.innerHTML = '';
     }
 
     if (cfg.wppNumber) {
