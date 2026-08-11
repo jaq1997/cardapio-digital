@@ -3,7 +3,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 // Mapeamento de subdomínios personalizados para os IDs das lojas no Supabase (UUID)
 const MAPA_SUBDOMINIOS = {
-  'lojateste-odenbreit-burger': '1e08fb6e-a4d4-412f-a668-a875bf267c0e',
+  'testeodenbreitburger': '1e08fb6e-a4d4-412f-a668-a875bf267c0e',
 };
 
 const urlParams = new URLSearchParams(window.location.search);
